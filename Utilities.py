@@ -15,6 +15,14 @@ def extract_function_name(string):
         return None
 
 
+# gets the function name from the function definition in human eval
+def get_function_name(funcDefiniton):
+    rs = re.search(r"\"\"\".*\"\"\"", funcDefiniton, re.DOTALL)
+    end = rs.span()[0]
+    funcDefiniton = funcDefiniton[:end]
+    return funcDefiniton
+
+
 def replace_function_name(string, replacement_string):
     # Define the regular expression pattern to match the function name
     pattern = r"def\s+(\w+)\s*"
@@ -55,24 +63,31 @@ def get_code_from_response(response):
     return code.group(0)
 
 
-# replaces the unittest call with another one to fix exec problem with running on colab
-def replaceUnitTestCall(code):
-    pattern = r"unittest.main()"
+# preprocesses the prompt string to be used in the few shot learning
+def preprocessStringFewShot(code, unittest):
+    string_few_shot = ""
+    code_prepend = "# Code of a similar function \n'''python\n"
+    test_case_prepend = "# Example unit tests for the similar code \n'''python\n"
+    code_append = test_case_append = "'''\n"
+    for i in zip(code, unittest):
+        string_few_shot += (
+            code_prepend
+            + i[0]
+            + code_append
+            + test_case_prepend
+            + i[1]
+            + test_case_append
+        )
+    return string_few_shot
 
-    # Use re.sub() to replace the pattern with the replacement string
-    modified_code = re.sub(
-        pattern, "unittest.main(argv=['first-arg-is-ignored'])", code
-    )
 
-    return modified_code
-
-
+# gets feedback from running the code using exec
 def get_feedback_from_run(response):
     lines = response.split("\n")
     feedback = ""
     in_failmessage = False
     for i, line in enumerate(lines):
-        if line.startswith("FAIL"):
+        if line.startswith("FAIL") or line.startswith("ERROR"):
             in_failmessage = True
             feedback += line + "\n"
         elif line.startswith("--"):
@@ -85,3 +100,63 @@ def get_feedback_from_run(response):
             if i == len(lines) - 1:
                 return feedback
             feedback += line + "\n"
+
+
+def get_feedback_from_run_list(response):  # omar's version
+    lines = response.split("\n")
+    in_failmessage = False
+    feedbacks = []
+    for i, line in enumerate(lines):
+        if line.startswith("FAIL") or line.startswith("ERROR"):
+            feedback = ""
+            in_failmessage = True
+            feedback += line + "\n"
+        elif line.startswith("--"):
+            if lines[i + 1].startswith("Ran"):
+                if feedback != "":
+                    feedbacks.append(feedback)
+                return feedbacks
+
+        elif in_failmessage == True:
+            if line.startswith("=="):
+                if feedback != "":
+                    feedbacks.append(feedback)
+                    feedback = ""
+                    continue
+            if i == len(lines) - 1:
+                if feedback != "":
+                    feedbacks.append(feedback)
+                return feedbacks
+            feedback += line + "\n"
+
+
+# replaces the unittest call with another one to fix exec problem with running on colab
+def replaceUnitTestCall(code):
+    pattern = r"unittest.main()"
+
+    # Use re.sub() to replace the pattern with the replacement string
+    modified_code = re.sub(
+        pattern, "unittest.main(argv=['first-arg-is-ignored'])", code
+    )
+
+    return modified_code
+
+
+# def get_feedback_from_run(response):
+#     lines = response.split("\n")
+#     feedback = ""
+#     in_failmessage = False
+#     for i, line in enumerate(lines):
+#         if line.startswith("FAIL"):
+#             in_failmessage = True
+#             feedback += line + "\n"
+#         elif line.startswith("--"):
+#             if lines[i + 1].startswith("Ran"):
+#                 return feedback
+
+#         elif in_failmessage == True:
+#             if line.startswith("=="):
+#                 continue
+#             if i == len(lines) - 1:
+#                 return feedback
+#             feedback += line + "\n"
