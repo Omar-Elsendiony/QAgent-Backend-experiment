@@ -27,23 +27,32 @@ def replace_function_name(string, replacement_string):
 
 # made according to mixtral response
 def get_code_from_response(response):
-    lines = response.split("\n")
-    code = ""
-    in_code = False
-    for i, line in enumerate(lines):
-        if line.startswith("```python"):
-            in_code = True
-        elif line.startswith("```"):
-            in_code = False
-            return code
-        elif in_code == True:
-            if i == len(lines) - 1:
-                return code
-            code += line + "\n"
-    # incomplete output, most likely incomplete assertion.
-    # ignore this last assertion and move with the rest
+    # lines = response.split("\n")
+    # code = ""
+    # in_code = False
+    # for i, line in enumerate(lines):
+    #     if line.startswith("```python"):
+    #         in_code = True
+    #     elif line.startswith("```"):
+    #         in_code = False
+    #         return code
+    #     elif in_code == True:
+    #         if i == len(lines) - 1:
+    #             return code
+    #         code += line + "\n"
+    # # incomplete output, most likely incomplete assertion.
+    # # ignore this last assertion and move with the rest
 
-    return code
+    # return code
+    # Omar: handles the cases where there are multiple python codes and where the response
+    # has backticks in different positions
+    code = re.search(r"[^\"](?<=```python\n)(.*)\)\n(?=```)", response, re.DOTALL)
+    if code is None:
+        code = re.search(r"[^\"](?<=```python\n)(.*)\)\n\n(?=```)", response, re.DOTALL)
+    if code is None:
+        code = re.search(r"[^\"](?<=```python\n)(.*)\)(?=```)", response, re.DOTALL)
+    # print(code.group(0))
+    return code.group(0)
 
 
 # replaces the unittest call with another one to fix exec problem with running on colab
