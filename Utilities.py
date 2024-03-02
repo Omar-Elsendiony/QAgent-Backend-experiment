@@ -61,6 +61,8 @@ def get_code_from_response(response):
         code = re.search(r"[^\"](?<=```python\n)(.*)\)\n\n(?=```)", response, re.DOTALL)
     if code is None:
         code = re.search(r"[^\"](?<=```python\n)(.*)\)(?=```)", response, re.DOTALL)
+    if code is None:
+        code = re.search(r"[^\"](?<=```python\n)(.*)", response, re.DOTALL)
     # print(code.group(0))
     return code.group(0)
 
