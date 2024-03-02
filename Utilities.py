@@ -18,6 +18,8 @@ def extract_function_name(string):
 # gets the function name from the function definition in human eval
 def get_function_name(funcDefiniton):
     rs = re.search(r"\"\"\".*\"\"\"", funcDefiniton, re.DOTALL)
+    if rs==None:
+        rs = re.search(r"\'\'\'.*\'\'\'", funcDefiniton, re.DOTALL) 
     end = rs.span()[0]
     funcDefiniton = funcDefiniton[:end]
     return funcDefiniton
