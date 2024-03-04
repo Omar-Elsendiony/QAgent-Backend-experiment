@@ -32,11 +32,23 @@ def get_few_shots(db, code):
     code_of_few_shotList = []
     query = code
     docs = db.similarity_search(query)
-    for i in range(1, 4):
+    # adjust the range to specify number of few shot examples
+    for i in range(0, 3):
 
         test_cases_of_few_shot = docs[i].metadata["test"]
         description_of_few_shot = docs[i].metadata["prompt"]
         code_of_few_shot = docs[i].page_content
+        # remove quotation mark from begeinning of code
+        indexer = 0
+        if code_of_few_shot[0] == '"':
+            indexer += 1
+        # remove spaces from 1st line of code
+        while code_of_few_shot[indexer] == " ":
+            indexer += 1
+        code_of_few_shot = code_of_few_shot[indexer:]
+        # remove quotation mark from end of code
+        if code_of_few_shot[len(code_of_few_shot)-1] == '"':
+            code_of_few_shot = code_of_few_shot[:len(code_of_few_shot)-1]
         # get the function header
         description_of_few_shot = get_function_name(description_of_few_shot)
         code_of_few_shot = re.sub(r"\\n", "\n", code_of_few_shot)
