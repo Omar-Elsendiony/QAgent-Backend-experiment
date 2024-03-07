@@ -1,6 +1,6 @@
 from langchain_community.llms import HuggingFaceHub
 from langchain_community.chat_models.huggingface import ChatHuggingFace
-
+import openai
 
 def InitializeModel(
     htoken, model_id="mistralai/Mixtral-8x7B-Instruct-v0.1", max_new_tokens=20000
@@ -18,3 +18,11 @@ def InitializeModel(
     )
     chat_model = ChatHuggingFace(llm=llm)
     return llm, chat_model
+def InitializeGptModel(
+    token, model_id="gpt-3.5-turbo", max_new_tokens=20000
+):
+    # model_id='databricks/dolly-v2-3b'
+    openai.api_key = token
+    llm= model_id
+    
+    return llm, llm

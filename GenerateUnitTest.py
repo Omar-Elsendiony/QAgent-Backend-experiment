@@ -1,6 +1,6 @@
 from langchain.chains import LLMChain
 from langchain.prompts import PromptTemplate
-
+import openai
 GenerateTestTemplate = """You are a python expert and your task is: Given the following description and python code:
   Description:
   {description}
@@ -43,3 +43,18 @@ def InitializeTestChain(chat_model, fewshots=False):
         llm=chat_model, verbose=False, prompt=Generate_Unit_Tests_Template
     )
     return GenUnitTestChain
+
+def createPromptString(description, code, fewshots=False, test_cases_of_few_shot=None):
+    if not fewshots:
+        prompt = GenerateTestTemplate.format(description=description, code=code)
+    else:
+        prompt = Gen_UnitTest_with_FewShots_template.format(description=description, code=code, test_cases_of_few_shot=test_cases_of_few_shot)
+    return prompt
+def queryGpt(model, description, code, fewshots=False, test_cases_of_few_shot=None):
+    prompt = createPromptString(description, code, fewshots, test_cases_of_few_shot)
+    response = openai.ChatCompletion.create(
+        model=model,
+        messages=[{"role": "user", "content": prompt}]
+    ) 
+
+    return response

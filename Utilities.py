@@ -35,8 +35,9 @@ def replace_function_name(string, replacement_string):
     return modified_string
 
 
+
 # made according to mixtral response
-def get_code_from_response(response):
+def get_code_from_response(response,funcDefiniton):
     # lines = response.split("\n")
     # code = ""
     # in_code = False
@@ -64,7 +65,15 @@ def get_code_from_response(response):
     if code is None:
         code = re.search(r"[^\"](?<=```python\n)(.*)", response, re.DOTALL)
     # print(code.group(0))
-    return code.group(0)
+    true_code=code.group(0)
+    #check if there is import for function under testand remove it
+    
+    # header="import "+funcDefiniton
+    # if header in true_code:
+    final_code = re.sub("from.*(?=class)", "", true_code, flags=re.DOTALL)
+
+        # return final_code
+    return final_code
 
 
 # preprocesses the prompt string to be used in the few shot learning
