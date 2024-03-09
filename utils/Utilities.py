@@ -1,6 +1,11 @@
 import re
 
 
+# adds Mixtral Special Tokens to the prompt in case of vanilla llm by API
+def add_Mixtral_Tokens(template):
+    return "<s> [INST] " + template + "</s> [INST]"
+
+
 def extract_function_name(string):
     # Define a regular expression pattern to match the function name
     pattern = r"def\s+(\w+)\s*\(.*\)"
@@ -18,8 +23,8 @@ def extract_function_name(string):
 # gets the function name from the function definition in human eval
 def get_function_name(funcDefiniton):
     rs = re.search(r"\"\"\".*\"\"\"", funcDefiniton, re.DOTALL)
-    if rs==None:
-        rs = re.search(r"\'\'\'.*\'\'\'", funcDefiniton, re.DOTALL) 
+    if rs == None:
+        rs = re.search(r"\'\'\'.*\'\'\'", funcDefiniton, re.DOTALL)
     end = rs.span()[0]
     funcDefiniton = funcDefiniton[:end]
     return funcDefiniton
@@ -35,9 +40,8 @@ def replace_function_name(string, replacement_string):
     return modified_string
 
 
-
 # made according to mixtral response
-def get_code_from_response(response,funcDefiniton):
+def get_code_from_response(response, funcDefiniton):
     # lines = response.split("\n")
     # code = ""
     # in_code = False
@@ -57,6 +61,7 @@ def get_code_from_response(response,funcDefiniton):
     # return code
     # Omar: handles the cases where there are multiple python codes and where the response
     # has backticks in different positions
+    incompleteResponse = False
     code = re.search(r"[^\"](?<=```python\n)(.*)\)\n(?=```)", response, re.DOTALL)
     if code is None:
         code = re.search(r"[^\"](?<=```python\n)(.*)\)\n\n(?=```)", response, re.DOTALL)
@@ -64,16 +69,18 @@ def get_code_from_response(response,funcDefiniton):
         code = re.search(r"[^\"](?<=```python\n)(.*)\)(?=```)", response, re.DOTALL)
     if code is None:
         code = re.search(r"[^\"](?<=```python\n)(.*)", response, re.DOTALL)
+        # incomplete response, add to count
+        incompleteResponse = True
     # print(code.group(0))
-    true_code=code.group(0)
-    #check if there is import for function under testand remove it
-    
+    true_code = code.group(0)
+    # check if there is import for function under testand remove it
+
     # header="import "+funcDefiniton
     # if header in true_code:
     final_code = re.sub("from.*(?=class)", "", true_code, flags=re.DOTALL)
 
-        # return final_code
-    return final_code
+    # return final_code
+    return final_code, incompleteResponse
 
 
 # preprocesses the prompt string to be used in the few shot learning

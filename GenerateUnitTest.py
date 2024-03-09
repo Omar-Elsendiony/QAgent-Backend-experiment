@@ -1,6 +1,9 @@
 from langchain.chains import LLMChain
 from langchain.prompts import PromptTemplate
+from langchain_community.llms import HuggingFaceHub
 import openai
+from utils.Utilities import add_Mixtral_Tokens
+
 GenerateTestTemplate = """You are a python expert and your task is: Given the following description and python code:
   Description:
   {description}
@@ -25,7 +28,15 @@ Gen_UnitTest_with_FewShots_template = """You are a python expert and your task i
   The output should be a markdown code snippet formatted in the following schema, including the leading and trailing "```python" and "```" respectively:"""
 
 
-def InitializeTestChain(chat_model, fewshots=False):
+def InitializeTestChain(llm, fewshots=False):
+    global GenerateTestTemplate
+    global Gen_UnitTest_with_FewShots_template
+    # adding [INST] to mixtral manually
+    if isinstance(llm, HuggingFaceHub) and "Mixtral" in llm.repo_id:
+        GenerateTestTemplate = add_Mixtral_Tokens(GenerateTestTemplate)
+        Gen_UnitTest_with_FewShots_template = add_Mixtral_Tokens(
+            Gen_UnitTest_with_FewShots_template
+        )
     if not fewshots:
         Generate_Unit_Tests_Template = PromptTemplate(
             template=GenerateTestTemplate,
@@ -40,21 +51,27 @@ def InitializeTestChain(chat_model, fewshots=False):
         )
 
     GenUnitTestChain = LLMChain(
-        llm=chat_model, verbose=False, prompt=Generate_Unit_Tests_Template
+        llm=llm, verbose=False, prompt=Generate_Unit_Tests_Template
     )
     return GenUnitTestChain
+
 
 def createPromptString(description, code, fewshots=False, test_cases_of_few_shot=None):
     if not fewshots:
         prompt = GenerateTestTemplate.format(description=description, code=code)
     else:
-        prompt = Gen_UnitTest_with_FewShots_template.format(description=description, code=code, test_cases_of_few_shot=test_cases_of_few_shot)
+        prompt = Gen_UnitTest_with_FewShots_template.format(
+            description=description,
+            code=code,
+            test_cases_of_few_shot=test_cases_of_few_shot,
+        )
     return prompt
+
+
 def queryGpt(model, description, code, fewshots=False, test_cases_of_few_shot=None):
     prompt = createPromptString(description, code, fewshots, test_cases_of_few_shot)
     response = openai.ChatCompletion.create(
-        model=model,
-        messages=[{"role": "user", "content": prompt}]
-    ) 
+        model=model, messages=[{"role": "user", "content": prompt}]
+    )
 
     return response

@@ -3,7 +3,7 @@ from langchain.embeddings.sentence_transformer import SentenceTransformerEmbeddi
 from langchain_community.vectorstores import Chroma
 from langchain_community.document_loaders import HuggingFaceDatasetLoader
 
-from Utilities import get_function_name
+from utils.Utilities import get_function_name
 import re
 
 
@@ -47,8 +47,8 @@ def get_few_shots(db, code):
             indexer += 1
         code_of_few_shot = code_of_few_shot[indexer:]
         # remove quotation mark from end of code
-        if code_of_few_shot[len(code_of_few_shot)-1] == '"':
-            code_of_few_shot = code_of_few_shot[:len(code_of_few_shot)-1]
+        if code_of_few_shot[len(code_of_few_shot) - 1] == '"':
+            code_of_few_shot = code_of_few_shot[: len(code_of_few_shot) - 1]
         # get the function header
         description_of_few_shot = get_function_name(description_of_few_shot)
         code_of_few_shot = re.sub(r"\\n", "\n", code_of_few_shot)
