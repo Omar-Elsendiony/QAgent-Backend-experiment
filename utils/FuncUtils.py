@@ -1,5 +1,7 @@
 import re
 
+# made according to human eval
+
 
 def extract_function_name(string):
     # Define a regular expression pattern to match the function name
@@ -25,6 +27,7 @@ def get_function_name(funcDefiniton):
     return funcDefiniton
 
 
+# replace function name if needed
 def replace_function_name(string, replacement_string):
     # Define the regular expression pattern to match the function name
     pattern = r"def\s+(\w+)\s*"

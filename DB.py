@@ -3,7 +3,8 @@ from langchain.embeddings.sentence_transformer import SentenceTransformerEmbeddi
 from langchain_community.vectorstores import Chroma
 from langchain_community.document_loaders import HuggingFaceDatasetLoader
 
-from utils.Utilities import get_function_name
+from utils.FuncUtils import get_function_name
+from utils.PreprocessUtils import remove_metadata
 import re
 
 
@@ -57,4 +58,6 @@ def get_few_shots(db, code):
         test_cases_of_few_shotList.append(test_cases_of_few_shot)
         description_of_few_shotList.append(description_of_few_shot)
         code_of_few_shotList.append(code_of_few_shot)
+
+    test_cases_of_few_shot = remove_metadata(test_cases_of_few_shotList)
     return (code_of_few_shotList, test_cases_of_few_shotList)
