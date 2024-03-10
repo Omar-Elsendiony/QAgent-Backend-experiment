@@ -4,7 +4,7 @@ import re
 
 # adds Mixtral Special Tokens to the prompt in case of vanilla llm by API
 def add_Mixtral_Tokens(template):
-    return "<s> [INST] " + template + "</s> [INST]"
+    return "<s> [INST] " + template + "</s> [/INST]"
 
 
 # made according to human eval
