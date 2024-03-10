@@ -17,7 +17,6 @@ def get_code_from_response(response):
         code_match = re.search(r"[^\"](?<=```python\n)(.*)", response, re.DOTALL)
         # incomplete response, add to count
         incompleteResponse = True
-    # print(code_match.group(0))
     code = code_match.group(0)
     # check if there is import for function under testand remove it
 

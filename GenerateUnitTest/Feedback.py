@@ -15,7 +15,7 @@ RegenerateTestTemplate = """You are a python expert and your task is: Given the 
   {UnitTests}'''
   and after running the code this was the output of the tests:
   {Feedback}
-  Use the Feedback to Fix the bugs that are highlighted in the feedback by either modifying the code or the unit tests.
+  Use the Feedback to fix the bugs that are highlighted in the feedback by either modifying the code or the unit tests.
   Make sure to include the unit test call unittest.main() to run the tests. Do not include any import for the code under test.
   The output should be a markdown code snippet formatted in the following schema, including the leading and trailing "```python" and "```" respectively:"""
 
