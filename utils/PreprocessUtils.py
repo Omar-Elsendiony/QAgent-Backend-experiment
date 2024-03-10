@@ -65,6 +65,23 @@ def replaceUnitTestCall(code):
     return modified_code
 
 
+def addUnitTestImport(code):
+    pattern = r"import unittest"
+
+    ## search for the pattern in code and add it if not present
+    if re.search(pattern, code):
+        return code
+    else:
+        modified_code = "import unittest\n" + code
+        return modified_code
+
+
+def preprocessUnitTest(code):
+    code = replaceUnitTestCall(code)
+    code = addUnitTestImport(code)
+    return code
+
+
 introCode = """
 import sys
 import re
