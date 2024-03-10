@@ -57,7 +57,7 @@ def get_failed_testcases(feedback):
     # Use a regular expression to find the number of Ran Tests and Failures
     ran_tests_match = re.search(r"Ran (\d+) tests", feedback)
     failures_match = re.search(r"failures=(\d+)", feedback)
-
+    errors_match = re.search(r"errors=(\d+)", feedback)
     # Extract the numbers or default to 0 if not found
     ran_tests = int(ran_tests_match.group(1)) if ran_tests_match else 0
     failures = int(failures_match.group(1)) if failures_match else 0
