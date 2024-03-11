@@ -41,7 +41,7 @@ def InitializeFeedbackChain(llm):
 
     Generate_Unit_Tests_Template = PromptTemplate(
         template=RegenerateTestTemplate,
-        input_variables=["description", "code"],
+        input_variables=["description", "code", "UnitTests", "Feedback"],
         verbose=False,
     )
     GenUnitTestChain = LLMChain(
