@@ -9,20 +9,24 @@ def get_feedback_from_run(response):
     lines = response.split("\n")
     feedback = ""
     in_failmessage = False
-    for i, line in enumerate(lines):
-        if line.startswith("FAIL") or line.startswith("ERROR"):
-            in_failmessage = True
-            feedback += line + "\n"
-        elif line.startswith("--"):
-            if lines[i + 1].startswith("Ran"):
-                return feedback
+    if lines[0].startswith("F") or lines[0].startswith(".") or lines[0].startswith("E"):
+        for i, line in enumerate(lines):
+            if line.startswith("FAIL") or line.startswith("ERROR"):
+                in_failmessage = True
+                feedback += line + "\n"
+            elif line.startswith("--"):
+                if lines[i + 1].startswith("Ran"):
+                    return feedback
 
-        elif in_failmessage == True:
-            if line.startswith("=="):
-                continue
-            if i == len(lines) - 1:
-                return feedback
-            feedback += line + "\n"
+            elif in_failmessage == True:
+                if line.startswith("=="):
+                    continue
+                if i == len(lines) - 1:
+                    return feedback
+                feedback += line + "\n"
+        return feedback
+    else:
+        return response
 
 
 def get_feedback_from_run_list(response):  # omar's version

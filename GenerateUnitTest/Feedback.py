@@ -4,20 +4,33 @@ from langchain_community.llms import HuggingFaceHub
 import openai
 from utils.PreprocessUtils import add_Mixtral_Tokens
 
-RegenerateTestTemplate = """You are a python expert and your task is: Given the following description and python code:
-  Description:
-  {description}
-  Code:
-  '''python
-  {code}'''
-  You Previously Generated the Following code as unit tests:
-  '''python
-  {UnitTests}'''
-  and after running the code this was the output of the tests:
-  {Feedback}
-  Use the Feedback to fix the bugs that are highlighted in the feedback by either modifying the code or the unit tests.
-  Make sure to include the unit test call unittest.main() to run the tests. Do not include any import for the code under test.
-  The output should be a markdown code snippet formatted in the following schema, including the leading and trailing "```python" and "```" respectively:"""
+RegenerateTestTemplate = """You are a Python expert, and your task is to debug and improve the following Python code based on the given description, code snippet, and unit tests feedback:
+
+*Description:*
+{description}
+
+*Given Code:*
+```python
+{code}```
+You previously generated the following code as unit tests:
+
+python
+```python
+{UnitTests}```
+
+After running the code with these tests, you received the following feedback based on the test output:
+Feedback:
+{Feedback}
+
+Your goal is to revise the code or tests based on the feedback. Ensure to:
+
+Address all highlighted bugs in the feedback.
+Modify only the unit tests
+Do not include new imports for the code or tests.
+Preserve all existing functionality not related to the bugs.
+Run your fixed code with the unit tests by calling unittest.main() to verify all tests pass.
+
+Return your revised code or unit tests as a formatted markdown code snippet, surrounded by triple backticks and the word 'python'."""
 
 
 def InitializeFeedbackChain(llm):
