@@ -34,7 +34,7 @@ def get_few_shots(db, code):
     query = code
     docs = db.similarity_search(query)
     # adjust the range to specify number of few shot examples
-    for i in range(0, 3):
+    for i in range(0, 4):
 
         test_cases_of_few_shot = docs[i].metadata["test"]
         description_of_few_shot = docs[i].metadata["prompt"]

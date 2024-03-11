@@ -56,7 +56,7 @@ def InitializeTestChain(llm, fewshots=False):
     return GenUnitTestChain
 
 
-def createPromptString(description, code, fewshots=False, test_cases_of_few_shot=None):
+def createPromptStringGenerateTest(description, code, fewshots=False, test_cases_of_few_shot=None):
     if not fewshots:
         prompt = GenerateTestTemplate.format(description=description, code=code)
     else:
@@ -68,8 +68,8 @@ def createPromptString(description, code, fewshots=False, test_cases_of_few_shot
     return prompt
 
 
-def queryGpt(model, description, code, fewshots=False, test_cases_of_few_shot=None):
-    prompt = createPromptString(description, code, fewshots, test_cases_of_few_shot)
+def queryGptGenerateTest(model, description, code, fewshots=False, test_cases_of_few_shot=None):
+    prompt = createPromptStringGenerateTest(description, code, fewshots, test_cases_of_few_shot)
     response = openai.ChatCompletion.create(
         model=model, messages=[{"role": "user", "content": prompt}]
     )
