@@ -51,10 +51,10 @@ def get_few_shots(db, code):
         if code_of_few_shot[len(code_of_few_shot) - 1] == '"':
             code_of_few_shot = code_of_few_shot[: len(code_of_few_shot) - 1]
         # get the function header
-        description_of_few_shot = get_function_name(description_of_few_shot)
+        description_of_few_shot, utility = get_function_name(description_of_few_shot)
         code_of_few_shot = re.sub(r"\\n", "\n", code_of_few_shot)
         # print(test_cases_of_few_shot)
-        code_of_few_shot = description_of_few_shot + code_of_few_shot
+        code_of_few_shot = utility + "\n" + description_of_few_shot + code_of_few_shot
         test_cases_of_few_shotList.append(test_cases_of_few_shot)
         description_of_few_shotList.append(description_of_few_shot)
         code_of_few_shotList.append(code_of_few_shot)

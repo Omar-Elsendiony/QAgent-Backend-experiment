@@ -27,3 +27,20 @@ def InitializeGptModel(token, model_id="gpt-3.5-turbo", max_new_tokens=20000):
     llm = model_id
 
     return llm, llm
+
+
+def InitializeModelArbiter(
+    htoken, repo_id="google/gemma-7b-it", max_new_tokens=5000
+):
+    llm = HuggingFaceHub(
+        repo_id=repo_id,
+        huggingfacehub_api_token=htoken,
+        task="text-generation",
+        model_kwargs={
+            "temperature": 0.1,  # can't be 0
+            "max_new_tokens": max_new_tokens,
+        },
+        cache=False,
+    )
+    chat_model = ChatHuggingFace(llm=llm)
+    return llm, chat_model

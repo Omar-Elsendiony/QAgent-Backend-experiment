@@ -65,8 +65,9 @@ def get_failed_testcases(feedback):
     # Extract the numbers or default to 0 if not found
     ran_tests = int(ran_tests_match.group(1)) if ran_tests_match else 0
     failures = int(failures_match.group(1)) if failures_match else 0
+    errors = int(errors_match.group(1)) if errors_match else 0
 
-    return ran_tests, failures
+    return ran_tests, failures, errors
 
 
 def get_num_assertions(code_text):

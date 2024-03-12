@@ -1,6 +1,7 @@
 from langchain.chains import LLMChain
 from langchain.prompts import PromptTemplate
 from langchain_community.llms import HuggingFaceHub
+from langchain_community.chat_models.huggingface import ChatHuggingFace
 import openai
 from utils.PreprocessUtils import add_Mixtral_Tokens
 
@@ -27,6 +28,39 @@ Gen_UnitTest_with_FewShots_template = """You are a python expert and your task i
   Make sure to include the unit test call unittest.main() to run the tests.
   The output should be a markdown code snippet formatted in the following schema, including the leading and trailing "```python" and "```" respectively:"""
 
+Gen_UnitTest_with_FewShots_templateCc = """You are python unit tester, Write at least 10 unit tests for a method under test. You follow my rules and orders and if you do not know the answer, don't make things UP!
+I am going to give you a method under test as well as its description and you are going to follow the criteria that I give to you in the generation.
+Criteria:
+1. Write 10 test cases that capture the intent of the user and create asserts that match descrition.
+2. Each test generated contains only one assertion.
+3- Complete the unittest code till "unittest.main()" is called. Think before you end the response. I do not want any incomplete code.
+4- Do not include import for the method under test in the unit tests.
+5- Run the tests and see if they match the description. If not, change the assertions to match the description.
+
+Method under test:
+{code}
+
+Description:
+{description}
+
+I am going to add similar functions and their corresponding test cases that you may need to use in your tests. You can use them in your tests.
+{test_cases_of_few_shot}
+
+I am going to to give you a template for your output where:
+1- CAPITALIZED WORD enclosed by double asterisk are my placeholders and you must replace them with the right values.
+2- Please preserve the indentation and the structure of the template.
+My template is:
+```python
+import unittest
+
+class **TESTMETHODUNDERTEST**(unittest.TestCase):
+    **TEST_CASES_WITH_UNDERSTANDABLE_NAMES**
+
+if __name__ == '__main__':
+    unittest.main()
+```
+Evaluate your generated test cases and change the assertions if needed to comply with the description. Do not make things up!
+"""
 
 def InitializeTestChain(llm, fewshots=False):
     global GenerateTestTemplate
@@ -75,3 +109,4 @@ def queryGpt(model, description, code, fewshots=False, test_cases_of_few_shot=No
     )
 
     return response
+
