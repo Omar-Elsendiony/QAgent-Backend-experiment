@@ -50,13 +50,13 @@ def InitializeFeedbackChain(llm):
     return GenUnitTestChain
 
 
-def createPromptString(description, code, fewshots=False, test_cases_of_few_shot=None):
-    prompt = RegenerateTestTemplate.format(description=description, code=code)
+def createPromptStringFeedback(description, code, UnitTests, Feedback):
+    prompt = RegenerateTestTemplate.format(description=description, code=code,UnitTests=UnitTests, Feedback=Feedback)
     return prompt
 
 
-def queryGpt(model, description, code, fewshots=False, test_cases_of_few_shot=None):
-    prompt = createPromptString(description, code, fewshots, test_cases_of_few_shot)
+def queryGptFeedback(model, description, code, UnitTests, Feedback):
+    prompt = createPromptStringFeedback(description, code, UnitTests, Feedback)
     response = openai.ChatCompletion.create(
         model=model, messages=[{"role": "user", "content": prompt}]
     )
