@@ -53,8 +53,6 @@ def replace_function_name(string, replacement_string):
 
 
 
-import re
-
 def getTestCase(splitLines, errorChunck):
     lineNoGroup = re.search(r'(?<=line )(\d)+', errorChunck)
     lineNo = lineNoGroup.group(0) #line number of the end of the error

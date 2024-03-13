@@ -60,7 +60,6 @@ def queryGptFeedback(model, description, code, UnitTests, Feedback):
     response = openai.ChatCompletion.create(
         model=model, messages=[{"role": "user", "content": prompt}]
     )
-
     return response
 
 

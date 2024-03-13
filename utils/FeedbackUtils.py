@@ -2,14 +2,13 @@
 
 import re
 
-
 # gets feedback from running the code using exec
 # empty in case of success
 def get_feedback_from_run(response):
     lines = response.split("\n")
     feedback = ""
     in_failmessage = False
-    if lines[0].startswith("F") or lines[0].startswith(".") or lines[0].startswith("E"):
+    if lines[0].startswith("F") or lines[0].startswith(".") or lines[0].startswith("E"): # the added . for the test case that includes an error
         for i, line in enumerate(lines):
             if line.startswith("FAIL") or line.startswith("ERROR"):
                 in_failmessage = True
@@ -32,7 +31,8 @@ def get_feedback_from_run(response):
 def get_feedback_from_run_list(response):  # omar's version
     lines = response.split("\n")
     in_failmessage = False
-    feedbacks = []
+    feedbacks = [] # initialize feedbacks list that will be returned
+    feedback = "" # feedback initially empty
     for i, line in enumerate(lines):
         if line.startswith("FAIL") or line.startswith("ERROR"):
             feedback = ""
