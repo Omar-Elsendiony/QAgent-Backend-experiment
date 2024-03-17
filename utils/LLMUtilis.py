@@ -5,22 +5,28 @@ import re
 def get_code_from_response(response):
     incompleteResponse = False
 
-    s  = re.finditer(r"```python", response)
+    s = re.finditer(r"```python", response)
+    ExtractedResponse = ""
     for st in s:
+        # pick a statement from the prompt template and ensure it's no in the chosen repsonse
         startIndex = st.span(0)[0]
-    response = response[startIndex:]
+    ExtractedResponse = response[startIndex:]
 
-    code_match = re.search(r"[^\"](?<=```python\n)(.*)\)\n(?=```)", response, re.DOTALL)
+    code_match = re.search(
+        r"[^\"](?<=```python\n)(.*)\)\n(?=```)", ExtractedResponse, re.DOTALL
+    )
     if code_match is None:
         code_match = re.search(
-            r"[^\"](?<=```python\n)(.*)\)\n\n(?=```)", response, re.DOTALL
+            r"[^\"](?<=```python\n)(.*)\)\n\n(?=```)", ExtractedResponse, re.DOTALL
         )
     if code_match is None:
         code_match = re.search(
-            r"[^\"](?<=```python\n)(.*)\)(?=```)", response, re.DOTALL
+            r"[^\"](?<=```python\n)(.*)\)(?=```)", ExtractedResponse, re.DOTALL
         )
     if code_match is None:
-        code_match = re.search(r"[^\"](?<=```python\n)(.*)", response, re.DOTALL)
+        code_match = re.search(
+            r"[^\"](?<=```python\n)(.*)", ExtractedResponse, re.DOTALL
+        )
         # incomplete response, add to count
         incompleteResponse = True
     # code = code_match.group(0)
@@ -28,7 +34,55 @@ def get_code_from_response(response):
 
     # header="import "+funcDefiniton
     # if header in code:
-    if (code_match is None): return(response[startIndex:], True)
+    if code_match is None:
+        return (response[startIndex:], True)
+    code = re.sub("from.*(?=class)", "", code_match.group(0), flags=re.DOTALL)
+    return code, incompleteResponse
+
+
+def get_code_from_feedbackresponse(response):
+    incompleteResponse = False
+
+    s = re.finditer(r"```python", response)
+    ExtractedResponse = ""
+    for st in s:
+        # pick a statement from the prompt template and ensure it's no in the chosen repsonse
+        startIndex = st.span(0)[0]
+        print("Start Index is ", startIndex)
+        ExtractedResponse = response[startIndex:]
+        print("Response is ", ExtractedResponse)
+        if (
+            "Your goal is to revise the code or tests based on the feedback. Ensure to:"
+            in ExtractedResponse
+        ):
+            continue
+        else:
+            break
+    print("Extracted Response is ", ExtractedResponse)
+    code_match = re.search(
+        r"[^\"](?<=```python\n)(.*)\)\n(?=```)", ExtractedResponse, re.DOTALL
+    )
+    if code_match is None:
+        code_match = re.search(
+            r"[^\"](?<=```python\n)(.*)\)\n\n(?=```)", ExtractedResponse, re.DOTALL
+        )
+    if code_match is None:
+        code_match = re.search(
+            r"[^\"](?<=```python\n)(.*)\)(?=```)", ExtractedResponse, re.DOTALL
+        )
+    if code_match is None:
+        code_match = re.search(
+            r"[^\"](?<=```python\n)(.*)", ExtractedResponse, re.DOTALL
+        )
+        # incomplete response, add to count
+        incompleteResponse = True
+    # code = code_match.group(0)
+    # check if there is import for function under testand remove it
+
+    # header="import "+funcDefiniton
+    # if header in code:
+    if code_match is None:
+        return (response[startIndex:], True)
     code = re.sub("from.*(?=class)", "", code_match.group(0), flags=re.DOTALL)
     return code, incompleteResponse
 
