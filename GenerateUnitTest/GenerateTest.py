@@ -12,6 +12,7 @@ GenerateTestTemplate = """You are a python expert and your task is: Given the fo
   '''python
   {code}'''
   Generate a class that contains at least 7 unit tests (where each test has only one assertion) written in python that acheive high coverage to find bugs, runtime errors or logical errors in the code to conform with the description and include any required imports.
+  Do not generate negative tests.
   Make sure to include the unit test call unittest.main() to run the tests. Do not include any import for the code under test.
   The output should be a markdown code snippet formatted in the following schema, including the leading and trailing "```python" and "```" respectively:"""
 
