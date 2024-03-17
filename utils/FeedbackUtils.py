@@ -59,19 +59,30 @@ def get_feedback_from_run_list(response):  # omar's version
 
 def get_failed_testcases(feedback):
     # Use a regular expression to find the number of Ran Tests and Failures
-    ran_tests_match = re.search(r"Ran (\d+) tests", feedback)
     failures_match = re.search(r"failures=(\d+)", feedback)
     errors_match = re.search(r"errors=(\d+)", feedback)
     # Extract the numbers or default to 0 if not found
-    ran_tests = int(ran_tests_match.group(1)) if ran_tests_match else 0
     failures = int(failures_match.group(1)) if failures_match else 0
     errors = int(errors_match.group(1)) if errors_match else 0
 
-    return ran_tests, failures, errors
+    return failures, errors
+
+
+def getFailedTestcasesIndices(feedback):
+    lines = feedback.split("\n")
+    indices = []
+    firstline = lines[0]
+    if (
+        firstline.startswith("F")
+        or firstline.startswith(".")
+        or firstline.startswith("E")
+    ):
+        for i in range(len(firstline)):
+            if firstline[i] == "F" or firstline[i] == "E":
+                indices.append(i)
+    return indices
 
 
 def get_num_assertions(code_text):
-    total_num = len(
-        re.findall(r"self\.assert\w*\(.*?\)", code_text, flags=re.MULTILINE)
-    )
+    total_num = len(re.findall(r"self\.assert", code_text, flags=re.MULTILINE))
     return total_num

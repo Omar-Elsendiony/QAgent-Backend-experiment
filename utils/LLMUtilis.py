@@ -48,9 +48,7 @@ def get_code_from_feedbackresponse(response):
     for st in s:
         # pick a statement from the prompt template and ensure it's no in the chosen repsonse
         startIndex = st.span(0)[0]
-        print("Start Index is ", startIndex)
         ExtractedResponse = response[startIndex:]
-        print("Response is ", ExtractedResponse)
         if (
             "Your goal is to revise the code or tests based on the feedback. Ensure to:"
             in ExtractedResponse
@@ -58,7 +56,6 @@ def get_code_from_feedbackresponse(response):
             continue
         else:
             break
-    print("Extracted Response is ", ExtractedResponse)
     code_match = re.search(
         r"[^\"](?<=```python\n)(.*)\)\n(?=```)", ExtractedResponse, re.DOTALL
     )
@@ -85,6 +82,25 @@ def get_code_from_feedbackresponse(response):
         return (response[startIndex:], True)
     code = re.sub("from.*(?=class)", "", code_match.group(0), flags=re.DOTALL)
     return code, incompleteResponse
+
+
+# extract test cases code according to given indices
+def getEachTestCase(UnitTestsCode, indices):
+    # split the test cases
+    if len(indices) == 0:
+        return UnitTestsCode
+    classHeader = re.search(r"(class.*:)", UnitTestsCode)
+    testsMatch = re.finditer(r"def(.*):", UnitTestsCode)
+    lastIndex = 0
+    tests = []
+    for i, test in enumerate(testsMatch):
+        if i - 1 in indices:
+            tests.append(UnitTestsCode[lastIndex : test.span(0)[0]])
+        lastIndex = test.span(0)[0]
+    if i in indices:
+        tests.append(UnitTestsCode[lastIndex:])
+    code = "\nimport unittest\n\n" + classHeader.group(0) + "\n" + "\n".join(tests)
+    return code
 
 
 def regeneratePrompt(chat_model_arb, code, description, testcase):
