@@ -2,7 +2,7 @@ import pandas as pd
 from utils.FeedbackUtils import *
 from utils.LLMUtilis import *
 
-OldFile = "Results/Mixtral-3Shot/"
+OldFile = "Results/FeedbackMixtral-3Shot/"
 OldCasesFile = OldFile + "RunningLogs.json"
 # OldCasesFile = "humaneval.jsonl"
 OldCases = pd.read_json(OldCasesFile, lines=False)
@@ -13,7 +13,7 @@ NowFailTotal = 0
 
 
 with open("Heval1.txt", "w") as f:
-    for i in range(0, 11):
+    for i in range(len(OldCases)):
         # OlTotal += OldCases.iloc[i]["Old Total Tests"]
         # if OldCases.iloc[i]["Feedback Tests failed"] > 0:
         #     OlTotal += OldCases.iloc[i]["Feedback Total Tests"]
@@ -23,7 +23,7 @@ with open("Heval1.txt", "w") as f:
         f.write(OldCases.iloc[i]["GeneratedCode"] + "\n=====================\n")
         # print(OldCases.iloc[i]["FullFeedback"])
         # f.write(OldCases.iloc[i]["GeneratedCode"])
-        FullFeedback = OldCases.iloc[i]["FullFeedback"]
+        FullFeedback = OldCases.iloc[i]["Feedback"]
         print(FullFeedback, "\n=====================\n")
         f.write(FullFeedback + "\n=====================\n")
         # indices = getFailedTestcasesIndices(FullFeedback)
