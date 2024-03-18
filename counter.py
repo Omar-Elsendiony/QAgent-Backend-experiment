@@ -10,23 +10,30 @@ OlTotal = 0
 OlFailTotal = 0
 NowTotal = 0
 NowFailTotal = 0
+
+
 with open("Heval1.txt", "w") as f:
-    for i in range(5):
+    for i in range(0, 11):
         # OlTotal += OldCases.iloc[i]["Old Total Tests"]
         # if OldCases.iloc[i]["Feedback Tests failed"] > 0:
         #     OlTotal += OldCases.iloc[i]["Feedback Total Tests"]
         print("Test case {i}\n===================================\n".format(i=i))
-        # f.write("Test case {i}\n===================================\n".format(i=i))
-        # print(OldCases.iloc[i]["GeneratedCode"])
+        f.write("Test case {i}\n===================================\n".format(i=i))
+        print(OldCases.iloc[i]["GeneratedCode"])
+        f.write(OldCases.iloc[i]["GeneratedCode"] + "\n=====================\n")
         # print(OldCases.iloc[i]["FullFeedback"])
         # f.write(OldCases.iloc[i]["GeneratedCode"])
         FullFeedback = OldCases.iloc[i]["FullFeedback"]
         print(FullFeedback, "\n=====================\n")
-        indices = getFailedTestcasesIndices(FullFeedback)
-        tests = getEachTestCase(OldCases.iloc[i]["GeneratedCode"], indices)
-        print(indices, "\n=====================\n")
-        print(tests, "\n=====================\n")
+        f.write(FullFeedback + "\n=====================\n")
+        # indices = getFailedTestcasesIndices(FullFeedback)
+        # tests = getEachTestCase(OldCases.iloc[i]["GeneratedCode"], indices)
+        # print(indices, "\n=====================\n")
+        # print(tests, "\n=====================\n")
         # OlFailTotal += OldCases.iloc[i]["Old Tests Failed"]
+        testsToRepeat = OldCases.iloc[i]["TestsToRepeat"]
+        print(testsToRepeat)
+        f.write(testsToRepeat + "\n=====================\n")
         # NowTotal += OldCases.iloc[i]["Feedback Total Tests"]
         # NowFailTotal += OldCases.iloc[i]["Feedback Tests failed"]
     # print(OldCases)

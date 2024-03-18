@@ -84,22 +84,42 @@ def get_code_from_feedbackresponse(response):
     return code, incompleteResponse
 
 
-# extract test cases code according to given indices
-def getEachTestCase(UnitTestsCode, indices):
+# extract test cases code according to given function names
+def getEachTestCase(UnitTestsCode, functionNames):
     # split the test cases
-    if len(indices) == 0:
+    if len(functionNames) == 0:
         return UnitTestsCode
     classHeader = re.search(r"(class.*:)", UnitTestsCode)
-    testsMatch = re.finditer(r"def(.*):", UnitTestsCode)
-    lastIndex = 0
+    method_pattern = r"""
+    (def\s+        # Match 'def' keyword followed by whitespace
+    ({0})         # Capture method signature using a named capturing group (1) 
+                   #  where {0} is replaced with the joined method names
+    \(.*?\)     
+    \s*:)\n        # Match whitespace, colon, and whitespace
+    (.*?)          # Capture method body (non-greedy) - group (3)
+    (?=\n\s*def|\n\Z) # Positive lookahead to ensure not followed by another 'def' or end of string
+    """.format(
+        "|".join(functionNames)
+    )  # Replace {0} with joined method names
     tests = []
-    for i, test in enumerate(testsMatch):
-        if i - 1 in indices:
-            tests.append(UnitTestsCode[lastIndex : test.span(0)[0]])
-        lastIndex = test.span(0)[0]
-    if i in indices:
-        tests.append(UnitTestsCode[lastIndex:])
-    code = "\nimport unittest\n\n" + classHeader.group(0) + "\n" + "\n".join(tests)
+    matches = re.finditer(
+        method_pattern, UnitTestsCode, flags=re.DOTALL | re.MULTILINE | re.VERBOSE
+    )
+    for functionmatch in matches:
+        method_defintion = functionmatch.group(1)
+        method_body = functionmatch.group(3)
+        method_body_lines = method_body.split("\n")
+        method_body = "\n".join(["\t" + line for line in method_body_lines])
+        tests.append("\t" + method_defintion + "\n" + method_body)
+    tests = "\n".join(tests)
+    editPattern = """if __name__ == '__main__':"""
+    index = tests.find(editPattern)
+    if index != -1:
+        mainCall = tests[index:]
+        mainCall_lines = mainCall.split("\n")
+        mainCall = "\n" + mainCall_lines[0] + "\n\t" + mainCall_lines[1].strip()
+        tests = tests[:index] + mainCall  # Slice up to the index of the substring
+    code = "\nimport unittest\n\n" + classHeader.group(0) + "\n" + tests
     return code
 
 

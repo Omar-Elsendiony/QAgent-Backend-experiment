@@ -5,7 +5,20 @@ import re
 
 # gets feedback from running the code using exec
 # empty in case of success
+
+
 def get_feedback_from_run(response):
+    """
+    An example parsed feedback is:
+
+    "FAIL: test_add (test_module.TestClass)
+    ----------
+    Traceback (most recent call last):
+    File "test_module.py", line 6, in test_add
+        self.assertEqual(add(2, 3), 5)
+    FAIL: test_sub (test_module.TestClass)
+    .....etc"
+    """
     lines = response.split("\n")
     feedback = ""
     in_failmessage = False
@@ -57,7 +70,7 @@ def get_feedback_from_run_list(response):  # omar's version
             feedback += line + "\n"
 
 
-def get_failed_testcases(feedback):
+def getNumNonSucceedingTestcases(feedback):
     # Use a regular expression to find the number of Ran Tests and Failures
     failures_match = re.search(r"failures=(\d+)", feedback)
     errors_match = re.search(r"errors=(\d+)", feedback)
@@ -68,21 +81,13 @@ def get_failed_testcases(feedback):
     return failures, errors
 
 
-def getFailedTestcasesIndices(feedback):
-    lines = feedback.split("\n")
-    indices = []
-    firstline = lines[0]
-    if (
-        firstline.startswith("F")
-        or firstline.startswith(".")
-        or firstline.startswith("E")
-    ):
-        for i in range(len(firstline)):
-            if firstline[i] == "F" or firstline[i] == "E":
-                indices.append(i)
-    return indices
+# gets the names of the failed test cases functions
+def getNonSucceedingTestcases(feedback):
+    failed_tests = re.findall(r"FAIL: (.*) \(", feedback)
+    error_tests = re.findall(r"ERROR: (.*) \(", feedback)
+    return {"failed": failed_tests, "error": error_tests}
 
 
 def get_num_assertions(code_text):
-    total_num = len(re.findall(r"self\.assert", code_text, flags=re.MULTILINE))
+    total_num = len(re.findall(r"self\.assert.", code_text, flags=re.MULTILINE))
     return total_num
