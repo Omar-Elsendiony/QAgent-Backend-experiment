@@ -31,109 +31,86 @@ FAILED (failures=3)
 =====================
 """
 
-generatedCode = """import unittest
+generatedCode = """
+```python
+import unittest
 
-class TestTruncateNumber(unittest.TestCase):
+class TestIntersperse(unittest.TestCase):
+    def test_delimiter_at_end(self):
+        self.assertEqual(intersperse([5, 6, 3, 2], 0), [5, 6, 3, 2, 0])
 
-    def setUp(self):
-        self.truncate_number = truncate_number
+    def test_delimiter_at_beginning(self):
+        self.assertEqual(intersperse([5, 6, 3, 2], 0, start_index=1), [5, 0, 6, 0, 3, 0, 2])
+```
+The `test_delimiter_at_end` method remains unchanged, while a new method `test_delimiter_at_beginning` is added to test the case where the delimiter should be inserted at the beginning of the list. The `start_index` parameter is introduced in the `intersperse` function to handle this case.
 
-    def test_truncate_positive_integer(self):
-        '''Test truncating a positive integer'''
-        number = 10
-        result = self.truncate_number(number)
-        self.assertEqual(result, 0.0)
+Here is the updated `intersperse` function with the `start_index` parameter:
+```python
+from typing import List
 
-    def test_truncate_negative_integer(self):
-        '''Test truncating a negative integer'''
-        number = -10
-        result = self.truncate_number(number)
-        self.assertEqual(result, 0.0)
+def intersperse(numbers: List[int], delimeter: int, start_index: int = 0) -> List[int]:
+    if not numbers:
+        return []
 
-    def test_truncate_positive_float(self):
-        '''Test truncating a positive float'''
-        number = 3.5
-        result = self.truncate_number(number)
-        self.assertEqual(result, 0.5)
+    result = []
 
-    def test_truncate_negative_float(self):
-        '''Test truncating a negative float'''
-        number = -3.5
-        result = self.truncate_number(number)
-        self.assertEqual(result, -0.5)
+    for i, n in enumerate(numbers[:-1]):
+        if i >= start_index:
+            result.append(delimeter)
+        result.append(n)
 
-    def test_truncate_zero(self):
-        '''Test truncating zero'''
-        number = 0.0
-        result = self.truncate_number(number)
-        self.assertEqual(result, 0.0)
+    result.append(numbers[-1])
 
-    def test_truncate_large_positive_float(self):
-        '''Test truncating a large positive float'''
-        number = 123456789.123456789
-        result = self.truncate_number(number)
-        self.assertEqual(result, 0.123456789)
-
-    def test_truncate_large_negative_float(self):
-        '''Test truncating a large negative float'''
-        number = -123456789.123456789
-        result = self.truncate_number(number)
-        self.assertEqual(result, -0.123456789)
-
+    return result
+```
+Finally, you can run the revised code with the unit tests by calling `unittest.main(argv=['first-arg-is-ignored'])()`:
+```python
 if __name__ == '__main__':
     unittest.main(argv=['first-arg-is-ignored'])()
 """
 import re
 
 
-def getEachTestCase(UnitTestsCode, functionNames):
-    # split the test cases
-    if len(functionNames) == 0:
-        return UnitTestsCode
-    classHeader = re.search(r"(class.*:)", UnitTestsCode)
-    method_pattern = r"""
-    (def\s+        # Match 'def' keyword followed by whitespace
-    ({0})         # Capture method signature using a named capturing group (1) 
-                   #  where {0} is replaced with the joined method names
-    \(.*?\)     
-    \s*:)\n        # Match whitespace, colon, and whitespace
-    (.*?)          # Capture method body (non-greedy) - group (3)
-    (?=\n\s*def|\n\Z) # Positive lookahead to ensure not followed by another 'def' or end of string
-    """.format(
-        "|".join(functionNames)
-    )  # Replace {0} with joined method names
-    tests = []
-    matches = re.finditer(
-        method_pattern, UnitTestsCode, flags=re.DOTALL | re.MULTILINE | re.VERBOSE
-    )
-    for functionmatch in matches:
-        print(functionmatch)
-        method_defintion = functionmatch.group(1)
-        method_body = functionmatch.group(3)
-        method_body_lines = method_body.split("\n")
-        method_body = "\n".join(["\t" + line for line in method_body_lines])
-        tests.append("\t" + method_defintion + "\n" + method_body)
-    tests = "\n".join(tests)
-    editPattern = """if __name__ == '__main__':"""
-    index = tests.find(editPattern)
-    if index != -1:
-        mainCall = tests[index:]
-        mainCall_lines = mainCall.split("\n")
-        mainCall = "\n" + mainCall_lines[0] + "\n\t" + mainCall_lines[1].strip()
-        tests = tests[:index] + mainCall  # Slice up to the index of the substring
-    code = "\nimport unittest\n\n" + classHeader.group(0) + "\n" + tests
-    return code
+def get_code_from_feedbackresponse(response):
+    incompleteResponse = False
+
+    s = re.finditer(r"```python", response)
+    ExtractedResponse = ""
+    for st in s:
+        # pick a statement from the prompt template and ensure it's no in the chosen repsonse
+        startIndex = st.span(0)[0]
+        ExtractedResponse = response[startIndex:]
+        if (
+            "Your goal is to revise the code or tests based on the feedback. Ensure to:"
+            in ExtractedResponse
+        ):
+            continue
+        else:
+            break
+    # question mark is added to make the match non-greedy
+    patterns = [
+        r"[^\"](?<=```python\n)(.*)?\)\n(?=```)",
+        r"[^\"](?<=```python\n)(.*)?\)\n\n(?=```)",
+        r"[^\"](?<=```python\n)(.*)?\)(?=```)",
+        r"[^\"](?<=```python\n)(.*)?",
+    ]
+    for i, pattern in enumerate(patterns):
+        code_match = re.search(pattern, ExtractedResponse, re.DOTALL)
+        if code_match is not None:
+            if i == len(patterns) - 1:
+                incompleteResponse = True
+            break
+    # code = code_match.group(0)
+    # check if there is import for function under testand remove it
+
+    # header="import "+funcDefiniton
+    # if header in code:
+    if code_match is None:
+        return (response[startIndex:], True)
+    code = re.sub("from.*(?=class)", "", code_match.group(0), flags=re.DOTALL)
+    return code, incompleteResponse
 
 
-def getNonSucceedingTestcases(feedback):
-    failed_tests = re.findall(r"FAIL: (.*) \(", feedback)
-    error_tests = re.findall(r"ERROR: (.*) \(", feedback)
-    return {"failed": failed_tests, "error": error_tests}
+final, _ = get_code_from_feedbackresponse(generatedCode)
 
-
-erroneous_tests = getNonSucceedingTestcases(feedback)
-print(erroneous_tests["failed"] + erroneous_tests["error"])
-total_tests = getEachTestCase(
-    generatedCode, erroneous_tests["failed"] + erroneous_tests["error"]
-)
-print(total_tests)
+print(final)

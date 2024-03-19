@@ -2,7 +2,8 @@ import pandas as pd
 from utils.FeedbackUtils import *
 from utils.LLMUtilis import *
 
-OldFile = "Results/FeedbackMixtral-3Shot/"
+OldFile = "FeedbackOutput/"
+OldFile = "Results/FeedbackMixtral-2Shot/"
 OldCasesFile = OldFile + "RunningLogs.json"
 # OldCasesFile = "humaneval.jsonl"
 OldCases = pd.read_json(OldCasesFile, lines=False)

@@ -28,9 +28,11 @@ Address all highlighted bugs in the feedback.
 Modify only the unit tests
 Do not include new imports for the code or tests.
 Preserve all existing functionality not related to the bugs.
-Run your fixed code with the unit tests by calling unittest.main() to verify all tests pass.
 
-Return your revised code or unit tests as a formatted markdown code snippet, surrounded by triple backticks and the word 'python'."""
+Return your revised code or unit tests as only one formatted markdown code snippet, surrounded by triple backticks and the word 'python'."""
+
+
+# TODO: Change only one
 
 
 def InitializeFeedbackChain(llm):
@@ -51,7 +53,9 @@ def InitializeFeedbackChain(llm):
 
 
 def createPromptStringFeedback(description, code, UnitTests, Feedback):
-    prompt = RegenerateTestTemplate.format(description=description, code=code,UnitTests=UnitTests, Feedback=Feedback)
+    prompt = RegenerateTestTemplate.format(
+        description=description, code=code, UnitTests=UnitTests, Feedback=Feedback
+    )
     return prompt
 
 
@@ -62,6 +66,3 @@ def queryGptFeedback(model, description, code, UnitTests, Feedback):
     )
 
     return response
-
-
-

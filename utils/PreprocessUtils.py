@@ -76,7 +76,19 @@ def addUnitTestImport(code):
         return modified_code
 
 
+# adds the unittest call to the code if not present
+def addUnitTestCall(code):
+    pattern = r"if __name__ == '__main__':\n    unittest.main\(\)"
+    match = re.search(pattern, code)
+    if match:
+        return code
+    else:
+        modified_code = code + "\nif __name__ == '__main__':\n    unittest.main()"
+        return modified_code
+
+
 def preprocessUnitTest(code):
+    code = addUnitTestCall(code)
     code = replaceUnitTestCall(code)
     code = addUnitTestImport(code)
     return code

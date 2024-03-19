@@ -2,44 +2,38 @@ import re
 
 
 # made according to mixtral response
+# Skips first code (CUT) and starts searching from after that
 def get_code_from_response(response):
     incompleteResponse = False
 
     s = re.finditer(r"```python", response)
     ExtractedResponse = ""
     for st in s:
-        # pick a statement from the prompt template and ensure it's no in the chosen repsonse
+        # pick the first code (code under test) in response and ensure its beginning doesn't match with the following patterns
         startIndex = st.span(0)[0]
     ExtractedResponse = response[startIndex:]
 
-    code_match = re.search(
-        r"[^\"](?<=```python\n)(.*)\)\n(?=```)", ExtractedResponse, re.DOTALL
-    )
-    if code_match is None:
-        code_match = re.search(
-            r"[^\"](?<=```python\n)(.*)\)\n\n(?=```)", ExtractedResponse, re.DOTALL
-        )
-    if code_match is None:
-        code_match = re.search(
-            r"[^\"](?<=```python\n)(.*)\)(?=```)", ExtractedResponse, re.DOTALL
-        )
-    if code_match is None:
-        code_match = re.search(
-            r"[^\"](?<=```python\n)(.*)", ExtractedResponse, re.DOTALL
-        )
-        # incomplete response, add to count
-        incompleteResponse = True
-    # code = code_match.group(0)
-    # check if there is import for function under testand remove it
-
-    # header="import "+funcDefiniton
-    # if header in code:
+    patterns = [
+        r"[^\"](?<=```python\n)(.*)\)\n(?=```)",
+        r"[^\"](?<=```python\n)(.*)\)\n\n(?=```)",
+        r"[^\"](?<=```python\n)(.*)\)(?=```)",
+        r"[^\"](?<=```python\n)(.*)",
+    ]
+    for i, pattern in enumerate(patterns):
+        code_match = re.search(pattern, ExtractedResponse, re.DOTALL)
+        if code_match is not None:
+            if i == len(patterns) - 1:
+                incompleteResponse = True
+            break
     if code_match is None:
         return (response[startIndex:], True)
     code = re.sub("from.*(?=class)", "", code_match.group(0), flags=re.DOTALL)
     return code, incompleteResponse
 
 
+# skips any substring that contains a statement from the prompt template
+# handles only if the llm changes either the code or the test cases
+# TODO: handle if the llm changes both the code and the test cases
 def get_code_from_feedbackresponse(response):
     incompleteResponse = False
 
@@ -56,28 +50,20 @@ def get_code_from_feedbackresponse(response):
             continue
         else:
             break
-    code_match = re.search(
-        r"[^\"](?<=```python\n)(.*)\)\n(?=```)", ExtractedResponse, re.DOTALL
-    )
-    if code_match is None:
-        code_match = re.search(
-            r"[^\"](?<=```python\n)(.*)\)\n\n(?=```)", ExtractedResponse, re.DOTALL
-        )
-    if code_match is None:
-        code_match = re.search(
-            r"[^\"](?<=```python\n)(.*)\)(?=```)", ExtractedResponse, re.DOTALL
-        )
-    if code_match is None:
-        code_match = re.search(
-            r"[^\"](?<=```python\n)(.*)", ExtractedResponse, re.DOTALL
-        )
-        # incomplete response, add to count
-        incompleteResponse = True
-    # code = code_match.group(0)
-    # check if there is import for function under testand remove it
+    # question mark is added to make the match non-greedy
+    patterns = [
+        r"[^\"](?<=```python\n)(.*)?\)\n(?=```)",
+        r"[^\"](?<=```python\n)(.*)?\)\n\n(?=```)",
+        r"[^\"](?<=```python\n)(.*)?\)(?=```)",
+        r"[^\"](?<=```python\n)(.*)?",
+    ]
+    for i, pattern in enumerate(patterns):
+        code_match = re.search(pattern, ExtractedResponse, re.DOTALL)
+        if code_match is not None:
+            if i == len(patterns) - 1:
+                incompleteResponse = True
+            break
 
-    # header="import "+funcDefiniton
-    # if header in code:
     if code_match is None:
         return (response[startIndex:], True)
     code = re.sub("from.*(?=class)", "", code_match.group(0), flags=re.DOTALL)
