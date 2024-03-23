@@ -1,15 +1,14 @@
 from Imports import *
 from CustomThread import *
+from GenerateUnitTest.Regeneration import *
 
+class TestFix:
 
-class TestGenerator:
-
-    def __init__(self, GenUnitTestChain, db, HEval_JsonObj, myglobals):
+    def __init__(self, myglobals):
         self.reset()
-        self.GenUnitTestChain = GenUnitTestChain
-        self.db = db
-        self.HEval_JsonObj = HEval_JsonObj
         self.myglobals = myglobals
+        llm_arb, chat_model_arb = InitializeModelArbiter(os.environ['HF_TOKEN'])
+        self.reg = Regeneration(chat_model_arb)
 
     def reset(self):
         self.total_test_cases = 0
@@ -29,9 +28,14 @@ class TestGenerator:
         self.TotalCases = 0
         self.TotalFailedCases = 0
         self.incompleteResponses = 0
-        self.OutputFile = "OutputTest/"
-        self.JSONFile = self.OutputFile + "RunningLogs.json"
-        self.CasesJSONFile = self.OutputFile + "Cases.json"
+        self.OutputFile="FeedbackOutput/"
+        self.JSONFile= self.OutputFile+"RunningLogs.json"
+        self.CasesJSONFile = self.OutputFile+"Cases.json"
+        OldFile="Results/FeedbackMixtral-2Shot/"
+        self.OldCasesFile= OldFile+"Cases.json"
+        self.OldJsonFile= OldFile+"RunningLogs.json"
+        self.CasesLogs=pd.read_json(self.OldJsonFile)
+        self.OldCases= pd.read_json(self.OldCasesFile)
         self.df = pd.DataFrame()
         self.casesDf = pd.DataFrame()
 
@@ -50,63 +54,45 @@ class TestGenerator:
         self.reset()
         c = open(self.OutputFile + "Cases.txt", "w+")
         for i in range(0, 3):
-            # if (i == 10): continue
-            print("Running Test Case ", i)
-            c.write(
-                "Running Test Case "
-                + str(i)
-                + "\n=====================================\n"
-            )
-            # description and code from database
-            description, code = self.extractInfo(i)
-            fewShotStr = self.extractFewShots(code)
+            print("Running Example ",i,"\n=====================\n")
+
+            currDescription, currCode, currGeneratedCode, currFeedback = self.extractInfo(i)
+            currRanCode = get_running_code(currCode, currGeneratedCode)
+
+            if pd.isna(currFeedback) or currFeedback=="" or currFeedback is None:
+                print("Example",i," has already passed")
+                c.write("Example "+str(i)+" has already passed\n=====================================\n")
+                continue
             try:
-                unittest = self.GenUnitTestChain.invoke(
-                    {
-                        "description": description,
-                        "code": code,
-                        "test_cases_of_few_shot": fewShotStr,
-                    }
-                )  # ,"test_cases_of_few_shot":fewShotStr
+                codeTobeRun = self.reg.get_feedback(currDescription, currCode, currRanCode, currFeedback, get_feedback_from_run_list)
+                if (codeTobeRun is not None):
+                    codeTobeRun = replaceUnitTestCall(codeTobeRun)
+                    feedback = runCode(code = codeTobeRun, myglobals = self.myglobals)
+                    print("original feedback is: ",feedback)
+                    feedbackparsed = get_feedback_from_run(feedback)
+                    unittest_code = codeTobeRun[(re.search(r"import unittest", codeTobeRun)).span()[0]:]
+                else:
+                    self.incompleteResponses += 1
+                    continue
             except Exception as e:
-                print("ERROR in invoking GenUnitTestChain")
+                print("ERROR in invoking Feedback Chain")
                 self.apiErrors += 1
                 print(e)
-                c.write(
-                    "Test Case "
-                    + str(i)
-                    + " Didn't Run Due to Errorr\n=====================================\n"
-                )
+                c.write("Example "+str(i)+" Didn't Run Due to Errorr\n=====================================\n")
                 continue
-            unittest_code, isIncompleteResponse = get_code_from_response(
-                unittest["text"]
-            )
-            if isIncompleteResponse:
-                self.incompleteResponses += 1
-                print(
-                    "Test Case "
-                    + str(i)
-                    + " Didn't Run Due to Incomplete Response\n=====================================\n"
-                )
-                c.write(
-                    "Test Case "
-                    + str(i)
-                    + " Didn't Run Due to Incomplete Response\n=====================================\n"
-                )
-            feedback, feedbackparsed, codeTobeRun = self.runTest(code, unittest_code)
-            print(feedbackparsed)
+
 
             self.writeResults(feedback, feedbackparsed, unittest_code, c, i)
-            self.descriptions.append(description)
-            self.codes.append(code)
+            self.descriptions.append(currDescription)
+            self.codes.append(currCode)
             self.res_codes.append(unittest_code)
             self.feedbacks.append(feedbackparsed)  # feedbackparsed
             # codeRanList.append(codeTobeRun)
             new_row = pd.DataFrame(
                 {
                     "CaseNumber": i,
-                    "Description": description,
-                    "Code": code,
+                    "Description": currDescription,
+                    "Code": currCode,
                     "GeneratedCode": unittest_code,
                     "CodeRan": codeTobeRun,
                     "Feedback": feedbackparsed,
@@ -120,9 +106,9 @@ class TestGenerator:
             jsondata = self.df.to_dict(orient="records")
             with open(self.JSONFile, "w") as f:
                 json.dump(jsondata, f, indent=4)
-        c.close()
 
         self.printResults()
+        c.close()
         return
 
     def extractInfo(self, i):
@@ -131,38 +117,17 @@ class TestGenerator:
         Args: i (int): The index of the example in the JSON file
         Return: description (str): The description of the example
                 code (str): The code of the example
+                generatedCode (str): The generated code of the example
+                feedback (str): The feedback of the example
         """
-        description = self.HEval_JsonObj.iloc[i]["text"]
-        code = self.HEval_JsonObj.iloc[i]["canonical_solution"]
-        # current loop to remove initial spaces in extracted code
-        indexer = 0
-        while code[indexer] == " ":
-            indexer += 1
-        code = code[indexer:]
-        # extract the function definition and utility code
-        funcDefiniton = self.HEval_JsonObj.iloc[i]["prompt"]
-        funcDefiniton, Utility = get_function_name(
-            funcDefiniton
-        )  # does not need entry point at the end of the day
-        code = Utility + "\n" + funcDefiniton + code
+        currDescription = self.CasesLogs.iloc[i]['Description']
+        currCode = self.CasesLogs.iloc[i]['Code']
+        currGeneratedCode = self.CasesLogs.iloc[i]['GeneratedCode']
+        currFeedback = self.CasesLogs.iloc[i]['Feedback']
 
-        return description, code
+        return currDescription, currCode, currGeneratedCode, currFeedback
 
-    def extractFewShots(self, code):
-        """
-        Extract the few shot code and test cases from the database
-        Args: code (str): The code of the example
-        Return: fewShotStr (str): The few shot code and test cases
-        """
-        # get the few shot code and test cases
-        codes_of_few_shot, test_cases_few_shot = get_few_shots(self.db, code)
-        # take the most similar few shot other than the code itself
-        codes_of_few_shot, test_cases_few_shot = (
-            codes_of_few_shot[1:3],
-            test_cases_few_shot[1:3],
-        )
-        fewShotStr = preprocessStringFewShot(codes_of_few_shot, test_cases_few_shot)
-        return fewShotStr
+
 
     def checkPaths(self):
         """
@@ -170,20 +135,12 @@ class TestGenerator:
         Args: None
         Return: None
         """
-        if not os.path.exists(self.OutputFile):
-            try:
-                os.makedirs(self.OutputFile)
-                print(f"Directory {self.OutputFile} created successfully!")
-            except Exception as e:
-                print(f"Error creating directory {self.OutputFile}: {e}")
-                exit()
-
         if not os.path.exists(self.CasesJSONFile):
             try:
                 # Create a new empty JSON file with an empty list structure
-                with open(self.CasesJSONFile, "w") as f:
+                with open(self.CasesJSONFile, 'w') as f:
                     json.dump([], f)
-                    print(f"File {self.CasesJSONFile} created successfully!")
+                print(f"File {self.CasesJSONFile} created successfully!")
             except Exception as e:
                 print(f"Error creating file {self.CasesJSONFile}: {e}")
                 exit()
@@ -239,8 +196,15 @@ class TestGenerator:
             c.write("Test example " + str(i) + " succeeded\n")
             c.write("Number of Ran Tests : " + str(num_of_assertions) + "\n")
             c.write("Number of Succeeded Test : " + str(num_of_assertions) + "\n")
-            new_case_row=pd.DataFrame({'CaseNumber':i,'Total Tests':num_of_assertions,'Tests failed':failedCasesNum, 'Error Tests': errorCasesNum},index=[0])
+            
+            oldTotalTests = self.OldCases.iloc[i]['Total Tests']
+            oldTestsFailed = self.OldCases.iloc[i]['Tests failed']
+            oldTestsError = ""
+            print("Old Error Tests",oldTestsError)
+        
 
+            new_case_row=pd.DataFrame({'CaseNumber':i,'Feedback Total Tests':num_of_assertions,'Feedback Tests failed':0,'Feedback Error Tests':0,
+                                    'Old Total Tests': oldTotalTests, 'Old Tests Failed': oldTestsFailed, 'Old Tests Error': oldTestsError},index=[0])
             self.casesDf = pd.concat([self.casesDf, new_case_row])
             casejsondata = self.casesDf.to_dict(orient="records")
             with open(self.CasesJSONFile, "w") as f:
@@ -271,8 +235,15 @@ class TestGenerator:
                 + str(numberOfSucceeded)
                 + "\n"
             )
-            new_case_row=pd.DataFrame({'CaseNumber':i,'Total Tests':num_of_assertions,'Tests failed':failedCasesNum, 'Error Tests': errorCasesNum},index=[0])
 
+            oldTotalTests = self.OldCases.iloc[i]['Total Tests']
+            oldTestsFailed = self.OldCases.iloc[i]['Tests failed']
+            oldTestsError = ""
+            print("Old Error Tests",oldTestsError)
+        
+
+            new_case_row=pd.DataFrame({'CaseNumber':i,'Feedback Total Tests':num_of_assertions,'Feedback Tests failed':0,'Feedback Error Tests':0,
+                                    'Old Total Tests': oldTotalTests, 'Old Tests Failed': oldTestsFailed, 'Old Tests Error': oldTestsError},index=[0])
             self.casesDf = pd.concat([self.casesDf, new_case_row])
             casejsondata = self.casesDf.to_dict(orient="records")
             with open(self.CasesJSONFile, "w") as f:
@@ -329,3 +300,4 @@ class TestGenerator:
             f.write("Tests to repeat : " + str(self.testsToRepeat) + "\n")
 
         print("Incomplete Responses are ", self.incompleteResponses)
+

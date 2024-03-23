@@ -7,8 +7,13 @@ def add_Mixtral_Tokens(template):
     return "<s> [INST] " + template + "</s> [/INST]"
 
 
-# made according to human eval
+
 def remove_metadata(unittests):
+    """
+    Removes the METADATA block from the unit tests that is not needed for the code to run and present in HUMANEVAL dataset
+    Args: unittests: list of unit tests
+    Returns: list of unit tests with METADATA block removed
+    """
     output = []
     for unitest in unittests:
         # pattern = re.compile(r"\bMETADATA\b\s*=\s*{.*}", re.DOTALL)
@@ -55,6 +60,9 @@ def preprocessStringFewShot(codes, example_unit_tests):
 
 # replaces the unittest call with another one to fix exec problem with running on colab
 def replaceUnitTestCall(code):
+    """
+    This makes the unittest call compatible when running on Jupyter Notebooks or Google Colab.
+    """
     pattern = r"unittest.main()"
 
     # Use re.sub() to replace the pattern with the replacement string
@@ -91,6 +99,8 @@ def preprocessUnitTest(code):
     code = addUnitTestCall(code)
     code = replaceUnitTestCall(code)
     code = addUnitTestImport(code)
+    code = re.sub(r"\\_", "_", code)  # added to remove the extra \\_ in the generated code
+
     return code
 
 

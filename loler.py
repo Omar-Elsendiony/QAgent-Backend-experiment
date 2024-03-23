@@ -1,3 +1,5 @@
+import unittest
+
 class TestTruncateNumber(unittest.TestCase):
     def test_truncate_negative_float(self):
         """Test truncating a negative float"""
