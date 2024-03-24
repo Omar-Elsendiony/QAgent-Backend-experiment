@@ -39,6 +39,7 @@ class TestFix:
         self.OldCases = pd.read_json(self.OldCasesFile)
         self.df = pd.DataFrame()
         self.casesDf = pd.DataFrame()
+        self.firstFeedback = True
 
     def generate(self):
         """
@@ -61,7 +62,7 @@ class TestFix:
                 self.extractInfo(i)
             )
             currRanCode = getRunningCode(currCode, currGeneratedCode)
-
+            # no feedback means testcase passed so don't run it again
             if pd.isna(currFeedback) or currFeedback == "" or currFeedback is None:
                 print("Example", i, " has already passed")
                 c.write(
@@ -99,8 +100,19 @@ class TestFix:
                     + " Didn't Run Due to Errorr\n=====================================\n"
                 )
                 continue
-
-            self.writeResults(feedback, feedbackparsed, unittestCode, c, i)
+            NonSucceedingCasesNames = getNonSucceedingTestcases(feedback)
+            NonSucceedingCasesNamesList = (
+                NonSucceedingCasesNames["failed"] + NonSucceedingCasesNames["error"]
+            )
+            testsToRepeat = getEachTestCase(unittestCode, NonSucceedingCasesNamesList)
+            self.writeResults(
+                feedback,
+                feedbackparsed,
+                unittestCode,
+                c,
+                NonSucceedingCasesNamesList,
+                i,
+            )
             self.descriptions.append(currDescription)
             self.codes.append(currCode)
             self.resCodes.append(unittestCode)
@@ -115,7 +127,7 @@ class TestFix:
                     "CodeRan": codeTobeRun,
                     "Feedback": feedbackparsed,
                     "FullFeedback": feedback,
-                    # "TestsToRepeat": testsToRepeat,
+                    "TestsToRepeat": testsToRepeat,
                 },
                 index=[0],
             )
@@ -172,7 +184,9 @@ class TestFix:
                 print(f"Error creating file {self.JSONFile}: {e}")
                 exit()
 
-    def writeResults(self, feedback, feedbackparsed, unittestCode, c, i):
+    def writeResults(
+        self, feedback, feedbackparsed, unittestCode, c, NonSucceedingCasesNamesList, i
+    ):
         """
         Responsible for writing results to cases.txt and cases.json
 
@@ -195,10 +209,17 @@ class TestFix:
             c.write("Number of Ran Tests : " + str(numOfAssertions) + "\n")
             c.write("Number of Succeeded Test : " + str(numOfAssertions) + "\n")
 
-            oldTotalTests = self.OldCases.iloc[i]["Total Tests"]
-            oldTestsFailed = self.OldCases.iloc[i]["Tests failed"]
-            oldTestsError = ""
-            print("Old Error Tests", oldTestsError)
+            oldTotalTests = 0
+            oldTestsFailed = 0
+            oldTestsError = 0
+            if self.firstFeedback:
+                oldTotalTests = self.OldCases.iloc[i]["Total Tests"]
+                oldTestsFailed = self.OldCases.iloc[i]["Tests failed"]
+                oldTestsError = self.OldCases.iloc[i]["Error Tests"]
+            else:
+                oldTotalTests = self.OldCases.iloc[i]["Feedback Total Tests"]
+                oldTestsFailed = self.OldCases.iloc[i]["Feedback Tests failed"]
+                oldTestsError = self.OldCases.iloc[i]["Feedback Error Tests"]
 
             newCaseRow = pd.DataFrame(
                 {
@@ -222,11 +243,6 @@ class TestFix:
         else:
             self.failedExamplesNum += 1
             failedCasesNum, errorCasesNum = getNumNonSucceedingTestcases(feedback)
-            NonSucceedingCasesNames = getNonSucceedingTestcases(feedback)
-            NonSucceedingCasesNamesList = (
-                NonSucceedingCasesNames["failed"] + NonSucceedingCasesNames["error"]
-            )
-            testsToRepeat = getEachTestCase(unittestCode, NonSucceedingCasesNamesList)
             numberOfSucceeded = numOfAssertions - failedCasesNum - errorCasesNum
             print(f"Test example {i} failed\n======================================\n")
             print("Number of Ran Tests : ", numOfAssertions)

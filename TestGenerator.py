@@ -165,11 +165,8 @@ class TestGenerator:
         """
         description = self.HEval_JsonObj.iloc[i]["text"]
         code = self.HEval_JsonObj.iloc[i]["canonical_solution"]
-        # current loop to remove initial spaces in extracted code
-        indexer = 0
-        while code[indexer] == " ":
-            indexer += 1
-        code = code[indexer:]
+        # remove initial spaces in extracted code
+        code = code.strip()
         # extract the function definition and utility code
         funcDefiniton = self.HEval_JsonObj.iloc[i]["prompt"]
         funcDefiniton, Utility = getFunctionName(
