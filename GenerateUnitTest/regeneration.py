@@ -39,8 +39,7 @@ with the following feedback:
 *Feedback*:
 {feedback}
 
-
-Is the testcase correct??? If not, please fix the test case and re-run the code.
+Take the two values that are being compared in the assertion above and check if the expected value is correct.
 Consider that the assertion may be a negative test that makes sure that the invalid behaviour is tested.
 Change either the test case or the assertion (if any of them is incorrect)
 Generate only the fixed test case enclosed by ```python and ``` to be able to run the code and re-run the code.
@@ -54,6 +53,9 @@ Generate only the fixed test case enclosed by ```python and ``` to be able to ru
     # made according to mixtral response
     def get_code_from_response(self, response):
         # has backticks in different positions
+        response = re.sub(r"```python```", "", response)
+
+        """ find all instances of ```python and start from the last one"""
         s = re.finditer(r"```python", response)
         for st in s:
             startIndex = st.span(0)[0]
@@ -117,7 +119,20 @@ Generate only the fixed test case enclosed by ```python and ``` to be able to ru
                 after = after[start:]
             else:
                 after = after[start : matched.span()[0]]
-            # print(after)
-            codeRan = self.updateUnittest(after, codeRan)
-            codeRan = self.get_code_from_response(codeRan)
+            
+            codeRan = substituteTestCases(before, after, codeRan)
+        
+
+        fix_unit = f"""
+        fix the unittest that is provided to be runnable and include the unittest call.
+        Find the differences between it and a correct unittest and change if necessary.
+
+        *Unittest*:
+        {codeRan}
+
+        Fix the indentation and remove redundant lines if any.
+        The output code should be encloded by ```python and ```
+        """
+        res = (self.chat_model_arb.invoke(fix_unit)).content
+        codeRan = self.get_code_from_response(res)
         return codeRan

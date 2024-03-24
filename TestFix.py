@@ -32,7 +32,7 @@ class TestFix:
         self.OutputFile = "FeedbackOutput/"
         self.JSONFile = self.OutputFile + "RunningLogs.json"
         self.CasesJSONFile = self.OutputFile + "Cases.json"
-        OldFile = "Results/FeedbackMixtral-2Shot/"
+        OldFile = "Results/1-Shot-M/"
         self.OldCasesFile = OldFile + "Cases.json"
         self.OldJsonFile = OldFile + "RunningLogs.json"
         self.CasesLogs = pd.read_json(self.OldJsonFile)
@@ -55,7 +55,7 @@ class TestFix:
         self.checkPaths()
         self.reset()
         c = open(self.OutputFile + "Cases.txt", "w+")
-        for i in range(0, 29):
+        for i in range(0, 30):
             print("Running Example ", i, "\n=====================\n")
 
             currDescription, currCode, currGeneratedCode, currFeedback = (
@@ -80,9 +80,9 @@ class TestFix:
                     getFeedbackFromRunList,
                 )
                 if codeTobeRun is not None:
-                    codeTobeRun = replaceUnitTestCall(codeTobeRun)
+                    codeTobeRun = preprocessUnitTest(codeTobeRun)
                     feedback = runCode(code=codeTobeRun, myglobals=self.myglobals)
-                    print("original feedback is: ", feedback)
+                    print("feedback is: ", feedback)
                     feedbackparsed = getFeedbackFromRun(feedback)
                     unittestCode = codeTobeRun[
                         (re.search(r"import unittest", codeTobeRun)).span()[0] :

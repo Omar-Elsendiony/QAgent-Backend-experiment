@@ -185,10 +185,8 @@ class TestGenerator:
         # get the few shot code and test cases
         codeOfFewShots, testCasesFewShots = getFewShots(self.db, code)
         # take the most similar few shot other than the code itself
-        codeOfFewShots, testCasesFewShots = (
-            codeOfFewShots[1:3],
-            testCasesFewShots[1:3],
-        )
+        codeOfFewShots= codeOfFewShots[1:4]
+        testCasesFewShots = testCasesFewShots[1:4]
         fewShotStr = preprocessStringFewShot(codeOfFewShots, testCasesFewShots)
         return fewShotStr
 
