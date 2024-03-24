@@ -22,4 +22,4 @@ else:
 
 
 HEval_JsonObj = pd.read_json(path_or_buf="humaneval.jsonl", lines=True)
-db = connect_db()
+db = connectDB()

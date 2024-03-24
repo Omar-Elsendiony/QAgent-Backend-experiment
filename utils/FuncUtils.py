@@ -3,7 +3,8 @@ import re
 # made according to human eval
 
 
-def extract_function_name(string):
+def extractFunctionName(string):
+    """Gets the function name from a function signature string."""
     # Define a regular expression pattern to match the function name
     pattern = r"def\s+(\w+)\s*\(.*\)"
 
@@ -18,13 +19,13 @@ def extract_function_name(string):
 
 
 # gets the function name from the function definition in human eval
-def get_function_name(funcDefinition):
+def getFunctionName(funcDefinition):
     rs = re.search(r"\"\"\".*\"\"\"", funcDefinition, re.DOTALL)
     if rs == None:
         rs = re.search(r"\'\'\'.*\'\'\'", funcDefinition, re.DOTALL)
-    
+
     allMatches = re.findall(r"def ", funcDefinition)
-    if (len(allMatches) == 1):
+    if len(allMatches) == 1:
         end = rs.span()[0]
         funcHeader = funcDefinition[:end]
         UtilityFunction = ""
@@ -34,15 +35,15 @@ def get_function_name(funcDefinition):
         secondPart = funcDefinition[begin:]
         rs = re.search(r"\"\"\".*\"\"\"", secondPart, re.DOTALL)
         if rs == None:
-            rs = re.search(r"\'\'\'.*\'\'\'", secondPart, re.DOTALL)        
+            rs = re.search(r"\'\'\'.*\'\'\'", secondPart, re.DOTALL)
         end = rs.span()[0]
-        funcHeader = funcDefinition[begin:end+begin]
+        funcHeader = funcDefinition[begin : end + begin]
         UtilityFunction = funcDefinition[:begin]
     return funcHeader, UtilityFunction
 
 
 # replace function name if needed
-def replace_function_name(string, replacement_string):
+def replaceFunctionName(string, replacement_string):
     # Define the regular expression pattern to match the function name
     pattern = r"def\s+(\w+)\s*"
 
@@ -52,19 +53,16 @@ def replace_function_name(string, replacement_string):
     return modified_string
 
 
-
-import re
-
 def getTestCase(splitLines, errorChunck):
-    lineNoGroup = re.search(r'(?<=line )(\d)+', errorChunck)
-    lineNo = lineNoGroup.group(0) #line number of the end of the error
+    lineNoGroup = re.search(r"(?<=line )(\d)+", errorChunck)
+    lineNo = lineNoGroup.group(0)  # line number of the end of the error
+
     def getStartTestCase(splitLines, startIndex):
         for i in range(startIndex, 0, -1):
-            if splitLines[i].find('def test') != - 1:
+            if splitLines[i].find("def test") != -1:
                 return i
         return -1
+
     startCaseIndex = getStartTestCase(splitLines, int(lineNo))
-    testCase = "\n".join(splitLines[startCaseIndex:int(lineNo)])
+    testCase = "\n".join(splitLines[startCaseIndex : int(lineNo)])
     return testCase
-
-

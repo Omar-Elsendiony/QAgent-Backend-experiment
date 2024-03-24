@@ -2,13 +2,12 @@
 import re
 
 
-# adds Mixtral Special Tokens to the prompt in case of vanilla llm by API
-def add_Mixtral_Tokens(template):
+def addMixtralTokens(template):
+    """Adds Mixtral Special Tokens to the prompt in case of vanilla llm by API to try to prevent incomplete responses problem."""
     return "<s> [INST] " + template + "</s> [/INST]"
 
 
-
-def remove_metadata(unittests):
+def removeMetaData(unittests):
     """
     Removes the METADATA block from the unit tests that is not needed for the code to run and present in HUMANEVAL dataset
     Args: unittests: list of unit tests
@@ -28,7 +27,8 @@ def remove_metadata(unittests):
 
 # preprocesses the prompt string to be used in the few shot learning
 def preprocessStringFewShot(codes, example_unit_tests):
-
+    """Preprocesses the prompt string to be used in the few shot learning puts it in the format:
+    {"examples": [{"input 1": "code", "output 1": "test_case"}, ...]"""
     string_few_shot = ""
     string_few_shot += '{\n"examples": ['
     open_curly = "{"
@@ -99,7 +99,9 @@ def preprocessUnitTest(code):
     code = addUnitTestCall(code)
     code = replaceUnitTestCall(code)
     code = addUnitTestImport(code)
-    code = re.sub(r"\\_", "_", code)  # added to remove the extra \\_ in the generated code
+    code = re.sub(
+        r"\\_", "_", code
+    )  # added to remove the extra \\_ in the generated code
 
     return code
 
@@ -111,7 +113,8 @@ sys.setrecursionlimit(100)
 """
 
 
-def get_running_code(code, unittest_code):
+def getRunningCode(codeUnderTest, unitTestCode):
+    """Takes in the code under test and the unittest code and returns the code to run"""
     global introCode
-    runningCode = introCode + "\n" + code + "\n" + unittest_code
+    runningCode = introCode + "\n" + codeUnderTest + "\n" + unitTestCode
     return runningCode

@@ -77,9 +77,9 @@ def getCodeFromResponse(response, testFixing=False):
         return getCodeFromTestFixing(response)
 
 
-# extract test cases code according to given function names
 def getEachTestCase(UnitTestsCode, functionNames):
-    # split the test cases
+    """Extract test cases code according to given function names"""
+    # First split the test cases
     if len(functionNames) == 0:
         return UnitTestsCode
     classHeader = re.search(r"(class.*:)", UnitTestsCode)
