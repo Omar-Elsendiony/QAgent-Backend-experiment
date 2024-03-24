@@ -79,8 +79,8 @@ class TestGenerator:
                     + " Didn't Run Due to Errorr\n=====================================\n"
                 )
                 continue
-            unittest_code, isIncompleteResponse = get_code_from_response(
-                unittest["text"]
+            unittest_code, isIncompleteResponse = getCodeFromResponse(
+                unittest["text"], False
             )
             if isIncompleteResponse:
                 self.incompleteResponses += 1
