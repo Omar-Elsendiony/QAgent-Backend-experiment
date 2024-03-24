@@ -55,7 +55,7 @@ class TestFix:
         self.checkPaths()
         self.reset()
         c = open(self.OutputFile + "Cases.txt", "w+")
-        for i in range(0, 3):
+        for i in range(0, 29):
             print("Running Example ", i, "\n=====================\n")
 
             currDescription, currCode, currGeneratedCode, currFeedback = (

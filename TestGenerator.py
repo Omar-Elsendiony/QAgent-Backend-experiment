@@ -50,7 +50,7 @@ class TestGenerator:
         self.checkPaths()
         self.reset()
         FileHandle = open(self.OutputFile + "Cases.txt", "w+")
-        for i in range(0, 3):
+        for i in range(0, 30):
             # if (i == 10): continue
             print("Running Test Case ", i)
             FileHandle.write(
