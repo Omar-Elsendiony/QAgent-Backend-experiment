@@ -5,6 +5,21 @@ class Regeneration:
     def __init__(self, chat_model) -> None:
         self.chat_model_arb = chat_model
 
+    def updateUnittest(self, code, tc):
+        updatetestcase = f"""
+        Make this test case:
+        {tc}
+
+        replace the one in the following code:
+        {code}
+
+
+        Generate the whole code after replacement and it should be encloded by ```python and ```
+        Preserve the indentation correctness in the response.
+        """
+        res = (self.chat_model_arb.invoke(updatetestcase)).content
+        return res
+
     def regeneratePrompt(self, code, description, testcase, feedback):
         reGenerationPrompt = f"""
 you generated unittest for the following method under test having the following description:
@@ -79,14 +94,9 @@ Generate only the fixed test case enclosed by ```python and ``` to be able to ru
         feedback_l = get_feedback_from_run_list(feedback_test)
         if (feedback_l is None):
             return None
-        # if (i == 2):
-        #     print(codeRan)
-        # print("================================")
         for f in feedback_l:
             # print("before:")
             before = self.getTestCase(splitLines, f)
-            # print(before)
-            # print("after: ")
             afterX = self.regeneratePrompt(code, description, before, f)
             after = self.get_code_from_response(afterX)
             matched = re.search(r'def test', after, re.DOTALL)
@@ -100,7 +110,8 @@ Generate only the fixed test case enclosed by ```python and ``` to be able to ru
             else:
                 after = after[start:matched.span()[0]]
             # print(after)
-            codeRan = substituteTestCases(before, after, codeRan)
+            codeRan = self.updateUnittest(after, codeRan)
+            codeRan = self.get_code_from_response(codeRan)
         return codeRan
 
 
