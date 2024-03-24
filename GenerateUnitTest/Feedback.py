@@ -29,7 +29,7 @@ Modify only the unit tests
 Do not include new imports for the code or tests.
 Preserve all existing functionality not related to the bugs.
 
-Return your revised code or unit tests as only one formatted markdown code snippet, surrounded by triple backticks and the word 'python'."""
+Return your revised code or unit tests as only one formatted markdown code snippet without further explanation, surrounded by triple backticks and the word 'python'."""
 
 
 # TODO: Change only one

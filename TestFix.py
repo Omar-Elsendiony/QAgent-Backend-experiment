@@ -2,12 +2,13 @@ from Imports import *
 from CustomThread import *
 from GenerateUnitTest.Regeneration import *
 
+
 class TestFix:
 
     def __init__(self, myglobals):
         self.reset()
         self.myglobals = myglobals
-        llm_arb, chat_model_arb = InitializeModelArbiter(os.environ['HF_TOKEN'])
+        llm_arb, chat_model_arb = InitializeModelArbiter(os.environ["HF_TOKEN"])
         self.reg = Regeneration(chat_model_arb)
 
     def reset(self):
@@ -28,14 +29,14 @@ class TestFix:
         self.TotalCases = 0
         self.TotalFailedCases = 0
         self.incompleteResponses = 0
-        self.OutputFile="FeedbackOutput/"
-        self.JSONFile= self.OutputFile+"RunningLogs.json"
-        self.CasesJSONFile = self.OutputFile+"Cases.json"
-        OldFile="Results/FeedbackMixtral-2Shot/"
-        self.OldCasesFile= OldFile+"Cases.json"
-        self.OldJsonFile= OldFile+"RunningLogs.json"
-        self.CasesLogs=pd.read_json(self.OldJsonFile)
-        self.OldCases= pd.read_json(self.OldCasesFile)
+        self.OutputFile = "FeedbackOutput/"
+        self.JSONFile = self.OutputFile + "RunningLogs.json"
+        self.CasesJSONFile = self.OutputFile + "Cases.json"
+        OldFile = "Results/FeedbackMixtral-2Shot/"
+        self.OldCasesFile = OldFile + "Cases.json"
+        self.OldJsonFile = OldFile + "RunningLogs.json"
+        self.CasesLogs = pd.read_json(self.OldJsonFile)
+        self.OldCases = pd.read_json(self.OldCasesFile)
         self.df = pd.DataFrame()
         self.casesDf = pd.DataFrame()
 
@@ -54,23 +55,37 @@ class TestFix:
         self.reset()
         c = open(self.OutputFile + "Cases.txt", "w+")
         for i in range(0, 3):
-            print("Running Example ",i,"\n=====================\n")
+            print("Running Example ", i, "\n=====================\n")
 
-            currDescription, currCode, currGeneratedCode, currFeedback = self.extractInfo(i)
+            currDescription, currCode, currGeneratedCode, currFeedback = (
+                self.extractInfo(i)
+            )
             currRanCode = get_running_code(currCode, currGeneratedCode)
 
-            if pd.isna(currFeedback) or currFeedback=="" or currFeedback is None:
-                print("Example",i," has already passed")
-                c.write("Example "+str(i)+" has already passed\n=====================================\n")
+            if pd.isna(currFeedback) or currFeedback == "" or currFeedback is None:
+                print("Example", i, " has already passed")
+                c.write(
+                    "Example "
+                    + str(i)
+                    + " has already passed\n=====================================\n"
+                )
                 continue
             try:
-                codeTobeRun = self.reg.get_feedback(currDescription, currCode, currRanCode, currFeedback, get_feedback_from_run_list)
-                if (codeTobeRun is not None):
+                codeTobeRun = self.reg.get_feedback(
+                    currDescription,
+                    currCode,
+                    currRanCode,
+                    currFeedback,
+                    get_feedback_from_run_list,
+                )
+                if codeTobeRun is not None:
                     codeTobeRun = replaceUnitTestCall(codeTobeRun)
-                    feedback = runCode(code = codeTobeRun, myglobals = self.myglobals)
-                    print("original feedback is: ",feedback)
+                    feedback = runCode(code=codeTobeRun, myglobals=self.myglobals)
+                    print("original feedback is: ", feedback)
                     feedbackparsed = get_feedback_from_run(feedback)
-                    unittest_code = codeTobeRun[(re.search(r"import unittest", codeTobeRun)).span()[0]:]
+                    unittest_code = codeTobeRun[
+                        (re.search(r"import unittest", codeTobeRun)).span()[0] :
+                    ]
                 else:
                     self.incompleteResponses += 1
                     continue
@@ -78,9 +93,12 @@ class TestFix:
                 print("ERROR in invoking Feedback Chain")
                 self.apiErrors += 1
                 print(e)
-                c.write("Example "+str(i)+" Didn't Run Due to Errorr\n=====================================\n")
+                c.write(
+                    "Example "
+                    + str(i)
+                    + " Didn't Run Due to Errorr\n=====================================\n"
+                )
                 continue
-
 
             self.writeResults(feedback, feedbackparsed, unittest_code, c, i)
             self.descriptions.append(currDescription)
@@ -97,6 +115,7 @@ class TestFix:
                     "CodeRan": codeTobeRun,
                     "Feedback": feedbackparsed,
                     "FullFeedback": feedback,
+                    # "TestsToRepeat": testsToRepeat,
                 },
                 index=[0],
             )
@@ -120,14 +139,12 @@ class TestFix:
                 generatedCode (str): The generated code of the example
                 feedback (str): The feedback of the example
         """
-        currDescription = self.CasesLogs.iloc[i]['Description']
-        currCode = self.CasesLogs.iloc[i]['Code']
-        currGeneratedCode = self.CasesLogs.iloc[i]['GeneratedCode']
-        currFeedback = self.CasesLogs.iloc[i]['Feedback']
+        currDescription = self.CasesLogs.iloc[i]["Description"]
+        currCode = self.CasesLogs.iloc[i]["Code"]
+        currGeneratedCode = self.CasesLogs.iloc[i]["GeneratedCode"]
+        currFeedback = self.CasesLogs.iloc[i]["Feedback"]
 
         return currDescription, currCode, currGeneratedCode, currFeedback
-
-
 
     def checkPaths(self):
         """
@@ -138,7 +155,7 @@ class TestFix:
         if not os.path.exists(self.CasesJSONFile):
             try:
                 # Create a new empty JSON file with an empty list structure
-                with open(self.CasesJSONFile, 'w') as f:
+                with open(self.CasesJSONFile, "w") as f:
                     json.dump([], f)
                 print(f"File {self.CasesJSONFile} created successfully!")
             except Exception as e:
@@ -196,15 +213,24 @@ class TestFix:
             c.write("Test example " + str(i) + " succeeded\n")
             c.write("Number of Ran Tests : " + str(num_of_assertions) + "\n")
             c.write("Number of Succeeded Test : " + str(num_of_assertions) + "\n")
-            
-            oldTotalTests = self.OldCases.iloc[i]['Total Tests']
-            oldTestsFailed = self.OldCases.iloc[i]['Tests failed']
-            oldTestsError = ""
-            print("Old Error Tests",oldTestsError)
-        
 
-            new_case_row=pd.DataFrame({'CaseNumber':i,'Feedback Total Tests':num_of_assertions,'Feedback Tests failed':0,'Feedback Error Tests':0,
-                                    'Old Total Tests': oldTotalTests, 'Old Tests Failed': oldTestsFailed, 'Old Tests Error': oldTestsError},index=[0])
+            oldTotalTests = self.OldCases.iloc[i]["Total Tests"]
+            oldTestsFailed = self.OldCases.iloc[i]["Tests failed"]
+            oldTestsError = ""
+            print("Old Error Tests", oldTestsError)
+
+            new_case_row = pd.DataFrame(
+                {
+                    "CaseNumber": i,
+                    "Feedback Total Tests": num_of_assertions,
+                    "Feedback Tests failed": 0,
+                    "Feedback Error Tests": 0,
+                    "Old Total Tests": oldTotalTests,
+                    "Old Tests Failed": oldTestsFailed,
+                    "Old Tests Error": oldTestsError,
+                },
+                index=[0],
+            )
             self.casesDf = pd.concat([self.casesDf, new_case_row])
             casejsondata = self.casesDf.to_dict(orient="records")
             with open(self.CasesJSONFile, "w") as f:
@@ -216,34 +242,42 @@ class TestFix:
             self.num_failed_examples += 1
             failedCasesNum, errorCasesNum = getNumNonSucceedingTestcases(feedback)
             NonSucceedingCasesNames = getNonSucceedingTestcases(feedback)
-            NonSucceedingCasesNamesList = NonSucceedingCasesNames["failed"]+NonSucceedingCasesNames["error"]
+            NonSucceedingCasesNamesList = (
+                NonSucceedingCasesNames["failed"] + NonSucceedingCasesNames["error"]
+            )
             testsToRepeat = getEachTestCase(unittest_code, NonSucceedingCasesNamesList)
-            numberOfSucceeded = num_of_assertions-failedCasesNum-errorCasesNum
+            numberOfSucceeded = num_of_assertions - failedCasesNum - errorCasesNum
             print(f"Test example {i} failed\n======================================\n")
             print("Number of Ran Tests : ", num_of_assertions)
             print("Number of failed Tests : ", failedCasesNum)
             print("Number of error Tests : ", errorCasesNum)
             print(
-                "Number of Succeeded Test : ", numberOfSucceeded,
+                "Number of Succeeded Test : ",
+                numberOfSucceeded,
             )
             c.write("Test example " + str(i) + " failed\n")
             c.write("Number of Ran Tests : " + str(num_of_assertions) + "\n")
             c.write("Number of failed Tests : " + str(failedCasesNum) + "\n")
             c.write("Number of Error Test : " + str(errorCasesNum) + "\n")
-            c.write(
-                "Number of Succeeded Test : "
-                + str(numberOfSucceeded)
-                + "\n"
-            )
+            c.write("Number of Succeeded Test : " + str(numberOfSucceeded) + "\n")
 
-            oldTotalTests = self.OldCases.iloc[i]['Total Tests']
-            oldTestsFailed = self.OldCases.iloc[i]['Tests failed']
+            oldTotalTests = self.OldCases.iloc[i]["Total Tests"]
+            oldTestsFailed = self.OldCases.iloc[i]["Tests failed"]
             oldTestsError = ""
-            print("Old Error Tests",oldTestsError)
-        
+            print("Old Error Tests", oldTestsError)
 
-            new_case_row=pd.DataFrame({'CaseNumber':i,'Feedback Total Tests':num_of_assertions,'Feedback Tests failed':0,'Feedback Error Tests':0,
-                                    'Old Total Tests': oldTotalTests, 'Old Tests Failed': oldTestsFailed, 'Old Tests Error': oldTestsError},index=[0])
+            new_case_row = pd.DataFrame(
+                {
+                    "CaseNumber": i,
+                    "Feedback Total Tests": num_of_assertions,
+                    "Feedback Tests failed": 0,
+                    "Feedback Error Tests": 0,
+                    "Old Total Tests": oldTotalTests,
+                    "Old Tests Failed": oldTestsFailed,
+                    "Old Tests Error": oldTestsError,
+                },
+                index=[0],
+            )
             self.casesDf = pd.concat([self.casesDf, new_case_row])
             casejsondata = self.casesDf.to_dict(orient="records")
             with open(self.CasesJSONFile, "w") as f:
@@ -296,8 +330,7 @@ class TestFix:
             f.write(
                 "Incomplete Responses are : " + str(self.incompleteResponses) + "\n"
             )
-            f.write('API Errors are : ' + str(self.apiErrors) + '\n')
+            f.write("API Errors are : " + str(self.apiErrors) + "\n")
             f.write("Tests to repeat : " + str(self.testsToRepeat) + "\n")
 
         print("Incomplete Responses are ", self.incompleteResponses)
-
