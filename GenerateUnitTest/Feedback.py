@@ -2,7 +2,7 @@ from langchain.chains import LLMChain
 from langchain.prompts import PromptTemplate
 from langchain_community.llms import HuggingFaceHub
 import openai
-from utils.PreprocessUtils import add_Mixtral_Tokens
+from utils.PreprocessUtils import addMixtralTokens
 
 RegenerateTestTemplate = """You are a Python expert, and your task is to debug and improve the following Python code based on the given description, code snippet, and unit tests feedback:
 
@@ -39,7 +39,7 @@ def InitializeFeedbackChain(llm):
     global RegenerateTestTemplate
     # adding [INST] to mixtral manually
     if isinstance(llm, HuggingFaceHub) and "Mixtral" in llm.repo_id:
-        RegenerateTestTemplate = add_Mixtral_Tokens(RegenerateTestTemplate)
+        RegenerateTestTemplate = addMixtralTokens(RegenerateTestTemplate)
 
     Generate_Unit_Tests_Template = PromptTemplate(
         template=RegenerateTestTemplate,

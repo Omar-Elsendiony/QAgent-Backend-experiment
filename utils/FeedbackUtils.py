@@ -5,9 +5,7 @@ import re
 
 # gets feedback from running the code using exec
 # empty in case of success
-
-
-def get_feedback_from_run(response):
+def getFeedbackFromRun(response):
     """
     An example parsed feedback is:
 
@@ -42,7 +40,7 @@ def get_feedback_from_run(response):
         return response
 
 
-def get_feedback_from_run_list(response):  # omar's version
+def getFeedbackFromRunList(response):  # omar's version
     lines = response.split("\n")
     in_failmessage = False
     feedbacks = []
@@ -71,7 +69,7 @@ def get_feedback_from_run_list(response):  # omar's version
 
 
 def getNumNonSucceedingTestcases(feedback):
-    # Use a regular expression to find the number of Ran Tests and Failures
+    """Finds the number of Ran Tests and Failures"""
     failures_match = re.search(r"failures=(\d+)", feedback)
     errors_match = re.search(r"errors=(\d+)", feedback)
     # Extract the numbers or default to 0 if not found
@@ -81,13 +79,13 @@ def getNumNonSucceedingTestcases(feedback):
     return failures, errors
 
 
-# gets the names of the failed test cases functions
 def getNonSucceedingTestcases(feedback):
+    """Gets the names of the failed test cases functions"""
     failed_tests = re.findall(r"FAIL: (.*) \(", feedback)
     error_tests = re.findall(r"ERROR: (.*) \(", feedback)
     return {"failed": failed_tests, "error": error_tests}
 
 
-def get_num_assertions(code_text):
+def getNumAssertions(code_text):
     total_num = len(re.findall(r"self\.assert.", code_text, flags=re.MULTILINE))
     return total_num

@@ -4,6 +4,7 @@ from _thread import interrupt_main
 import sys
 from io import StringIO
 
+
 class CustomThread(threading.Thread):
     def __init__(self, *args, **kwargs):
         super(CustomThread, self).__init__(*args, **kwargs)
@@ -20,29 +21,30 @@ class CustomThread(threading.Thread):
         while not self.stopped():
             interrupt_main()
 
+
 def runCode(code, myglobals):
-    old_stdout = sys.stdout
-    redirected_output = sys.stdout = StringIO()
-    oldstderr = sys.stderr
-    redirected_output2 = sys.stderr = StringIO()
+    oldStdOUT = sys.stdout
+    redirectedOutput = sys.stdout = StringIO()
+    oldStdERR = sys.stderr
+    redirectedOutput2 = sys.stderr = StringIO()
     result = ""
     thread = CustomThread()
     try:
         thread.start()
         exec(code, myglobals)
-        result = redirected_output.getvalue()
+        result = redirectedOutput.getvalue()
     except Exception as e:
         # print(repr(e))
         result = repr(e)
     except SystemExit as s:
         # print(repr(s))
-        result = redirected_output2.getvalue()
+        result = redirectedOutput2.getvalue()
     except KeyboardInterrupt as k:
         result = "timed out"
     thread.stop()
     myglobals.popitem()
-    sys.stdout = old_stdout
-    sys.stderr = oldstderr
+    sys.stdout = oldStdOUT
+    sys.stderr = oldStdERR
     # print(result)
     # print("maaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
 

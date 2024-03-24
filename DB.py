@@ -3,12 +3,12 @@ from langchain.embeddings.sentence_transformer import SentenceTransformerEmbeddi
 from langchain_community.vectorstores import Chroma
 from langchain_community.document_loaders import HuggingFaceDatasetLoader
 
-from utils.FuncUtils import get_function_name
-from utils.PreprocessUtils import remove_metadata
+from utils.FuncUtils import getFunctionName
+from utils.PreprocessUtils import removeMetaData
 import re
 
 
-def connect_db(
+def connectDB(
     dataset_name="openai_humaneval", page_content_column="canonical_solution"
 ):
     embedding_function = SentenceTransformerEmbeddings(model_name="all-MiniLM-L6-v2")
@@ -18,7 +18,7 @@ def connect_db(
     return db
 
 
-def get_one_shot(db, code):
+def getOneShot(db, code):
     query = code
     docs = db.similarity_search(query)
     test_cases_of_few_shot = docs[0].metadata["test"]
@@ -27,7 +27,7 @@ def get_one_shot(db, code):
     return test_cases_of_few_shot
 
 
-def get_few_shots(db, code):
+def getFewShots(db, code):
     test_cases_of_few_shotList = []
     description_of_few_shotList = []
     code_of_few_shotList = []
@@ -51,7 +51,7 @@ def get_few_shots(db, code):
         if code_of_few_shot[len(code_of_few_shot) - 1] == '"':
             code_of_few_shot = code_of_few_shot[: len(code_of_few_shot) - 1]
         # get the function header
-        description_of_few_shot, utility = get_function_name(description_of_few_shot)
+        description_of_few_shot, utility = getFunctionName(description_of_few_shot)
         code_of_few_shot = re.sub(r"\\n", "\n", code_of_few_shot)
         # print(test_cases_of_few_shot)
         code_of_few_shot = utility + "\n" + description_of_few_shot + code_of_few_shot
@@ -59,5 +59,5 @@ def get_few_shots(db, code):
         description_of_few_shotList.append(description_of_few_shot)
         code_of_few_shotList.append(code_of_few_shot)
 
-    test_cases_of_few_shot = remove_metadata(test_cases_of_few_shotList)
+    test_cases_of_few_shot = removeMetaData(test_cases_of_few_shotList)
     return (code_of_few_shotList, test_cases_of_few_shotList)
