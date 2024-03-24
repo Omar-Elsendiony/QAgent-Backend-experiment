@@ -3,7 +3,7 @@ from utils.FeedbackUtils import *
 from utils.LLMUtilis import *
 
 OldFile = "FeedbackOutput/"
-OldFile = "TestGenerationOutput/"
+OldFile = "Results_withSyntaxE/Mixtral-3Shot/"
 OldCasesFile = OldFile + "RunningLogs.json"
 # OldCasesFile = "humaneval.jsonl"
 OldCases = pd.read_json(OldCasesFile, lines=False)
@@ -24,7 +24,7 @@ with open("Heval1.txt", "w") as f:
         f.write(OldCases.iloc[i]["GeneratedCode"] + "\n=====================\n")
         # print(OldCases.iloc[i]["FullFeedback"])
         # f.write(OldCases.iloc[i]["GeneratedCode"])
-        FullFeedback = OldCases.iloc[i]["Feedback"]
+        FullFeedback = OldCases.iloc[i]["FullFeedback"]
         print(FullFeedback, "\n=====================\n")
         f.write(FullFeedback + "\n=====================\n")
         # indices = getFailedTestcasesIndices(FullFeedback)

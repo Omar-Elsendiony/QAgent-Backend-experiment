@@ -3,7 +3,7 @@ import re
 
 # made according to mixtral response
 # Skips first code (CUT) and starts searching from after that
-def get_code_from_response(response):
+def getCodefromTestGeneration(response):
     incompleteResponse = False
 
     s = re.finditer(r"```python", response)
@@ -34,7 +34,7 @@ def get_code_from_response(response):
 # skips any substring that contains a statement from the prompt template
 # handles only if the llm changes either the code or the test cases
 # TODO: handle if the llm changes both the code and the test cases
-def get_code_from_feedbackresponse(response):
+def getCodeFromTestFixing(response):
     incompleteResponse = False
 
     s = re.finditer(r"```python", response)
@@ -68,6 +68,13 @@ def get_code_from_feedbackresponse(response):
         return (response[startIndex:], True)
     code = re.sub("from.*(?=class)", "", code_match.group(0), flags=re.DOTALL)
     return code, incompleteResponse
+
+
+def getCodeFromResponse(response, testFixing=False):
+    if not testFixing:
+        return getCodefromTestGeneration(response)
+    else:
+        return getCodeFromTestFixing(response)
 
 
 # extract test cases code according to given function names
