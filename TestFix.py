@@ -31,7 +31,7 @@ class TestFix:
         self.OutputFile="FeedbackOutput/"
         self.JSONFile= self.OutputFile+"RunningLogs.json"
         self.CasesJSONFile = self.OutputFile+"Cases.json"
-        OldFile="Results/FeedbackMixtral-2Shot/"
+        OldFile="Results/FeedbackMixtral-x/"
         self.OldCasesFile= OldFile+"Cases.json"
         self.OldJsonFile= OldFile+"RunningLogs.json"
         self.CasesLogs=pd.read_json(self.OldJsonFile)
@@ -53,7 +53,7 @@ class TestFix:
         self.checkPaths()
         self.reset()
         c = open(self.OutputFile + "Cases.txt", "w+")
-        for i in range(0, 3):
+        for i in range(0, 29):
             print("Running Example ",i,"\n=====================\n")
 
             currDescription, currCode, currGeneratedCode, currFeedback = self.extractInfo(i)
@@ -66,7 +66,7 @@ class TestFix:
             try:
                 codeTobeRun = self.reg.get_feedback(currDescription, currCode, currRanCode, currFeedback, get_feedback_from_run_list)
                 if (codeTobeRun is not None):
-                    codeTobeRun = replaceUnitTestCall(codeTobeRun)
+                    codeTobeRun = preprocessUnitTest(codeTobeRun)
                     feedback = runCode(code = codeTobeRun, myglobals = self.myglobals)
                     print("original feedback is: ",feedback)
                     feedbackparsed = get_feedback_from_run(feedback)
@@ -120,6 +120,7 @@ class TestFix:
                 generatedCode (str): The generated code of the example
                 feedback (str): The feedback of the example
         """
+        print("Extracting Example ",i)
         currDescription = self.CasesLogs.iloc[i]['Description']
         currCode = self.CasesLogs.iloc[i]['Code']
         currGeneratedCode = self.CasesLogs.iloc[i]['GeneratedCode']
@@ -155,25 +156,7 @@ class TestFix:
                 print(f"Error creating file {self.JSONFile}: {e}")
                 exit()
 
-    def extractExampleInfo(self, example):
-        # Extract the code and description from the example
-        code = example["code"]
-        description = example["description"]
-        return code, description
-
-    def runTest(self, code, unittest_code):
-        """
-        Run the test case after some preprocessing of the returned response
-        """
-        unittest_code = preprocessUnitTest(unittest_code)
-        # codeTobeRun = introCode + "\n" + code + "\n" + unittest_code
-        codeTobeRun = get_running_code(code, unittest_code)
-        # print("unittest_code is: \n ",unittest_code)
-        # print("run_code is \n",codeTobeRun)
-        feedback = runCode(codeTobeRun, self.myglobals)
-        feedbackparsed = get_feedback_from_run(feedback)
-        return feedback, feedbackparsed, codeTobeRun
-
+    
     def writeResults(self, feedback, feedbackparsed, unittest_code, c, i):
         """
         Responsible for writing results to cases.txt and cases.json
@@ -199,7 +182,7 @@ class TestFix:
             
             oldTotalTests = self.OldCases.iloc[i]['Total Tests']
             oldTestsFailed = self.OldCases.iloc[i]['Tests failed']
-            oldTestsError = ""
+            oldTestsError = self.OldCases.iloc[i]['Error Tests']
             print("Old Error Tests",oldTestsError)
         
 
@@ -230,15 +213,11 @@ class TestFix:
             c.write("Number of Ran Tests : " + str(num_of_assertions) + "\n")
             c.write("Number of failed Tests : " + str(failedCasesNum) + "\n")
             c.write("Number of Error Test : " + str(errorCasesNum) + "\n")
-            c.write(
-                "Number of Succeeded Test : "
-                + str(numberOfSucceeded)
-                + "\n"
-            )
+            c.write("Number of Succeeded Test : " + str(numberOfSucceeded) + "\n")
 
             oldTotalTests = self.OldCases.iloc[i]['Total Tests']
             oldTestsFailed = self.OldCases.iloc[i]['Tests failed']
-            oldTestsError = ""
+            oldTestsError = self.OldCases.iloc[i]['Error Tests']
             print("Old Error Tests",oldTestsError)
         
 

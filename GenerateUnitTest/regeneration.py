@@ -5,23 +5,29 @@ class Regeneration:
     def __init__(self, chat_model) -> None:
         self.chat_model_arb = chat_model
 
-    def regeneratePrompt(self, code, description, testcase):
+    def regeneratePrompt(self, code, description, testcase, feedback):
         reGenerationPrompt = f"""
-        you generated unittest for the following method under test having the following description:
-        *Method under test*:
-        {code}
+you generated unittest for the following method under test having the following description:
+*Method under test*:
+{code}
 
-        *Description*:
-        {description}
-
-
-        but this test failed
-        *Test*:
-        {testcase}
+*Description*:
+{description}
 
 
-        Preserve the indentation correctness in the response
-        fix only the unit test and re-run the code. The code should pass the test after the fix and enclosed by ```python and ``` to be able to run the code
+but this test failed
+*Test*:
+{testcase}
+
+with the following feedback:
+*Feedback*:
+{feedback}
+
+
+Is the testcase correct??? If not, please fix the test case and re-run the code.
+Consider that the assertion may be a negative test that makes sure that the invalid behaviour is tested.
+Change either the test case or the assertion (if any of them is incorrect)
+Generate only the fixed test case enclosed by ```python and ``` to be able to run the code and re-run the code.
         """
 
         res = (self.chat_model_arb.invoke(reGenerationPrompt))
@@ -81,7 +87,7 @@ class Regeneration:
             before = self.getTestCase(splitLines, f)
             # print(before)
             # print("after: ")
-            afterX = self.regeneratePrompt(code, description, before)
+            afterX = self.regeneratePrompt(code, description, before, f)
             after = self.get_code_from_response(afterX)
             matched = re.search(r'def test', after, re.DOTALL)
             # if (matched is None):

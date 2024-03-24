@@ -49,7 +49,7 @@ class TestGenerator:
         self.checkPaths()
         self.reset()
         c = open(self.OutputFile + "Cases.txt", "w+")
-        for i in range(0, 3):
+        for i in range(15, 19):
             # if (i == 10): continue
             print("Running Test Case ", i)
             c.write(
@@ -77,7 +77,19 @@ class TestGenerator:
                     + str(i)
                     + " Didn't Run Due to Errorr\n=====================================\n"
                 )
+                new_row = pd.DataFrame(
+                    {
+                        "CaseNumber": i,"Description": description,"Code": code,"GeneratedCode": None,"CodeRan": None,"Feedback": None,"FullFeedback": None,
+                    },index=[0],
+                )
+                # df = df.append(new_row, ignore_index=True)
+                self.df = pd.concat([self.df, new_row])
+                # Save the updated DataFrame back to the excel file using 'openpyxl' engine for writing
+                jsondata = self.df.to_dict(orient="records")
+                with open(self.JSONFile, "w") as f:
+                    json.dump(jsondata, f, indent=4)
                 continue
+            print("unittest is: ", unittest["text"])
             unittest_code, isIncompleteResponse = get_code_from_response(
                 unittest["text"]
             )
@@ -239,7 +251,7 @@ class TestGenerator:
             c.write("Test example " + str(i) + " succeeded\n")
             c.write("Number of Ran Tests : " + str(num_of_assertions) + "\n")
             c.write("Number of Succeeded Test : " + str(num_of_assertions) + "\n")
-            new_case_row=pd.DataFrame({'CaseNumber':i,'Total Tests':num_of_assertions,'Tests failed':failedCasesNum, 'Error Tests': errorCasesNum},index=[0])
+            new_case_row=pd.DataFrame({'CaseNumber':i,'Total Tests':num_of_assertions,'Tests failed':0, 'Error Tests': 0},index=[0])
 
             self.casesDf = pd.concat([self.casesDf, new_case_row])
             casejsondata = self.casesDf.to_dict(orient="records")
