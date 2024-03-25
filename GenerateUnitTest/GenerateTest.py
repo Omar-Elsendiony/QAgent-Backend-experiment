@@ -16,7 +16,7 @@ Do not generate negative tests.
 Make sure to include the unit test call unittest.main() to run the tests. Do not include any import for the code under test.
 The output should be a markdown code snippet formatted in the following schema, including the leading and trailing "```python" and "```" respectively:"""
 
-Gen_UnitTest_with_FewShots_templateCC = """You are a python expert and your task is: Given the following description and python code:
+Gen_UnitTest_with_FewShots_template = """You are a python expert and your task is: Given the following description and python code:
 Description:
 {description}
 Code:
@@ -29,7 +29,7 @@ You are given examples of unit tests for a similar code, which you can use to wr
 Make sure to include the unit test call unittest.main() to run the tests.
 The output should be a markdown code snippet formatted in the following schema, including the leading and trailing "```python" and "```" respectively:"""
 
-Gen_UnitTest_with_FewShots_template = """You are python unit tester, Write at least 7 unit tests for a method under test. You follow my rules and orders and if you do not know the answer, don't make things UP!
+Gen_UnitTest_with_FewShots_templateLol = """You are python unit tester, Write at least 7 unit tests for a method under test. You follow my rules and orders and if you do not know the answer, don't make things UP!
 I am going to give you a method under test as well as its description and you are going to follow the criteria that I give to you in the generation.
 Criteria:
 1. Write 7 test cases that capture the intent of the user and create asserts that match descrition.

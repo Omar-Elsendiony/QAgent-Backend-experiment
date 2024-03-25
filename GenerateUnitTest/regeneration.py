@@ -41,7 +41,7 @@ with the following feedback:
 
 Take the two values that are being compared in the assertion above and check if the expected value is correct.
 Consider that the assertion may be a negative test that makes sure that the invalid behaviour is tested.
-Change either the test case or the assertion (if any of them is incorrect)
+Change either the test case or the assertion (if any of them is incorrect) and explain your thought process in changing the value if any.
 Generate only the fixed test case enclosed by ```python and ``` to be able to run the code and re-run the code.
         """
 
@@ -90,7 +90,12 @@ Generate only the fixed test case enclosed by ```python and ``` to be able to ru
         return testCase
 
     def get_feedback(
-        self, description, code, codeRan, feedback_test, getFeedbackFromRunList
+        self,
+        description,
+        code,
+        codeRan,
+        feedback_test,
+        getFeedbackFromRunList,
     ):
         def substituteTestCases(old, new, codeRan):
             new = re.sub(r"\n {4}([^d ])", r"\n        \1", new)
@@ -100,6 +105,8 @@ Generate only the fixed test case enclosed by ```python and ``` to be able to ru
             codeRan = re.sub(rf"{re.escape(old)}", rf"{new}", codeRan)
             return codeRan
 
+        explanationFile = open("FeedbackOutput/" + "explanation.txt", "a")
+
         splitLines = codeRan.split("\n")
         feedback_l = getFeedbackFromRunList(feedback_test)
         if feedback_l is None:
@@ -108,6 +115,9 @@ Generate only the fixed test case enclosed by ```python and ``` to be able to ru
             # print("before:")
             before = self.getTestCase(splitLines, f)
             afterX = self.regeneratePrompt(code, description, before, f)
+            print(afterX)
+            explanationFile.write(afterX)
+            explanationFile.write("\n=========================================\n")
             after = self.get_code_from_response(afterX)
             matched = re.search(r"def test", after, re.DOTALL)
             # if (matched is None):
@@ -119,9 +129,8 @@ Generate only the fixed test case enclosed by ```python and ``` to be able to ru
                 after = after[start:]
             else:
                 after = after[start : matched.span()[0]]
-            
+
             codeRan = substituteTestCases(before, after, codeRan)
-        
 
         fix_unit = f"""
         fix the unittest that is provided to be runnable and include the unittest call.
@@ -135,4 +144,5 @@ Generate only the fixed test case enclosed by ```python and ``` to be able to ru
         """
         res = (self.chat_model_arb.invoke(fix_unit)).content
         codeRan = self.get_code_from_response(res)
+        explanationFile.close()
         return codeRan

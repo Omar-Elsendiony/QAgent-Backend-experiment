@@ -31,7 +31,7 @@ class TestFix:
         self.OutputFile = "FeedbackOutput/"
         self.JSONFile = self.OutputFile + "RunningLogs.json"
         self.CasesJSONFile = self.OutputFile + "Cases.json"
-        OldFile = "Results/1-Shot-M/"
+        OldFile = "ResultsEachTest/Mixtral-3Shot/"
         self.OldCasesFile = OldFile + "Cases.json"
         self.OldJsonFile = OldFile + "RunningLogs.json"
         self.CasesLogs = pd.read_json(self.OldJsonFile)
@@ -54,7 +54,7 @@ class TestFix:
         self.checkPaths()
         self.reset()
         c = open(self.OutputFile + "Cases.txt", "w+")
-        for i in range(0, 30):
+        for i in range(len(self.CasesLogs)):
             print("Running Example ", i, "\n=====================\n")
 
             currDescription, currCode, currGeneratedCode, currFeedback = (
@@ -152,7 +152,7 @@ class TestFix:
         """
         currDescription = self.CasesLogs.iloc[i]["Description"]
         currCode = self.CasesLogs.iloc[i]["Code"]
-        currGeneratedCode = self.CasesLogs.iloc[i]["GeneratedCode"]
+        currGeneratedCode = self.CasesLogs.iloc[i]["TestsToRepeat"]
         currFeedback = self.CasesLogs.iloc[i]["Feedback"]
 
         return currDescription, currCode, currGeneratedCode, currFeedback
@@ -163,6 +163,14 @@ class TestFix:
         Args: None
         Return: None
         """
+        if not os.path.exists(self.OutputFile):
+            try:
+                os.makedirs(self.OutputFile)
+                print(f"Directory {self.OutputFile} created successfully!")
+            except Exception as e:
+                print(f"Error creating directory {self.OutputFile}: {e}")
+                exit()
+
         if not os.path.exists(self.CasesJSONFile):
             try:
                 # Create a new empty JSON file with an empty list structure

@@ -50,7 +50,7 @@ class TestGenerator:
         self.checkPaths()
         self.reset()
         FileHandle = open(self.OutputFile + "Cases.txt", "w+")
-        for i in range(0, 30):
+        for i in range(5):
             # if (i == 10): continue
             print("Running Test Case ", i)
             FileHandle.write(
@@ -185,7 +185,7 @@ class TestGenerator:
         # get the few shot code and test cases
         codeOfFewShots, testCasesFewShots = getFewShots(self.db, code)
         # take the most similar few shot other than the code itself
-        codeOfFewShots= codeOfFewShots[1:4]
+        codeOfFewShots = codeOfFewShots[1:4]
         testCasesFewShots = testCasesFewShots[1:4]
         fewShotStr = preprocessStringFewShot(codeOfFewShots, testCasesFewShots)
         return fewShotStr
