@@ -266,8 +266,8 @@ class TestFix:
                 {
                     "CaseNumber": i,
                     "Feedback Total Tests": numOfAssertions,
-                    "Feedback Tests failed": 0,
-                    "Feedback Error Tests": 0,
+                    "Feedback Tests failed": failedCasesNum,
+                    "Feedback Error Tests": errorCasesNum,
                     "Old Total Tests": oldTotalTests,
                     "Old Tests Failed": oldTestsFailed,
                     "Old Tests Error": oldTestsError,
