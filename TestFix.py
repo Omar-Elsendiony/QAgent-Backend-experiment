@@ -5,11 +5,10 @@ from GenerateUnitTest.Regeneration import *
 
 class TestFix:
 
-    def __init__(self, myglobals):
+    def __init__(self, myglobals, chat_model):
         self.reset()
         self.myglobals = myglobals
-        llm_arb, chat_model_arb = InitializeModelArbiter(os.environ["HF_TOKEN"])
-        self.reg = Regeneration(chat_model_arb)
+        self.reg = Regeneration(chat_model)
 
     def reset(self):
         self.totalTestCasesNum = 0

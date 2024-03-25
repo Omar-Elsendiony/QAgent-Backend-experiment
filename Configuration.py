@@ -3,22 +3,23 @@ from Imports import *
 load_dotenv()
 # model_id="google/gemma-7b-it"
 model_id = "mistralai/Mixtral-8x7B-Instruct-v0.1"
+model_id = "bigcode/starcoder2-15b"
 max_new_tokens = 6000
 if "Mixtral" in model_id:
     max_new_tokens = 20_000
 
 llm, chat_model = InitializeModel(
-    os.environ["HF_TOKEN"], model_id, max_new_tokens=max_new_tokens
+    os.environ["HUGGINGFACEHUB_API_TOKEN"], model_id, max_new_tokens=max_new_tokens
 )
 if "Mixtral" in model_id:
     GenUnitTestChain = InitializeTestChain(llm, True)
 else:
-    GenUnitTestChain = InitializeTestChain(chat_model, True)
+    GenUnitTestChain = InitializeTestChain(llm, True)
 
 if "Mixtral" in model_id:
     UnitTestFeedbackChain = InitializeFeedbackChain(llm)
 else:
-    UnitTestFeedbackChain = InitializeFeedbackChain(chat_model)
+    UnitTestFeedbackChain = InitializeFeedbackChain(llm)
 
 
 HEval_JsonObj = pd.read_json(path_or_buf="humaneval.jsonl", lines=True)
