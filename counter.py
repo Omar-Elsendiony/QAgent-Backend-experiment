@@ -2,17 +2,18 @@ import pandas as pd
 from utils.FeedbackUtils import *
 from utils.LLMUtilis import *
 
-OldFile = "FeedbackOutput/"
 OldFile = "Results_withSyntaxE/Mixtral-3Shot/"
+OldFile = "ResultsEachTest/Mixtral-3Shot/"
 OldCasesFile = OldFile + "RunningLogs.json"
 # OldCasesFile = "humaneval.jsonl"
 OldCases = pd.read_json(OldCasesFile, lines=False)
-OlTotal = 0
-OlFailTotal = 0
-NowTotal = 0
-NowFailTotal = 0
+# OlTotal = 0
+# OlFailTotal = 0
+# NowTotal = 0
+# NowFailTotal = 0
 
-
+succ = 0
+tottt = 0
 with open("Heval1.txt", "w") as f:
     for i in range(len(OldCases)):
         # OlTotal += OldCases.iloc[i]["Old Total Tests"]
@@ -20,13 +21,15 @@ with open("Heval1.txt", "w") as f:
         #     OlTotal += OldCases.iloc[i]["Feedback Total Tests"]
         print("Test case {i}\n===================================\n".format(i=i))
         f.write("Test case {i}\n===================================\n".format(i=i))
-        print(OldCases.iloc[i]["GeneratedCode"])
-        f.write(OldCases.iloc[i]["GeneratedCode"] + "\n=====================\n")
-        # print(OldCases.iloc[i]["FullFeedback"])
-        # f.write(OldCases.iloc[i]["GeneratedCode"])
-        FullFeedback = OldCases.iloc[i]["FullFeedback"]
-        print(FullFeedback, "\n=====================\n")
-        f.write(FullFeedback + "\n=====================\n")
+        # print(OldCases.iloc[i]["GeneratedCode"])
+        # f.write(OldCases.iloc[i]["GeneratedCode"] + "\n=====================\n")
+        print(OldCases.iloc[i]["FullFeedback"])
+        f.write(OldCases.iloc[i]["FullFeedback"])
+        f.write("\n=====================\n")
+        print("\n=====================\n")
+        # FullFeedback = OldCases.iloc[i]["FullFeedback"]
+        # print(FullFeedback, "\n=====================\n")
+        # f.write(FullFeedback + "\n=====================\n")
         # indices = getFailedTestcasesIndices(FullFeedback)
         # tests = getEachTestCase(OldCases.iloc[i]["GeneratedCode"], indices)
         # print(indices, "\n=====================\n")
