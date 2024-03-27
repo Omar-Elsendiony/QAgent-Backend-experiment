@@ -31,7 +31,7 @@ class TestFix:
         self.OutputFile = "FeedbackOutput/"
         self.JSONFile = self.OutputFile + "RunningLogs.json"
         self.CasesJSONFile = self.OutputFile + "Cases.json"
-        OldFile = "ResultsEachTest/Mixtral-3Shot/"
+        OldFile = "ResultsEachTest/Mixtral-2Shot/"
         self.OldCasesFile = OldFile + "Cases.json"
         self.OldJsonFile = OldFile + "RunningLogs.json"
         self.CasesLogs = pd.read_json(self.OldJsonFile)
@@ -152,7 +152,7 @@ class TestFix:
         """
         currDescription = self.CasesLogs.iloc[i]["Description"]
         currCode = self.CasesLogs.iloc[i]["Code"]
-        currGeneratedCode = self.CasesLogs.iloc[i]["TestsToRepeat"]
+        currGeneratedCode = self.CasesLogs.iloc[i]["GeneratedCode"]
         currFeedback = self.CasesLogs.iloc[i]["Feedback"]
 
         return currDescription, currCode, currGeneratedCode, currFeedback
