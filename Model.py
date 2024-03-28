@@ -34,7 +34,7 @@ def InitializeGptModel(token, model_id="gpt-3.5-turbo", max_new_tokens=20000):
 
 
 def InitializeModelArbiter(
-    htoken, repo_id="google/gemma-7b-it", max_new_tokens = 5000
+    htoken, repo_id="google/Gemma-7B", max_new_tokens = 5000
 ):
     llm = HuggingFaceHub(
         repo_id=repo_id,

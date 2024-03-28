@@ -54,6 +54,7 @@ Generate only the fixed test case enclosed by ```python and ``` to be able to ru
     def get_code_from_response(self, response):
         # has backticks in different positions
         response = re.sub(r"```python```", "", response)
+        response = re.sub(r"```python and ```", "", response)
 
         """ find all instances of ```python and start from the last one"""
         s = re.finditer(r"```python", response)
@@ -86,16 +87,11 @@ Generate only the fixed test case enclosed by ```python and ``` to be able to ru
             return -1
 
         startCaseIndex = getStartTestCase(splitLines, int(lineNo))
-        testCase = "\n".join(splitLines[startCaseIndex : int(lineNo)])
+        testCase = "\n".join(splitLines[startCaseIndex : int(lineNo) + 2])
         return testCase
 
     def get_feedback(
-        self,
-        description,
-        code,
-        codeRan,
-        feedback_test,
-        getFeedbackFromRunList,
+        self,description,code,codeRan,feedback_test,getFeedbackFromRunList,
     ):
         def substituteTestCases(old, new, codeRan):
             new = re.sub(r"\n {4}([^d ])", r"\n        \1", new)
@@ -130,19 +126,17 @@ Generate only the fixed test case enclosed by ```python and ``` to be able to ru
             else:
                 after = after[start : matched.span()[0]]
 
+            after = re.sub(r"\\'", r"\'", after)
+            # after = re.sub(r"\\", r"\'", after)
             codeRan = substituteTestCases(before, after, codeRan)
 
         fix_unit = f"""
-        fix the unittest that is provided to be runnable and include the unittest call.
-        Find the differences between it and a correct unittest and change if necessary.
+Remove the lines that are incorrect in the following unit test and replace them with the correct lines if needed:
+{codeRan}
 
-        *Unittest*:
-        {codeRan}
-
-        Fix the indentation and remove redundant lines if any.
-        The output code should be encloded by ```python and ```
+The output code should be encloded by ```python and ```
         """
-        res = (self.chat_model_arb.invoke(fix_unit)).content
-        codeRan = self.get_code_from_response(res)
+        # res = (self.chat_model_arb.invoke(fix_unit)).content
+        # codeRan = self.get_code_from_response(res)
         explanationFile.close()
         return codeRan

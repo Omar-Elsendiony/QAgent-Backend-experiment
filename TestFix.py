@@ -31,14 +31,14 @@ class TestFix:
         self.OutputFile = "FeedbackOutput/"
         self.JSONFile = self.OutputFile + "RunningLogs.json"
         self.CasesJSONFile = self.OutputFile + "Cases.json"
-        OldFile = "ResultsEachTest/Mixtral-2Shot/"
+        OldFile = "temp/Mixtral-3Shot/"
         self.OldCasesFile = OldFile + "Cases.json"
         self.OldJsonFile = OldFile + "RunningLogs.json"
         self.CasesLogs = pd.read_json(self.OldJsonFile)
         self.OldCases = pd.read_json(self.OldCasesFile)
         self.df = pd.DataFrame()
         self.casesDf = pd.DataFrame()
-        self.firstFeedback = True
+        self.firstFeedback = False
 
     def generate(self):
         """
@@ -55,6 +55,8 @@ class TestFix:
         self.reset()
         c = open(self.OutputFile + "Cases.txt", "w+")
         for i in range(len(self.CasesLogs)):
+            # if (i == 28):
+            #     x = 9000
             print("Running Example ", i, "\n=====================\n")
 
             currDescription, currCode, currGeneratedCode, currFeedback = (
@@ -265,10 +267,15 @@ class TestFix:
             c.write("Number of Error Test : " + str(errorCasesNum) + "\n")
             c.write("Number of Succeeded Test : " + str(numberOfSucceeded) + "\n")
 
-            oldTotalTests = self.OldCases.iloc[i]["Total Tests"]
-            oldTestsFailed = self.OldCases.iloc[i]["Tests failed"]
-            oldTestsError = ""
-            print("Old Error Tests", oldTestsError)
+            if self.firstFeedback:
+                oldTotalTests = self.OldCases.iloc[i]["Total Tests"]
+                oldTestsFailed = self.OldCases.iloc[i]["Tests failed"]
+                oldTestsError = self.OldCases.iloc[i]["Error Tests"]
+            else:
+                oldTotalTests = self.OldCases.iloc[i]["Feedback Total Tests"]
+                oldTestsFailed = self.OldCases.iloc[i]["Feedback Tests failed"]
+                oldTestsError = self.OldCases.iloc[i]["Feedback Error Tests"]
+            # print("Old Error Tests", oldTestsError)
 
             newCaseRow = pd.DataFrame(
                 {
