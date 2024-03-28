@@ -2,8 +2,9 @@ from Imports import *
 
 load_dotenv()
 # model_id = "bigcode/starcoder2-15b"
-model_id = "mistralai/Mixtral-8x7B-Instruct-v0.1"
 model_id="google/gemma-7b-it"
+model_id = "mistralai/Mixtral-8x7B-Instruct-v0.1"
+
 max_new_tokens = 6000
 if "Mixtral" in model_id:
     max_new_tokens = 20_000
