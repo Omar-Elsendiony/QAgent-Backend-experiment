@@ -1,14 +1,19 @@
 from Imports import *
 from CustomThread import *
-from GenerateUnitTest.Regeneration import *
 
 
 class TestFix:
 
-    def __init__(self, myglobals, chat_model):
+    def __init__(
+        self,
+        UnitTestFeedbackChain,
+        firstFeedback,
+        myglobals,
+    ):
         self.reset()
+        self.UnitTestFeedbackChain = UnitTestFeedbackChain
         self.myglobals = myglobals
-        self.reg = Regeneration(chat_model)
+        self.firstFeedback = firstFeedback
 
     def reset(self):
         self.totalTestCasesNum = 0
@@ -31,14 +36,14 @@ class TestFix:
         self.OutputFile = "FeedbackOutput/"
         self.JSONFile = self.OutputFile + "RunningLogs.json"
         self.CasesJSONFile = self.OutputFile + "Cases.json"
-        OldFile = "temp/Mixtral-3Shot/"
+        OldFile = "OutputTest/"
         self.OldCasesFile = OldFile + "Cases.json"
         self.OldJsonFile = OldFile + "RunningLogs.json"
         self.CasesLogs = pd.read_json(self.OldJsonFile)
         self.OldCases = pd.read_json(self.OldCasesFile)
         self.df = pd.DataFrame()
         self.casesDf = pd.DataFrame()
-        self.firstFeedback = False
+        self.firstFeedback = True
 
     def generate(self):
         """
@@ -51,6 +56,7 @@ class TestFix:
         Args: None
         Return: None
         """
+        print(self.firstFeedback)
         self.checkPaths()
         self.reset()
         c = open(self.OutputFile + "Cases.txt", "w+")
@@ -73,24 +79,32 @@ class TestFix:
                 )
                 continue
             try:
-                codeTobeRun = self.reg.get_feedback(
-                    currDescription,
-                    currCode,
-                    currRanCode,
-                    currFeedback,
-                    getFeedbackFromRunList,
+                # codeTobeRun = self.reg.get_feedback(
+                #     currDescription,
+                #     currCode,
+                #     currRanCode,
+                #     currFeedback,
+                #     getFeedbackFromRunList,
+                # )
+                GenerationPostFeedback = self.UnitTestFeedbackChain.invoke(
+                    {
+                        "description": currDescription,
+                        "code": currCode,
+                        "UnitTests": currGeneratedCode,
+                        "Feedback": currFeedback,
+                    }
                 )
-                if codeTobeRun is not None:
-                    codeTobeRun = preprocessUnitTest(codeTobeRun)
-                    feedback = runCode(code=codeTobeRun, myglobals=self.myglobals)
-                    print("feedback is: ", feedback)
-                    feedbackparsed = getFeedbackFromRun(feedback)
-                    unittestCode = codeTobeRun[
-                        (re.search(r"import unittest", codeTobeRun)).span()[0] :
-                    ]
-                else:
-                    self.incompleteResponses += 1
-                    continue
+                # if codeTobeRun is not None:
+                #     codeTobeRun = preprocessUnitTest(codeTobeRun)
+                #     feedback = runCode(code=codeTobeRun, myglobals=self.myglobals)
+                #     print("feedback is: ", feedback)
+                #     feedbackparsed = getFeedbackFromRun(feedback)
+                #     unittestCode = codeTobeRun[
+                #         (re.search(r"import unittest", codeTobeRun)).span()[0] :
+                #     ]
+                # else:
+                #     self.incompleteResponses += 1
+                #     continue
             except Exception as e:
                 print("ERROR in invoking Feedback Chain")
                 self.apiErrors += 1
@@ -101,11 +115,30 @@ class TestFix:
                     + " Didn't Run Due to Errorr\n=====================================\n"
                 )
                 continue
+            newUnitTestCode, isIncompleteResponse = getCodeFromResponse(
+                GenerationPostFeedback["text"], testFixing=True
+            )
+            if isIncompleteResponse:
+                self.incompleteResponses += 1
+                print(
+                    "Test Case "
+                    + str(i)
+                    + " Didn't Run Due to Incomplete Response\n=====================================\n"
+                )
+                c.write(
+                    "Example "
+                    + str(i)
+                    + " Didn't Run Due to Incomplete Response\n=====================================\n"
+                )
+            unittestCode = preprocessUnitTest(newUnitTestCode)
+            codeTobeRun = getRunningCode(currCode, unittestCode)
+            feedback = runCode(code=codeTobeRun)
             NonSucceedingCasesNames = getNonSucceedingTestcases(feedback)
             NonSucceedingCasesNamesList = (
                 NonSucceedingCasesNames["failed"] + NonSucceedingCasesNames["error"]
             )
             testsToRepeat = getEachTestCase(unittestCode, NonSucceedingCasesNamesList)
+            feedbackparsed = getFeedbackFromRun(feedback)
             self.writeResults(
                 feedback,
                 feedbackparsed,

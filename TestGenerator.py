@@ -80,7 +80,13 @@ class TestGenerator:
                 )
                 newRow = pd.DataFrame(
                     {
-                        "CaseNumber": i, "Description": description, "Code": code,"GeneratedCode": None,"CodeRan": None,"Feedback": None,"FullFeedback": None,
+                        "CaseNumber": i,
+                        "Description": description,
+                        "Code": code,
+                        "GeneratedCode": None,
+                        "CodeRan": None,
+                        "Feedback": None,
+                        "FullFeedback": None,
                     },
                     index=[0],
                 )
@@ -114,7 +120,12 @@ class TestGenerator:
                 NonSucceedingCasesNames["failed"] + NonSucceedingCasesNames["error"]
             )
             self.writeResults(
-                feedback, feedbackparsed,unittestCode,FileHandle,NonSucceedingCasesNamesList,i
+                feedback,
+                feedbackparsed,
+                unittestCode,
+                FileHandle,
+                NonSucceedingCasesNamesList,
+                i,
             )
             testsToRepeat = getEachTestCase(unittestCode, NonSucceedingCasesNamesList)
             self.descriptions.append(description)
@@ -174,8 +185,8 @@ class TestGenerator:
         # get the few shot code and test cases
         codeOfFewShots, testCasesFewShots = getFewShots(self.db, code)
         # take the most similar few shot other than the code itself
-        codeOfFewShots = codeOfFewShots[1:2]
-        testCasesFewShots = testCasesFewShots[1:2]
+        codeOfFewShots = codeOfFewShots[1:4]
+        testCasesFewShots = testCasesFewShots[1:4]
         fewShotStr = preprocessStringFewShot(codeOfFewShots, testCasesFewShots)
         return fewShotStr
 
