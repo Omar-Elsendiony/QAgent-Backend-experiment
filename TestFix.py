@@ -79,13 +79,6 @@ class TestFix:
                 )
                 continue
             try:
-                # codeTobeRun = self.reg.get_feedback(
-                #     currDescription,
-                #     currCode,
-                #     currRanCode,
-                #     currFeedback,
-                #     getFeedbackFromRunList,
-                # )
                 GenerationPostFeedback = self.UnitTestFeedbackChain.invoke(
                     {
                         "description": currDescription,
@@ -132,7 +125,7 @@ class TestFix:
                 )
             unittestCode = preprocessUnitTest(newUnitTestCode)
             codeTobeRun = getRunningCode(currCode, unittestCode)
-            feedback = runCode(code=codeTobeRun)
+            feedback = runCode(codeTobeRun, self.myglobals)
             NonSucceedingCasesNames = getNonSucceedingTestcases(feedback)
             NonSucceedingCasesNamesList = (
                 NonSucceedingCasesNames["failed"] + NonSucceedingCasesNames["error"]
