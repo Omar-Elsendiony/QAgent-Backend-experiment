@@ -14,8 +14,6 @@ class TestGenerator:
     def reset(self):
         self.totalTestCasesNum = 0
         self.totalSuccessTestCasesNum = 0
-        self.failed_test_cases = 0
-        self.error_test_cases = 0
         self.failedExamplesNum = 0
         self.successfulExamplesNum = 0
         self.apiErrors = 0

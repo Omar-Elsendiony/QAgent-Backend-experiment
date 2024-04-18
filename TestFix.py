@@ -1,5 +1,5 @@
 from Imports import *
-from CustomThread import *
+from utils.CustomThread import *
 
 
 class TestFix:
@@ -33,12 +33,12 @@ class TestFix:
         self.TotalCases = 0
         self.TotalFailedCases = 0
         self.incompleteResponses = 0
-        self.OutputFile = "FeedbackOutput/"
-        self.JSONFile = self.OutputFile + "RunningLogs.json"
-        self.CasesJSONFile = self.OutputFile + "Cases.json"
-        OldFile = "OutputTest/"
-        self.OldCasesFile = OldFile + "Cases.json"
-        self.OldJsonFile = OldFile + "RunningLogs.json"
+        self.OutputFolder = "FeedbackOutput/"
+        self.JSONFile = self.OutputFolder + "RunningLogs.json"
+        self.CasesJSONFile = self.OutputFolder + "Cases.json"
+        OldGeneratedTestsFolder = "OutputTest/"
+        self.OldCasesFile = OldGeneratedTestsFolder + "Cases.json"
+        self.OldJsonFile = OldGeneratedTestsFolder + "RunningLogs.json"
         self.CasesLogs = pd.read_json(self.OldJsonFile)
         self.OldCases = pd.read_json(self.OldCasesFile)
         self.df = pd.DataFrame()
@@ -48,7 +48,7 @@ class TestFix:
     def generate(self):
         """
         This function is responsible for generating the test cases and running them
-        It is the core of the TestGenerator class. It is responsible for:
+        The function is responsible for:
         1. Extracting the code and description from the example
         2. Generating the test cases
         3. Running the test cases
@@ -59,7 +59,7 @@ class TestFix:
         print(self.firstFeedback)
         self.checkPaths()
         self.reset()
-        c = open(self.OutputFile + "Cases.txt", "w+")
+        c = open(self.OutputFolder + "Cases.txt", "w+")
         for i in range(len(self.CasesLogs)):
             # if (i == 28):
             #     x = 9000
@@ -68,7 +68,6 @@ class TestFix:
             currDescription, currCode, currGeneratedCode, currFeedback = (
                 self.extractInfo(i)
             )
-            currRanCode = getRunningCode(currCode, currGeneratedCode)
             # no feedback means testcase passed so don't run it again
             if pd.isna(currFeedback) or currFeedback == "" or currFeedback is None:
                 print("Example", i, " has already passed")
@@ -191,12 +190,12 @@ class TestFix:
         Args: None
         Return: None
         """
-        if not os.path.exists(self.OutputFile):
+        if not os.path.exists(self.OutputFolder):
             try:
-                os.makedirs(self.OutputFile)
-                print(f"Directory {self.OutputFile} created successfully!")
+                os.makedirs(self.OutputFolder)
+                print(f"Directory {self.OutputFolder} created successfully!")
             except Exception as e:
-                print(f"Error creating directory {self.OutputFile}: {e}")
+                print(f"Error creating directory {self.OutputFolder}: {e}")
                 exit()
 
         if not os.path.exists(self.CasesJSONFile):
@@ -345,7 +344,7 @@ class TestFix:
         print("Tests to repeat : ", self.testsToRepeat)
         print("Incomplete Responses are : ", self.incompleteResponses)
         print("API Errors are : ", self.apiErrors)
-        with open(self.OutputFile + "Res.txt", "w") as f:
+        with open(self.OutputFolder + "Res.txt", "w") as f:
             f.write(
                 "Total succeeded examples : " + str(self.successfulExamplesNum) + "\n"
             )
