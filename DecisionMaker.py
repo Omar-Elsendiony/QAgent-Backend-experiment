@@ -130,6 +130,9 @@ class DecisionMaker:
                     "Description": description,
                     "Code": code,
                     "Judgement": judgement,
+                    "Explanation": explanation,
+                    "TestCaseError": errorTestCases,
+                    "ErrorMessage": errorMsg,
                 },
                 index=[0],
             )
