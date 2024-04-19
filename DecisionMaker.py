@@ -232,7 +232,8 @@ class DecisionMaker:
 
         """
         print(f"Test example {i} Judgement\n======================================\n")
-        finaljudge = "Code is buggy " if judgement == False else "Code is correct"
+        booljudgement = 1 if judgement == "True" else 0
+        finaljudge = "Code is buggy " if booljudgement == 0 else "Code is correct"
         print("Judgement : ", finaljudge)
         print("Explanation : ", explanation)
         FileHandle.write("Test example " + str(i) + " failed\n")
