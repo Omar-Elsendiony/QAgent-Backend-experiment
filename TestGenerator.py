@@ -356,9 +356,10 @@ class TestGenerator:
         )
         print("Total failed testcases : ", self.failed_test_cases)
         print("Total error testcases : ", self.error_test_cases)
-        print("Tests to repeat : ", self.testsToRepeatNum)
         print("Incomplete Responses are : ", self.incompleteResponses)
+        print("Incomplete Responses are ", self.incompleteResponses)
         print("API Errors are : ", self.apiErrors)
+        print("Tests to repeat : ", self.testsToRepeatNum)
         with open(self.OutputFolder + "Res.txt", "w") as f:
             f.write(
                 "Total succeeded examples : " + str(self.successfulExamplesNum) + "\n"
@@ -383,5 +384,3 @@ class TestGenerator:
             )
             f.write("API Errors are : " + str(self.apiErrors) + "\n")
             f.write("Tests to repeat : " + str(self.testsToRepeatNum) + "\n")
-
-        print("Incomplete Responses are ", self.incompleteResponses)

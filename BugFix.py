@@ -2,7 +2,7 @@ from Imports import *
 from utils.CustomThread import *
 
 
-class TestFix:
+class BugFix:
 
     def __init__(
         self,

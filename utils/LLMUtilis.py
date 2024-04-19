@@ -137,3 +137,24 @@ def regeneratePrompt(chat_model_arb, code, description, testcase):
 
     res = (chat_model_arb.invoke(reGenerationPrompt)).content
     return res
+
+
+# assumes following template:
+# Bug in the python code under test: **IS_METHOD_UNDER_TEST_BUGGY**
+# Explanation: **EXPLANATION**
+def getJudgmentFromGeneration(response):
+    incompleteResponse = False
+    s = re.finditer(r"</s> \[/INST\]", response)
+    # gets last element in iterator
+    *_, lastMatch = s
+    startIndex = lastMatch.span(0)[1]
+    ExtractedResponse = response[startIndex:]
+    judgement = re.search(
+        r"Bug in the python code under test: (True|False)", ExtractedResponse
+    )
+    explanation = re.search(r"Explanation: (.+)", ExtractedResponse)
+
+    if judgement is None:
+        return (response[startIndex:], explanation, True)
+
+    return judgement.group(1), explanation.group(1), incompleteResponse

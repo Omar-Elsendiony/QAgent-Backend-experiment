@@ -341,9 +341,10 @@ class TestFix:
         )
         print("Total failed testcases : ", self.failed_test_cases)
         print("Total error testcases : ", self.error_test_cases)
-        print("Tests to repeat : ", self.testsToRepeat)
         print("Incomplete Responses are : ", self.incompleteResponses)
         print("API Errors are : ", self.apiErrors)
+        print("Incomplete Responses are ", self.incompleteResponses)
+        print("Tests to repeat : ", self.testsToRepeat)
         with open(self.OutputFolder + "Res.txt", "w") as f:
             f.write(
                 "Total succeeded examples : " + str(self.successfulExamplesNum) + "\n"
@@ -368,5 +369,3 @@ class TestFix:
             )
             f.write("API Errors are : " + str(self.apiErrors) + "\n")
             f.write("Tests to repeat : " + str(self.testsToRepeat) + "\n")
-
-        print("Incomplete Responses are ", self.incompleteResponses)
