@@ -32,7 +32,7 @@ class TestGenerator:
         self.OutputFolder = "OutputTest/"
         self.JSONFile = self.OutputFolder + "RunningLogs.json"
         self.CasesJSONFile = self.OutputFolder + "Cases.json"
-        self.df = pd.DataFrame()
+        self.logsDf = pd.DataFrame()
         self.casesDf = pd.DataFrame()
         self.LOGGING = True
 
@@ -91,9 +91,9 @@ class TestGenerator:
                     index=[0],
                 )
                 # df = df.append(newRow, ignore_index=True)
-                self.df = pd.concat([self.df, newRow])
+                self.logsDf = pd.concat([self.logsDf, newRow])
                 # Save the updated DataFrame back to the excel file using 'openpyxl' engine for writing
-                jsondata = self.df.to_dict(orient="records")
+                jsondata = self.logsDf.to_dict(orient="records")
                 with open(self.JSONFile, "w") as f:
                     json.dump(jsondata, f, indent=4)
                 continue
@@ -146,9 +146,9 @@ class TestGenerator:
                 },
                 index=[0],
             )
-            self.df = pd.concat([self.df, newRow])
+            self.logsDf = pd.concat([self.logsDf, newRow])
             # Save the updated DataFrame back to the excel file using 'openpyxl' engine for writing
-            jsondata = self.df.to_dict(orient="records")
+            jsondata = self.logsDf.to_dict(orient="records")
             with open(self.JSONFile, "w") as f:
                 json.dump(jsondata, f, indent=4)
         FileHandle.close()

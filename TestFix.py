@@ -41,7 +41,7 @@ class TestFix:
         self.OldJsonFile = OldGeneratedTestsFolder + "RunningLogs.json"
         self.CasesLogs = pd.read_json(self.OldJsonFile)
         self.OldCases = pd.read_json(self.OldCasesFile)
-        self.df = pd.DataFrame()
+        self.logsDf = pd.DataFrame()
         self.casesDf = pd.DataFrame()
         self.firstFeedback = True
 
@@ -158,9 +158,9 @@ class TestFix:
                 index=[0],
             )
             # df = df.append(newRow, ignore_index=True)
-            self.df = pd.concat([self.df, newRow])
+            self.logsDf = pd.concat([self.logsDf, newRow])
             # Save the updated DataFrame back to the excel file using 'openpyxl' engine for writing
-            jsondata = self.df.to_dict(orient="records")
+            jsondata = self.logsDf.to_dict(orient="records")
             with open(self.JSONFile, "w") as f:
                 json.dump(jsondata, f, indent=4)
 

@@ -4,33 +4,30 @@ from utils.CustomThread import *
 
 class TestGenerator:
 
-    def __init__(self, GenUnitTestChain, db, HEval_JsonObj, myglobals):
+    def __init__(self, JudgeChain, myglobals):
         self.reset()
-        self.GenUnitTestChain = GenUnitTestChain
-        self.db = db
-        self.HEval_JsonObj = HEval_JsonObj
+        self.JudgeChain = JudgeChain
+        # self.db = db
         self.myglobals = myglobals
 
     def reset(self):
-        self.totalTestCasesNum = 0
-        self.totalSuccessTestCasesNum = 0
-        self.failedExamplesNum = 0
-        self.successfulExamplesNum = 0
         self.apiErrors = 0
-        self.testsToRepeatNum = 0  # Number of tests to repeat = Summation of all tests under failed examples whether they are failed or succeeded
-        self.OKCases = 0
-        self.descriptions = []
         self.codes = []
         self.resCodes = []
-        self.feedbacks = []
         self.codeRanList = []
         self.TotalCases = 0
-        self.TotalFailedCases = 0
         self.incompleteResponses = 0
-        self.OutputFolder = "OutputTest/"
+        self.OutputFolder = "JudgeOutput/"
         self.JSONFile = self.OutputFolder + "RunningLogs.json"
         self.CasesJSONFile = self.OutputFolder + "Cases.json"
-        self.df = pd.DataFrame()
+        ###############
+        OldGeneratedTestsFolder = "OutputTest/"
+        self.OldCasesFile = OldGeneratedTestsFolder + "Cases.json"
+        self.OldJsonFile = OldGeneratedTestsFolder + "RunningLogs.json"
+        self.CasesLogs = pd.read_json(self.OldJsonFile)
+        self.OldCases = pd.read_json(self.OldCasesFile)
+        # running logs
+        self.logsDf = pd.DataFrame()
         self.casesDf = pd.DataFrame()
         self.LOGGING = True
 
@@ -57,18 +54,20 @@ class TestGenerator:
                 + "\n=====================================\n"
             )
             # description and code from database
-            description, code = self.extractInfo(i)
-            fewShotStr = self.extractFewShots(code)
+            description, code, errorMsg, errorTestCases = self.extractInfo(i)
+            # fewShotStr = self.extractFewShots(code)
             try:
-                unittest = self.GenUnitTestChain.invoke(
+                unittest = self.JudgeChain.invoke(
                     {
-                        "description": description,
                         "code": code,
-                        "test_cases_of_few_shot": fewShotStr,
+                        "description": description,
+                        # "test_cases_of_few_shot": fewShotStr,
+                        "test_case_error": errorMsg,
+                        "error_message": errorTestCases,
                     }
                 )  # ,"test_cases_of_few_shot":fewShotStr
             except Exception as e:
-                print("ERROR in invoking GenUnitTestChain")
+                print("ERROR in invoking JudgeChain")
                 self.apiErrors += 1
                 print(e)
                 FileHandle.write(
@@ -89,9 +88,9 @@ class TestGenerator:
                     index=[0],
                 )
                 # df = df.append(newRow, ignore_index=True)
-                self.df = pd.concat([self.df, newRow])
+                self.logsDf = pd.concat([self.logsDf, newRow])
                 # Save the updated DataFrame back to the excel file using 'openpyxl' engine for writing
-                jsondata = self.df.to_dict(orient="records")
+                jsondata = self.logsDf.to_dict(orient="records")
                 with open(self.JSONFile, "w") as f:
                     json.dump(jsondata, f, indent=4)
                 continue
@@ -144,9 +143,9 @@ class TestGenerator:
                 },
                 index=[0],
             )
-            self.df = pd.concat([self.df, newRow])
+            self.logsDf = pd.concat([self.logsDf, newRow])
             # Save the updated DataFrame back to the excel file using 'openpyxl' engine for writing
-            jsondata = self.df.to_dict(orient="records")
+            jsondata = self.logsDf.to_dict(orient="records")
             with open(self.JSONFile, "w") as f:
                 json.dump(jsondata, f, indent=4)
         FileHandle.close()
@@ -160,19 +159,16 @@ class TestGenerator:
         Args: i (int): The index of the example in the JSON file
         Return: description (str): The description of the example
                 code (str): The code of the example
+                generatedCode (str): The generated code of the example
+                feedback (str): The feedback of the example
         """
-        description = self.HEval_JsonObj.iloc[i]["text"]
-        code = self.HEval_JsonObj.iloc[i]["canonical_solution"]
-        # remove initial spaces in extracted code
-        code = code.strip()
-        # extract the function definition and utility code
-        funcDefiniton = self.HEval_JsonObj.iloc[i]["prompt"]
-        funcDefiniton, Utility = getFunctionName(
-            funcDefiniton
-        )  # does not need entry point at the end of the day
-        code = Utility + "\n" + funcDefiniton + code
+        currCode = self.CasesLogs.iloc[i]["Code"]
+        currDescription = self.CasesLogs.iloc[i]["Description"]
+        currFeedback = self.CasesLogs.iloc[i]["Feedback"]
+        errorTestCases = self.CasesLogs.iloc[i]["TestsToRepeat"]
+        # generatedTestCases = self.CasesLogs.iloc[i]["GeneratedCode"]
 
-        return description, code
+        return currDescription, currCode, currFeedback, errorTestCases
 
     def extractFewShots(self, code):
         """
