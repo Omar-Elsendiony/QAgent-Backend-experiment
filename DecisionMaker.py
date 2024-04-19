@@ -234,7 +234,7 @@ class DecisionMaker:
         print("Explanation : ", explanation)
         FileHandle.write("Test example " + str(i) + " failed\n")
         FileHandle.write("Judgement : : " + finaljudge + "\n")
-        FileHandle.write("Explanation " + explanation + "\n")
+        FileHandle.write("Explanation " + str(explanation) + "\n")
 
     def printResults(self):
         """

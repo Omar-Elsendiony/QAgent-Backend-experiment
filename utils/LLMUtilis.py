@@ -149,12 +149,14 @@ def getJudgmentFromGeneration(response):
     *_, lastMatch = s
     startIndex = lastMatch.span(0)[1]
     ExtractedResponse = response[startIndex:]
-    judgement = re.search(
+    judgementMatch = re.search(
         r"Bug in the python code under test: (True|False)", ExtractedResponse
     )
-    explanation = re.search(r"Explanation: (.+)", ExtractedResponse)
+    explanationMatch = re.search(r"Explanation:", ExtractedResponse)
 
-    if judgement is None:
+    if judgementMatch is None:
         return (response[startIndex:], explanation, True)
-
-    return judgement.group(1), explanation.group(1), incompleteResponse
+    judgement = judgementMatch.group(1)
+    expIndex = explanationMatch.end()
+    explanation = ExtractedResponse[expIndex:]
+    return judgement, expIndex, incompleteResponse
