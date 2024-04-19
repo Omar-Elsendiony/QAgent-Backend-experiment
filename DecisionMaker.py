@@ -56,6 +56,14 @@ class DecisionMaker:
             # description and code from database
             description, code, errorMsg, errorTestCases = self.extractInfo(i)
             # fewShotStr = self.extractFewShots(code)
+            if pd.isna(errorMsg) or errorMsg == "" or errorMsg is None:
+                print("Example", i, " has already passed")
+                FileHandle.write(
+                    "Example "
+                    + str(i)
+                    + " has already passed\n=====================================\n"
+                )
+                continue
             try:
                 generatedJudgement = self.JudgeChain.invoke(
                     {

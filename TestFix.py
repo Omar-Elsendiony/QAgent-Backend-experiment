@@ -59,7 +59,7 @@ class TestFix:
         print(self.firstFeedback)
         self.checkPaths()
         self.reset()
-        c = open(self.OutputFolder + "Cases.txt", "w+")
+        FileHandle = open(self.OutputFolder + "Cases.txt", "w+")
         for i in range(len(self.CasesLogs)):
             # if (i == 28):
             #     x = 9000
@@ -71,7 +71,7 @@ class TestFix:
             # no feedback means testcase passed so don't run it again
             if pd.isna(currFeedback) or currFeedback == "" or currFeedback is None:
                 print("Example", i, " has already passed")
-                c.write(
+                FileHandle.write(
                     "Example "
                     + str(i)
                     + " has already passed\n=====================================\n"
@@ -101,7 +101,7 @@ class TestFix:
                 print("ERROR in invoking Feedback Chain")
                 self.apiErrors += 1
                 print(e)
-                c.write(
+                FileHandle.write(
                     "Example "
                     + str(i)
                     + " Didn't Run Due to Errorr\n=====================================\n"
@@ -117,7 +117,7 @@ class TestFix:
                     + str(i)
                     + " Didn't Run Due to Incomplete Response\n=====================================\n"
                 )
-                c.write(
+                FileHandle.write(
                     "Example "
                     + str(i)
                     + " Didn't Run Due to Incomplete Response\n=====================================\n"
@@ -135,7 +135,7 @@ class TestFix:
                 feedback,
                 feedbackparsed,
                 unittestCode,
-                c,
+                FileHandle,
                 NonSucceedingCasesNamesList,
                 i,
             )
@@ -165,7 +165,7 @@ class TestFix:
                 json.dump(jsondata, f, indent=4)
 
         self.printResults()
-        c.close()
+        FileHandle.close()
         return
 
     def extractInfo(self, i):
@@ -219,7 +219,13 @@ class TestFix:
                 exit()
 
     def writeResults(
-        self, feedback, feedbackparsed, unittestCode, c, NonSucceedingCasesNamesList, i
+        self,
+        feedback,
+        feedbackparsed,
+        unittestCode,
+        FileHanlde,
+        NonSucceedingCasesNamesList,
+        i,
     ):
         """
         Responsible for writing results to cases.txt and cases.json
@@ -239,9 +245,11 @@ class TestFix:
             print("Number of Ran Tests : ", numOfAssertions)
             print("Number of Succeeded Test : ", numOfAssertions)
             print("Number of Succeeded Test : ", 0)
-            c.write("Test example " + str(i) + " succeeded\n")
-            c.write("Number of Ran Tests : " + str(numOfAssertions) + "\n")
-            c.write("Number of Succeeded Test : " + str(numOfAssertions) + "\n")
+            FileHanlde.write("Test example " + str(i) + " succeeded\n")
+            FileHanlde.write("Number of Ran Tests : " + str(numOfAssertions) + "\n")
+            FileHanlde.write(
+                "Number of Succeeded Test : " + str(numOfAssertions) + "\n"
+            )
 
             oldTotalTests = 0
             oldTestsFailed = 0
@@ -286,11 +294,13 @@ class TestFix:
                 "Number of Succeeded Test : ",
                 numberOfSucceeded,
             )
-            c.write("Test example " + str(i) + " failed\n")
-            c.write("Number of Ran Tests : " + str(numOfAssertions) + "\n")
-            c.write("Number of failed Tests : " + str(failedCasesNum) + "\n")
-            c.write("Number of Error Test : " + str(errorCasesNum) + "\n")
-            c.write("Number of Succeeded Test : " + str(numberOfSucceeded) + "\n")
+            FileHanlde.write("Test example " + str(i) + " failed\n")
+            FileHanlde.write("Number of Ran Tests : " + str(numOfAssertions) + "\n")
+            FileHanlde.write("Number of failed Tests : " + str(failedCasesNum) + "\n")
+            FileHanlde.write("Number of Error Test : " + str(errorCasesNum) + "\n")
+            FileHanlde.write(
+                "Number of Succeeded Test : " + str(numberOfSucceeded) + "\n"
+            )
 
             if self.firstFeedback:
                 oldTotalTests = self.OldCases.iloc[i]["Total Tests"]
