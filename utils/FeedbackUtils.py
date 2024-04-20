@@ -87,5 +87,25 @@ def getNonSucceedingTestcases(feedback):
 
 
 def getNumAssertions(code_text):
-    total_num = len(re.findall(r"self\.assert.", code_text, flags=re.MULTILINE))
+    total_num = len(re.findall(r"self\.assert.",
+                    code_text, flags=re.MULTILINE))
     return total_num
+
+
+def extract_error_info(input_string):
+    start_marker = "ERROR: "
+    end_marker = "="
+    start_index = input_string.find(start_marker)
+    end_index = input_string.find(end_marker, start_index)
+    if start_index != -1 and end_index != -1:
+        return input_string[start_index:end_index]
+    else:
+        return None  # Substring not found
+
+
+# # read file text and save output in input_string
+# with open('test_error.txt', 'r') as file:
+#     input_string = file.read()
+
+# result = extract_error_info(input_string)
+# print(result)
