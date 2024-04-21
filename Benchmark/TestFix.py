@@ -102,7 +102,7 @@ class TestFix:
                 )
                 continue
             newUnitTestCode, isIncompleteResponse = getCodeFromResponse(
-                GenerationPostFeedback["text"], testFixing=True
+                GenerationPostFeedback["text"], 1
             )
             if isIncompleteResponse:
                 self.incompleteResponses += 1

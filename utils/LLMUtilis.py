@@ -34,7 +34,10 @@ def getCodefromTestGeneration(response):
 # skips any substring that contains a statement from the prompt template
 # handles only if the llm changes either the code or the test cases
 # TODO: handle if the llm changes both the code and the test cases
-def getCodeFromTestFixing(response):
+def getCodeFromTestFixing(
+    response,
+    promptStatementToCheck="Your goal is to revise the code or tests based on the feedback. Ensure to:",
+):
     incompleteResponse = False
 
     s = re.finditer(r"```python", response)
@@ -43,10 +46,7 @@ def getCodeFromTestFixing(response):
         # pick a statement from the prompt template and ensure it's no in the chosen repsonse
         startIndex = st.span(0)[0]
         ExtractedResponse = response[startIndex:]
-        if (
-            "Your goal is to revise the code or tests based on the feedback. Ensure to:"
-            in ExtractedResponse
-        ):
+        if promptStatementToCheck in ExtractedResponse:
             continue
         else:
             break
@@ -70,11 +70,13 @@ def getCodeFromTestFixing(response):
     return code, incompleteResponse
 
 
-def getCodeFromResponse(response, testFixing=False):
-    if not testFixing:
+def getCodeFromResponse(response, testFixing=0):
+    if testFixing == 0:
         return getCodefromTestGeneration(response)
-    else:
+    elif testFixing == 1:
         return getCodeFromTestFixing(response)
+    else:
+        return getCodeFromTestFixing(response, "including the leading and trailing")
 
 
 def getEachTestCase(UnitTestsCode, functionNames):

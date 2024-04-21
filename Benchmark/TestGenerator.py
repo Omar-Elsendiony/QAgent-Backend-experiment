@@ -99,7 +99,7 @@ class TestGenerator:
                     json.dump(jsondata, f, indent=4)
                 continue
             unittestCode, isIncompleteResponse = getCodeFromResponse(
-                unittest["text"], False
+                unittest["text"], 0
             )
             if isIncompleteResponse:
                 self.incompleteResponses += 1

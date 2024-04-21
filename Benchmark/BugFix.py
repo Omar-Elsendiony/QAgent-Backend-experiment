@@ -102,7 +102,7 @@ class BugFix:
                 )
                 continue
             newUnitTestCode, isIncompleteResponse = getCodeFromResponse(
-                GeneratedBugFix["text"], testFixing=True
+                GeneratedBugFix["text"], 3
             )
             if isIncompleteResponse:
                 self.incompleteResponses += 1
