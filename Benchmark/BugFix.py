@@ -69,7 +69,6 @@ class BugFix:
             (
                 currDescription,
                 currCode,
-                Judgement,
                 Explanation,
                 TestCaseError,
                 ErrorMessage,
@@ -94,8 +93,9 @@ class BugFix:
                     {
                         "description": currDescription,
                         "code": currCode,
-                        "UnitTests": currGeneratedCode,
-                        "Feedback": currFeedback,
+                        "test_case_error": TestCaseError,
+                        "error_message": ErrorMessage,
+                        "explanaion": Explanation,
                     }
                 )
             except Exception as e:
@@ -180,7 +180,6 @@ class BugFix:
         """
         currDescription = self.CasesLogs.iloc[i]["Description"]
         currCode = self.CasesLogs.iloc[i]["Code"]
-        Judgement = self.CasesLogs.iloc[i]["Judgement"]
         Explanation = self.CasesLogs.iloc[i]["Explanation"]
         TestCaseError = self.CasesLogs.iloc[i]["TestCaseError"]
         ErrorMessage = self.CasesLogs.iloc[i]["ErrorMessage"]
@@ -191,7 +190,6 @@ class BugFix:
         return (
             currDescription,
             currCode,
-            Judgement,
             Explanation,
             TestCaseError,
             ErrorMessage,
