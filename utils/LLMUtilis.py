@@ -159,4 +159,4 @@ def getJudgmentFromGeneration(response):
     judgement = judgementMatch.group(1)
     expIndex = explanationMatch.end()
     explanation = ExtractedResponse[expIndex:]
-    return judgement, expIndex, incompleteResponse
+    return judgement, explanation, incompleteResponse

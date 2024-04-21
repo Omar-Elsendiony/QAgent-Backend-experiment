@@ -35,6 +35,7 @@ class TestGenerator:
         self.logsDf = pd.DataFrame()
         self.casesDf = pd.DataFrame()
         self.LOGGING = True
+        self.fewshotsnum = 3
 
     def generate(self):
         """
@@ -185,8 +186,8 @@ class TestGenerator:
         # get the few shot code and test cases
         codeOfFewShots, testCasesFewShots = getFewShots(self.db, code)
         # take the most similar few shot other than the code itself
-        codeOfFewShots = codeOfFewShots[1:4]
-        testCasesFewShots = testCasesFewShots[1:4]
+        codeOfFewShots = codeOfFewShots[1 : self.fewshotsnum]
+        testCasesFewShots = testCasesFewShots[1 : self.fewshotsnum]
         fewShotStr = preprocessStringFewShot(codeOfFewShots, testCasesFewShots)
         return fewShotStr
 

@@ -69,7 +69,12 @@ class BugFix:
                 self.extractInfo(i)
             )
             # no feedback means testcase passed so don't run it again
-            if pd.isna(currFeedback) or currFeedback == "" or currFeedback is None:
+            if (
+                "OK" in currFeedback
+                or pd.isna(currFeedback)
+                or currFeedback == ""
+                or currFeedback is None
+            ):
                 print("Example", i, " has already passed")
                 c.write(
                     "Example "

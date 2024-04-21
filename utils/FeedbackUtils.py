@@ -89,3 +89,16 @@ def getNonSucceedingTestcases(feedback):
 def getNumAssertions(code_text):
     total_num = len(re.findall(r"self\.assert.", code_text, flags=re.MULTILINE))
     return total_num
+
+
+# gets whole feedback and returns the error message
+def getOneError(feedback):
+    match = re.search(r"(ERROR|FAIL):(.)+?(ERROR|FAIL)", feedback, re.DOTALL)
+    if match is None:
+        match = re.search(r"(ERROR|FAIL):(.)+", feedback, re.DOTALL)
+        if match is None:
+            # syntax error case
+            return feedback
+    ErrorText = match.group(0)
+    ErrorText = ErrorText[:-6]
+    return ErrorText

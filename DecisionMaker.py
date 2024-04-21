@@ -45,8 +45,8 @@ class DecisionMaker:
         self.reset()
         FileHandle = open(self.OutputFolder + "Cases.txt", "w+")
         for i in range(len(self.CasesLogs)):
-            # if i == 3:
-            #     continue
+            if i == 3:
+                continue
             print("Running Test Case ", i)
             FileHandle.write(
                 "Running Test Case "
@@ -56,7 +56,12 @@ class DecisionMaker:
             # description and code from database
             description, code, errorMsg, errorTestCases = self.extractInfo(i)
             # fewShotStr = self.extractFewShots(code)
-            if pd.isna(errorMsg) or errorMsg == "" or errorMsg is None:
+            if (
+                "OK" in errorMsg
+                or pd.isna(errorMsg)
+                or errorMsg == ""
+                or errorMsg is None
+            ):
                 print("Example", i, " has already passed")
                 FileHandle.write(
                     "Example "
@@ -65,6 +70,7 @@ class DecisionMaker:
                 )
                 continue
             try:
+                errorMsg = getOneError(errorMsg)
                 generatedJudgement = self.JudgeChain.invoke(
                     {
                         "code": code,
