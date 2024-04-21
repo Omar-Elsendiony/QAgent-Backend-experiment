@@ -37,8 +37,9 @@ class BugFix:
         self.JSONFile = self.OutputFolder + "RunningLogs.json"
         self.CasesJSONFile = self.OutputFolder + "Cases.json"
         OldGeneratedTestsFolder = "OutputTest/"
+        JudgeFolder = "JudgeOutput/"
         self.OldCasesFile = OldGeneratedTestsFolder + "Cases.json"
-        self.OldJsonFile = OldGeneratedTestsFolder + "RunningLogs.json"
+        self.OldJsonFile = JudgeFolder + "JudgmentLogs.json"
         self.CasesLogs = pd.read_json(self.OldJsonFile)
         self.OldCases = pd.read_json(self.OldCasesFile)
         self.logsDf = pd.DataFrame()
@@ -65,23 +66,29 @@ class BugFix:
             #     x = 9000
             print("Running Example ", i, "\n=====================\n")
 
-            currDescription, currCode, currGeneratedCode, currFeedback = (
-                self.extractInfo(i)
-            )
+            (
+                currDescription,
+                currCode,
+                Judgement,
+                Explanation,
+                TestCaseError,
+                ErrorMessage,
+            ) = self.extractInfo(i)
             # no feedback means testcase passed so don't run it again
-            if (
-                "OK" in currFeedback
-                or pd.isna(currFeedback)
-                or currFeedback == ""
-                or currFeedback is None
-            ):
-                print("Example", i, " has already passed")
-                c.write(
-                    "Example "
-                    + str(i)
-                    + " has already passed\n=====================================\n"
-                )
-                continue
+            # truncated from step before
+            # if (
+            #     "OK" in currFeedback
+            #     or pd.isna(currFeedback)
+            #     or currFeedback == ""
+            #     or currFeedback is None
+            # ):
+            #     print("Example", i, " has already passed")
+            #     c.write(
+            #         "Example "
+            #         + str(i)
+            #         + " has already passed\n=====================================\n"
+            #     )
+            #     continue
             try:
                 GeneratedBugFix = self.BugFixChain.invoke(
                     {
@@ -173,10 +180,22 @@ class BugFix:
         """
         currDescription = self.CasesLogs.iloc[i]["Description"]
         currCode = self.CasesLogs.iloc[i]["Code"]
-        currGeneratedCode = self.CasesLogs.iloc[i]["GeneratedCode"]
-        currFeedback = self.CasesLogs.iloc[i]["Feedback"]
+        Judgement = self.CasesLogs.iloc[i]["Judgement"]
+        Explanation = self.CasesLogs.iloc[i]["Explanation"]
+        TestCaseError = self.CasesLogs.iloc[i]["TestCaseError"]
+        ErrorMessage = self.CasesLogs.iloc[i]["ErrorMessage"]
+        # test_case_error
+        # error_message
+        # explanation
 
-        return currDescription, currCode, currGeneratedCode, currFeedback
+        return (
+            currDescription,
+            currCode,
+            Judgement,
+            Explanation,
+            TestCaseError,
+            ErrorMessage,
+        )
 
     def checkPaths(self):
         """
