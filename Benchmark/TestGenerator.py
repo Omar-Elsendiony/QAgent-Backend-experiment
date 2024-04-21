@@ -4,12 +4,13 @@ from utils.CustomThread import *
 
 class TestGenerator:
 
-    def __init__(self, GenUnitTestChain, db, HEval_JsonObj, myglobals):
+    def __init__(self, GenUnitTestChain, db, data_JsonObj, myglobals, isHumanEval=True):
         self.reset()
         self.GenUnitTestChain = GenUnitTestChain
         self.db = db
-        self.HEval_JsonObj = HEval_JsonObj
+        self.data_JsonObj = data_JsonObj  # data json object , previously humanEval_JsonObj
         self.myglobals = myglobals
+        self.isHumanEval = isHumanEval
 
     def reset(self):
         self.totalTestCasesNum = 0
@@ -67,7 +68,7 @@ class TestGenerator:
                     {
                         "description": description,
                         "code": code,
-                        "test_cases_of_few_shot": fewShotStr,
+                        "test_cases_of_few_shot": '', # few shot str empty till RAG is implemented
                     }
                 )  # ,"test_cases_of_few_shot":fewShotStr
             except Exception as e:
@@ -164,18 +165,24 @@ class TestGenerator:
         Return: description (str): The description of the example
                 code (str): The code of the example
         """
-        description = self.HEval_JsonObj.iloc[i]["text"]
-        code = self.HEval_JsonObj.iloc[i]["canonical_solution"]
-        # remove initial spaces in extracted code
-        code = code.strip()
-        # extract the function definition and utility code
-        funcDefiniton = self.HEval_JsonObj.iloc[i]["prompt"]
-        funcDefiniton, Utility = getFunctionName(
-            funcDefiniton
-        )  # does not need entry point at the end of the day
-        code = Utility + "\n" + funcDefiniton + code
+        if (self.isHumanEval):
+            description = self.data_JsonObj.iloc[i]["text"]
+            code = self.data_JsonObj.iloc[i]["canonical_solution"]
+            # remove initial spaces in extracted code
+            code = code.strip()
+            # extract the function definition and utility code
+            funcDefiniton = self.data_JsonObj.iloc[i]["prompt"]
+            funcDefiniton, Utility = getFunctionName(
+                funcDefiniton
+            )  # does not need entry point at the end of the day
+            code = Utility + "\n" + funcDefiniton + code
+            return description, code
+        else:
+            example = self.data_JsonObj[i]
+            code = example[0]['code_tokens']
+            description = example[0]['description']
+            return code, description
 
-        return description, code
 
     def extractFewShots(self, code):
         """
@@ -225,11 +232,11 @@ class TestGenerator:
                 print(f"Error creating file {self.JSONFile}: {e}")
                 exit()
 
-    def extractExampleInfo(self, example):
-        # Extract the code and description from the example
-        code = example["code"]
-        description = example["description"]
-        return code, description
+    # def extractExampleInfo(self, example):
+    #     # Extract the code and description from the example
+    #     code = example["code"]
+    #     description = example["description"]
+    #     return code, description
 
     def runTest(self, code, unittestCode):
         """
