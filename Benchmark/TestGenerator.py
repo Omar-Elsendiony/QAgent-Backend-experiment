@@ -8,7 +8,9 @@ class TestGenerator:
         self.reset()
         self.GenUnitTestChain = GenUnitTestChain
         self.db = db
-        self.data_JsonObj = data_JsonObj  # data json object , previously humanEval_JsonObj
+        self.data_JsonObj = (
+            data_JsonObj  # data json object , previously humanEval_JsonObj
+        )
         self.myglobals = myglobals
         self.isHumanEval = isHumanEval
 
@@ -37,6 +39,7 @@ class TestGenerator:
         self.casesDf = pd.DataFrame()
         self.LOGGING = True
         self.fewshotsnum = 3
+        self.isFewShot = True
 
     def generate(self):
         """
@@ -61,14 +64,14 @@ class TestGenerator:
                 + "\n=====================================\n"
             )
             # description and code from database
-            description, code = self.extractInfo(i)
+            code, description = self.extractInfo(i)
             fewShotStr = self.extractFewShots(code)
             try:
                 unittest = self.GenUnitTestChain.invoke(
                     {
                         "description": description,
                         "code": code,
-                        "test_cases_of_few_shot": '', # few shot str empty till RAG is implemented
+                        "test_cases_of_few_shot": "",  # few shot str empty till RAG is implemented
                     }
                 )  # ,"test_cases_of_few_shot":fewShotStr
             except Exception as e:
@@ -165,7 +168,7 @@ class TestGenerator:
         Return: description (str): The description of the example
                 code (str): The code of the example
         """
-        if (self.isHumanEval):
+        if self.isHumanEval:
             description = self.data_JsonObj.iloc[i]["text"]
             code = self.data_JsonObj.iloc[i]["canonical_solution"]
             # remove initial spaces in extracted code
@@ -178,11 +181,14 @@ class TestGenerator:
             code = Utility + "\n" + funcDefiniton + code
             return description, code
         else:
-            example = self.data_JsonObj[i]
-            code = example[0]['code_tokens']
-            description = example[0]['description']
+            example = self.data_JsonObj.iloc[i][0]
+            code = example["code_tokens"]
+            # preprocess it in form of function and replace all input() statements
+            code = replace_input(code)
+            # code = example[0]["code_tokens"]
+            description = example["description"]
+            # description = example[0]["description"]
             return code, description
-
 
     def extractFewShots(self, code):
         """

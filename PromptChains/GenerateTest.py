@@ -93,28 +93,41 @@ def InitializeTestChain(llm, fewshots=False):
     return GenUnitTestChain
 
 
-def createPromptStringGenerateTest(
-    description, code, fewshots=False, test_cases_of_few_shot=None
-):
-    if not fewshots:
-        prompt = GenerateTestTemplate.format(description=description, code=code)
-    else:
-        prompt = Gen_UnitTest_with_FewShots_template.format(
-            description=description,
-            code=code,
-            test_cases_of_few_shot=test_cases_of_few_shot,
-        )
-    return prompt
+# def CallTestChain(llm, description, code, fewshots=False, test_cases_of_few_shot=None):
+#     GenUnitTestChain = InitializeTestChain(llm, fewshots)
+#     if not fewshots:
+#         response = GenUnitTestChain.run(description=description, code=code)
+#     else:
+#         response = GenUnitTestChain.run(
+#             description=description,
+#             code=code,
+#             test_cases_of_few_shot=test_cases_of_few_shot,
+#         )
+#     return response
 
 
-def queryGptGenerateTest(
-    model, description, code, fewshots=False, test_cases_of_few_shot=None
-):
-    prompt = createPromptStringGenerateTest(
-        description, code, fewshots, test_cases_of_few_shot
-    )
-    response = openai.ChatCompletion.create(
-        model=model, messages=[{"role": "user", "content": prompt}]
-    )
+# def createPromptStringGenerateTest(
+#     description, code, fewshots=False, test_cases_of_few_shot=None
+# ):
+#     if not fewshots:
+#         prompt = GenerateTestTemplate.format(description=description, code=code)
+#     else:
+#         prompt = Gen_UnitTest_with_FewShots_template.format(
+#             description=description,
+#             code=code,
+#             test_cases_of_few_shot=test_cases_of_few_shot,
+#         )
+#     return prompt
 
-    return response
+
+# def queryGptGenerateTest(
+#     model, description, code, fewshots=False, test_cases_of_few_shot=None
+# ):
+#     prompt = createPromptStringGenerateTest(
+#         description, code, fewshots, test_cases_of_few_shot
+#     )
+#     response = openai.ChatCompletion.create(
+#         model=model, messages=[{"role": "user", "content": prompt}]
+#     )
+
+#     return response
