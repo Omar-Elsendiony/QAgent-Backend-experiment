@@ -139,9 +139,29 @@ def regeneratePrompt(chat_model_arb, code, description, testcase):
     return res
 
 
-# assumes following template:
+# assumes following the first template:
 # Bug in the python code under test: **IS_METHOD_UNDER_TEST_BUGGY**
 # Explanation: **EXPLANATION**
+# def getJudgmentFromGeneration(response):
+#     incompleteResponse = False
+#     s = re.finditer(r"</s> \[/INST\]", response)
+#     # gets last element in iterator
+#     *_, lastMatch = s
+#     startIndex = lastMatch.span(0)[1]
+#     ExtractedResponse = response[startIndex:]
+#     judgementMatch = re.search(
+#         r"Bug in the python code under test: (True|False)", ExtractedResponse
+#     )
+#     explanationMatch = re.search(r"Explanation:", ExtractedResponse)
+
+#     if judgementMatch is None:
+#         return (response[startIndex:], "", True)
+#     judgement = judgementMatch.group(1)
+#     expIndex = explanationMatch.end()
+#     explanation = ExtractedResponse[expIndex:]
+#     return judgement, explanation, incompleteResponse
+
+
 def getJudgmentFromGeneration(response):
     incompleteResponse = False
     s = re.finditer(r"</s> \[/INST\]", response)
@@ -149,13 +169,19 @@ def getJudgmentFromGeneration(response):
     *_, lastMatch = s
     startIndex = lastMatch.span(0)[1]
     ExtractedResponse = response[startIndex:]
-    judgementMatch = re.search(
-        r"Bug in the python code under test: (True|False)", ExtractedResponse
-    )
+    judgementMatch = re.search(r"Bug in the Code: (True|False)", ExtractedResponse)
+    if judgementMatch is None:
+        judgementMatch = re.search(
+            r"Bug in the Test Case: (True|False)", ExtractedResponse
+        )
+        if judgementMatch is None:
+            incompleteResponse = True
+            return (response[startIndex:], "", True)
+    judgement = judgementMatch.group(1)
     explanationMatch = re.search(r"Explanation:", ExtractedResponse)
 
-    if judgementMatch is None:
-        return (response[startIndex:], explanation, True)
+    # if judgementMatch is None:
+    #     return (response[startIndex:], "", True)
     judgement = judgementMatch.group(1)
     expIndex = explanationMatch.end()
     explanation = ExtractedResponse[expIndex:]

@@ -9,7 +9,7 @@ from utils.PreprocessUtils import addMixtralTokens
 # This judge function is proposed to judge if the error is in the code under test or in the test case itself.
 # according to that we decide if we are going to attempt fixing the codes or maybe regenerate the test cases.
 
-judge_template = """You are python unit tester judge. Given the following python code, its description, a test case that produce an error and the error message.
+judge_templatee = """You are python unit tester judge. Given the following python code, its description, a test case that produce an error and the error message.
 You are going to follow the criteria that I give to you.
 You follow my rules and orders and if you do not know the answer, don't make things UP!
 Criteria:
@@ -40,6 +40,36 @@ My template is:
 Bug in the python code under test: **IS_METHOD_UNDER_TEST_BUGGY**
 Explanation: **EXPLANATION**
 Remember you are a judge and you should be fair and just. Do not make things up. Think before you end the response. I do not want any incomplete response.
+"""
+
+
+judge_template = """Given the Python code below, its description, and an error-producing test case with the associated error message, determine the cause of the error. Use the information provided to decide whether the error is due to a bug in the Python code itself or in the test case. Provide a reasoned conclusion.
+
+- Code Under Test:
+{code}
+
+- Description of Functionality:
+{description}
+
+- Error-Inducing Test Case:
+{test_case_error}
+
+- Observed Error Message:
+{error_message}
+
+Evaluate the provided information carefully before reaching a conclusion. Inspect the relevant portions of the code and the test case, and provide a reasoned explanation for your judgment. Consider the following:
+
+- If you identify a bug in the code, replace *ITS_METHOD_UNDER_TEST_BUGGY* with True and provide an explanation.
+- If the test case is incorrect, replace *ITS_METHOD_UNDER_TEST_BUGGY* with False and explain why the test is invalid.
+
+Your explanation should be detailed and justified based on the evidence provided. Do not make assumptions beyond the given data.
+
+Template output:
+
+Bug in the Code: *ITS_METHOD_UNDER_TEST_BUGGY*
+Explanation: *EXPLANATION*
+
+Note: Provide complete and just reasoning. Avoid assumptions not supported by the given data.
 """
 
 
