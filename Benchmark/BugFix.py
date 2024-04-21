@@ -69,6 +69,7 @@ class BugFix:
             (
                 currDescription,
                 currCode,
+                Judgement,
                 Explanation,
                 TestCaseError,
                 ErrorMessage,
@@ -88,6 +89,15 @@ class BugFix:
             #         + " has already passed\n=====================================\n"
             #     )
             #     continue
+            if Judgement == "True":
+                print("Example", i, " has already passed")
+                c.write(
+                    "Example "
+                    + str(i)
+                    + " has already passed\n=====================================\n"
+                )
+                continue
+
             try:
                 GeneratedBugFix = self.BugFixChain.invoke(
                     {
@@ -180,6 +190,7 @@ class BugFix:
         """
         currDescription = self.CasesLogs.iloc[i]["Description"]
         currCode = self.CasesLogs.iloc[i]["Code"]
+        Judgement = self.CasesLogs.iloc[i]["Judgement"]
         Explanation = self.CasesLogs.iloc[i]["Explanation"]
         TestCaseError = self.CasesLogs.iloc[i]["TestCaseError"]
         ErrorMessage = self.CasesLogs.iloc[i]["ErrorMessage"]
@@ -190,6 +201,7 @@ class BugFix:
         return (
             currDescription,
             currCode,
+            Judgement,
             Explanation,
             TestCaseError,
             ErrorMessage,
