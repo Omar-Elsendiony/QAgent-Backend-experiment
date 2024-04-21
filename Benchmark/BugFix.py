@@ -2,16 +2,16 @@ from Imports import *
 from utils.CustomThread import *
 
 
-class TestFix:
+class BugFix:
 
     def __init__(
         self,
-        UnitTestFeedbackChain,
+        BugFixChain,
         firstFeedback,
         myglobals,
     ):
         self.reset()
-        self.UnitTestFeedbackChain = UnitTestFeedbackChain
+        self.BugFixChain = BugFixChain
         self.myglobals = myglobals
         self.firstFeedback = firstFeedback
 
@@ -33,7 +33,7 @@ class TestFix:
         self.TotalCases = 0
         self.TotalFailedCases = 0
         self.incompleteResponses = 0
-        self.OutputFolder = "FeedbackOutput/"
+        self.OutputFolder = "BugFix/"
         self.JSONFile = self.OutputFolder + "RunningLogs.json"
         self.CasesJSONFile = self.OutputFolder + "Cases.json"
         OldGeneratedTestsFolder = "OutputTest/"
@@ -47,10 +47,10 @@ class TestFix:
 
     def generate(self):
         """
-        This function is responsible for generating the test cases and running them
+        This function is responsible for Fixing Bugs in Code and running the code with generated tests
         The function is responsible for:
         1. Extracting the code and description from the example
-        2. Generating the test cases
+        2. Fixing Bugs in Code
         3. Running the test cases
         4. Storing the results in a JSON file
         Args: None
@@ -59,7 +59,7 @@ class TestFix:
         print(self.firstFeedback)
         self.checkPaths()
         self.reset()
-        FileHandle = open(self.OutputFolder + "Cases.txt", "w+")
+        c = open(self.OutputFolder + "Cases.txt", "w+")
         for i in range(len(self.CasesLogs)):
             # if (i == 28):
             #     x = 9000
@@ -76,14 +76,14 @@ class TestFix:
                 or currFeedback is None
             ):
                 print("Example", i, " has already passed")
-                FileHandle.write(
+                c.write(
                     "Example "
                     + str(i)
                     + " has already passed\n=====================================\n"
                 )
                 continue
             try:
-                GenerationPostFeedback = self.UnitTestFeedbackChain.invoke(
+                GeneratedBugFix = self.BugFixChain.invoke(
                     {
                         "description": currDescription,
                         "code": currCode,
@@ -91,29 +91,18 @@ class TestFix:
                         "Feedback": currFeedback,
                     }
                 )
-                # if codeTobeRun is not None:
-                #     codeTobeRun = preprocessUnitTest(codeTobeRun)
-                #     feedback = runCode(code=codeTobeRun, myglobals=self.myglobals)
-                #     print("feedback is: ", feedback)
-                #     feedbackparsed = getFeedbackFromRun(feedback)
-                #     unittestCode = codeTobeRun[
-                #         (re.search(r"import unittest", codeTobeRun)).span()[0] :
-                #     ]
-                # else:
-                #     self.incompleteResponses += 1
-                #     continue
             except Exception as e:
                 print("ERROR in invoking Feedback Chain")
                 self.apiErrors += 1
                 print(e)
-                FileHandle.write(
+                c.write(
                     "Example "
                     + str(i)
                     + " Didn't Run Due to Errorr\n=====================================\n"
                 )
                 continue
             newUnitTestCode, isIncompleteResponse = getCodeFromResponse(
-                GenerationPostFeedback["text"], testFixing=True
+                GeneratedBugFix["text"], testFixing=True
             )
             if isIncompleteResponse:
                 self.incompleteResponses += 1
@@ -122,7 +111,7 @@ class TestFix:
                     + str(i)
                     + " Didn't Run Due to Incomplete Response\n=====================================\n"
                 )
-                FileHandle.write(
+                c.write(
                     "Example "
                     + str(i)
                     + " Didn't Run Due to Incomplete Response\n=====================================\n"
@@ -140,7 +129,7 @@ class TestFix:
                 feedback,
                 feedbackparsed,
                 unittestCode,
-                FileHandle,
+                c,
                 NonSucceedingCasesNamesList,
                 i,
             )
@@ -170,7 +159,7 @@ class TestFix:
                 json.dump(jsondata, f, indent=4)
 
         self.printResults()
-        FileHandle.close()
+        c.close()
         return
 
     def extractInfo(self, i):
@@ -224,13 +213,7 @@ class TestFix:
                 exit()
 
     def writeResults(
-        self,
-        feedback,
-        feedbackparsed,
-        unittestCode,
-        FileHanlde,
-        NonSucceedingCasesNamesList,
-        i,
+        self, feedback, feedbackparsed, unittestCode, c, NonSucceedingCasesNamesList, i
     ):
         """
         Responsible for writing results to cases.txt and cases.json
@@ -250,11 +233,9 @@ class TestFix:
             print("Number of Ran Tests : ", numOfAssertions)
             print("Number of Succeeded Test : ", numOfAssertions)
             print("Number of Succeeded Test : ", 0)
-            FileHanlde.write("Test example " + str(i) + " succeeded\n")
-            FileHanlde.write("Number of Ran Tests : " + str(numOfAssertions) + "\n")
-            FileHanlde.write(
-                "Number of Succeeded Test : " + str(numOfAssertions) + "\n"
-            )
+            c.write("Test example " + str(i) + " succeeded\n")
+            c.write("Number of Ran Tests : " + str(numOfAssertions) + "\n")
+            c.write("Number of Succeeded Test : " + str(numOfAssertions) + "\n")
 
             oldTotalTests = 0
             oldTestsFailed = 0
@@ -299,13 +280,11 @@ class TestFix:
                 "Number of Succeeded Test : ",
                 numberOfSucceeded,
             )
-            FileHanlde.write("Test example " + str(i) + " failed\n")
-            FileHanlde.write("Number of Ran Tests : " + str(numOfAssertions) + "\n")
-            FileHanlde.write("Number of failed Tests : " + str(failedCasesNum) + "\n")
-            FileHanlde.write("Number of Error Test : " + str(errorCasesNum) + "\n")
-            FileHanlde.write(
-                "Number of Succeeded Test : " + str(numberOfSucceeded) + "\n"
-            )
+            c.write("Test example " + str(i) + " failed\n")
+            c.write("Number of Ran Tests : " + str(numOfAssertions) + "\n")
+            c.write("Number of failed Tests : " + str(failedCasesNum) + "\n")
+            c.write("Number of Error Test : " + str(errorCasesNum) + "\n")
+            c.write("Number of Succeeded Test : " + str(numberOfSucceeded) + "\n")
 
             if self.firstFeedback:
                 oldTotalTests = self.OldCases.iloc[i]["Total Tests"]
@@ -356,10 +335,9 @@ class TestFix:
         )
         print("Total failed testcases : ", self.failed_test_cases)
         print("Total error testcases : ", self.error_test_cases)
+        print("Tests to repeat : ", self.testsToRepeat)
         print("Incomplete Responses are : ", self.incompleteResponses)
         print("API Errors are : ", self.apiErrors)
-        print("Incomplete Responses are ", self.incompleteResponses)
-        print("Tests to repeat : ", self.testsToRepeat)
         with open(self.OutputFolder + "Res.txt", "w") as f:
             f.write(
                 "Total succeeded examples : " + str(self.successfulExamplesNum) + "\n"
@@ -384,3 +362,5 @@ class TestFix:
             )
             f.write("API Errors are : " + str(self.apiErrors) + "\n")
             f.write("Tests to repeat : " + str(self.testsToRepeat) + "\n")
+
+        print("Incomplete Responses are ", self.incompleteResponses)
