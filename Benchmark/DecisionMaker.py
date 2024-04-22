@@ -45,8 +45,8 @@ class DecisionMaker:
         self.reset()
         FileHandle = open(self.OutputFolder + "Cases.txt", "w+")
         for i in range(len(self.CasesLogs)):
-            # if i == 3:
-            #     continue
+            if i == 3:
+                continue
             print("Running Test Case ", i)
             FileHandle.write(
                 "Running Test Case "
@@ -56,7 +56,21 @@ class DecisionMaker:
             # description and code from database
             description, code, errorMsg, errorTestCases = self.extractInfo(i)
             # fewShotStr = self.extractFewShots(code)
+            if (
+                "OK" in errorMsg
+                or pd.isna(errorMsg)
+                or errorMsg == ""
+                or errorMsg is None
+            ):
+                print("Example", i, " has already passed")
+                FileHandle.write(
+                    "Example "
+                    + str(i)
+                    + " has already passed\n=====================================\n"
+                )
+                continue
             try:
+                errorMsg = getOneError(errorMsg)
                 generatedJudgement = self.JudgeChain.invoke(
                     {
                         "code": code,
@@ -130,6 +144,9 @@ class DecisionMaker:
                     "Description": description,
                     "Code": code,
                     "Judgement": judgement,
+                    "Explanation": explanation,
+                    "TestCaseError": errorTestCases,
+                    "ErrorMessage": errorMsg,
                 },
                 index=[0],
             )
@@ -229,12 +246,13 @@ class DecisionMaker:
 
         """
         print(f"Test example {i} Judgement\n======================================\n")
-        finaljudge = "Code is buggy " if judgement == False else "Code is correct"
+        booljudgement = 1 if judgement == "True" else 0
+        finaljudge = "Code is buggy " if booljudgement == 0 else "Code is correct"
         print("Judgement : ", finaljudge)
         print("Explanation : ", explanation)
         FileHandle.write("Test example " + str(i) + " failed\n")
         FileHandle.write("Judgement : : " + finaljudge + "\n")
-        FileHandle.write("Explanation " + explanation + "\n")
+        FileHandle.write("Explanation " + str(explanation) + "\n")
 
     def printResults(self):
         """

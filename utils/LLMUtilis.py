@@ -34,7 +34,10 @@ def getCodefromTestGeneration(response):
 # skips any substring that contains a statement from the prompt template
 # handles only if the llm changes either the code or the test cases
 # TODO: handle if the llm changes both the code and the test cases
-def getCodeFromTestFixing(response):
+def getCodeFromTestFixing(
+    response,
+    promptStatementToCheck="Your goal is to revise the code or tests based on the feedback. Ensure to:",
+):
     incompleteResponse = False
 
     s = re.finditer(r"```python", response)
@@ -43,10 +46,7 @@ def getCodeFromTestFixing(response):
         # pick a statement from the prompt template and ensure it's no in the chosen repsonse
         startIndex = st.span(0)[0]
         ExtractedResponse = response[startIndex:]
-        if (
-            "Your goal is to revise the code or tests based on the feedback. Ensure to:"
-            in ExtractedResponse
-        ):
+        if promptStatementToCheck in ExtractedResponse:
             continue
         else:
             break
@@ -70,11 +70,13 @@ def getCodeFromTestFixing(response):
     return code, incompleteResponse
 
 
-def getCodeFromResponse(response, testFixing=False):
-    if not testFixing:
+def getCodeFromResponse(response, testFixing=0):
+    if testFixing == 0:
         return getCodefromTestGeneration(response)
-    else:
+    elif testFixing == 1:
         return getCodeFromTestFixing(response)
+    else:
+        return getCodeFromTestFixing(response, "including the leading and trailing")
 
 
 def getEachTestCase(UnitTestsCode, functionNames):
@@ -139,9 +141,29 @@ def regeneratePrompt(chat_model_arb, code, description, testcase):
     return res
 
 
-# assumes following template:
+# assumes following the first template:
 # Bug in the python code under test: **IS_METHOD_UNDER_TEST_BUGGY**
 # Explanation: **EXPLANATION**
+# def getJudgmentFromGeneration(response):
+#     incompleteResponse = False
+#     s = re.finditer(r"</s> \[/INST\]", response)
+#     # gets last element in iterator
+#     *_, lastMatch = s
+#     startIndex = lastMatch.span(0)[1]
+#     ExtractedResponse = response[startIndex:]
+#     judgementMatch = re.search(
+#         r"Bug in the python code under test: (True|False)", ExtractedResponse
+#     )
+#     explanationMatch = re.search(r"Explanation:", ExtractedResponse)
+
+#     if judgementMatch is None:
+#         return (response[startIndex:], "", True)
+#     judgement = judgementMatch.group(1)
+#     expIndex = explanationMatch.end()
+#     explanation = ExtractedResponse[expIndex:]
+#     return judgement, explanation, incompleteResponse
+
+
 def getJudgmentFromGeneration(response):
     incompleteResponse = False
     s = re.finditer(r"</s> \[/INST\]", response)
@@ -149,12 +171,20 @@ def getJudgmentFromGeneration(response):
     *_, lastMatch = s
     startIndex = lastMatch.span(0)[1]
     ExtractedResponse = response[startIndex:]
-    judgement = re.search(
-        r"Bug in the python code under test: (True|False)", ExtractedResponse
-    )
-    explanation = re.search(r"Explanation: (.+)", ExtractedResponse)
+    judgementMatch = re.search(r"Bug in the Code: (True|False)", ExtractedResponse)
+    if judgementMatch is None:
+        judgementMatch = re.search(
+            r"Bug in the Test Case: (True|False)", ExtractedResponse
+        )
+        if judgementMatch is None:
+            incompleteResponse = True
+            return (response[startIndex:], "", True)
+    judgement = judgementMatch.group(1)
+    explanationMatch = re.search(r"Explanation:", ExtractedResponse)
 
-    if judgement is None:
-        return (response[startIndex:], explanation, True)
-
-    return judgement.group(1), explanation.group(1), incompleteResponse
+    # if judgementMatch is None:
+    #     return (response[startIndex:], "", True)
+    judgement = judgementMatch.group(1)
+    expIndex = explanationMatch.end()
+    explanation = ExtractedResponse[expIndex:]
+    return judgement, explanation, incompleteResponse

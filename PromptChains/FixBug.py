@@ -33,7 +33,7 @@ Criteria:
 2. Interpret the test case that produces an error and the accompanying error message.
 3. Understand the explanation of a judge for why the error is in the code under test.
 3. Repair the code under test to be bug-free.
-4. make sure that the functionality of the repaired code conforms to the description.
+4. Make sure that the functionality of the repaired code conforms to the description.
 
 Your answer is a list of bugs found and the repaired code only.
 The repaired code should be a markdown code snippet formatted in the following schema, including the leading and trailing "```python" and "```" respectively:"""
@@ -68,7 +68,7 @@ Criteria:
 2. Interpret the test case that produces an error and the accompanying error message.
 3. Understand the explanation of a judge for why the error is in the code under test.
 3. Repair the code under test to be bug-free.
-4. make sure that the functionality of the repaired code conforms to the description.
+4. Make sure that the functionality of the repaired code conforms to the description.
 
 Your answer is a list of bugs found and the repaired code only.
 The repaired code should be a markdown code snippet formatted in the following schema, including the leading and trailing "```python" and "```" respectively:"""

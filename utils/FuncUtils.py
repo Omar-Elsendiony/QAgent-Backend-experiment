@@ -66,3 +66,23 @@ def getTestCase(splitLines, errorChunck):
     startCaseIndex = getStartTestCase(splitLines, int(lineNo))
     testCase = "\n".join(splitLines[startCaseIndex : int(lineNo)])
     return testCase
+
+
+def replace_input(code):
+    # find all the lines that have input() in them
+    lines = code.split("\n")
+    variableNames = []
+    # find the variable name on the left hand side of the assignment
+    variablematches = re.finditer(r"(.+?)\s*=\s*input\(\)\s*", code)
+    for matcher in variablematches:
+        variableNames.append(matcher.group(1).strip())
+    functionheader = "def myfunc(" + ",".join(variableNames) + "):"
+    # replace any line containing input with ""
+    for i in range(len(lines)):
+        if "input()" in lines[i]:
+            lines[i] = ""
+        lines[i] = "\t" + lines[i]
+
+    # add function header and format code
+    code = functionheader + "\n" + "\n".join(lines)
+    return code

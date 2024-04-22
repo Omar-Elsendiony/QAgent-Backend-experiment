@@ -2,16 +2,16 @@ from Imports import *
 from utils.CustomThread import *
 
 
-class TestFix:
+class BugFix:
 
     def __init__(
         self,
-        UnitTestFeedbackChain,
+        BugFixChain,
         firstFeedback,
         myglobals,
     ):
         self.reset()
-        self.UnitTestFeedbackChain = UnitTestFeedbackChain
+        self.BugFixChain = BugFixChain
         self.myglobals = myglobals
         self.firstFeedback = firstFeedback
 
@@ -33,12 +33,13 @@ class TestFix:
         self.TotalCases = 0
         self.TotalFailedCases = 0
         self.incompleteResponses = 0
-        self.OutputFolder = "FeedbackOutput/"
+        self.OutputFolder = "BugFix/"
         self.JSONFile = self.OutputFolder + "RunningLogs.json"
         self.CasesJSONFile = self.OutputFolder + "Cases.json"
         OldGeneratedTestsFolder = "OutputTest/"
+        JudgeFolder = "JudgeOutput/"
         self.OldCasesFile = OldGeneratedTestsFolder + "Cases.json"
-        self.OldJsonFile = OldGeneratedTestsFolder + "RunningLogs.json"
+        self.OldJsonFile = JudgeFolder + "JudgmentLogs.json"
         self.CasesLogs = pd.read_json(self.OldJsonFile)
         self.OldCases = pd.read_json(self.OldCasesFile)
         self.logsDf = pd.DataFrame()
@@ -47,10 +48,10 @@ class TestFix:
 
     def generate(self):
         """
-        This function is responsible for generating the test cases and running them
+        This function is responsible for Fixing Bugs in Code and running the code with generated tests
         The function is responsible for:
         1. Extracting the code and description from the example
-        2. Generating the test cases
+        2. Fixing Bugs in Code
         3. Running the test cases
         4. Storing the results in a JSON file
         Args: None
@@ -65,11 +66,30 @@ class TestFix:
             #     x = 9000
             print("Running Example ", i, "\n=====================\n")
 
-            currDescription, currCode, currGeneratedCode, currFeedback = (
-                self.extractInfo(i)
-            )
+            (
+                currDescription,
+                currCode,
+                Judgement,
+                Explanation,
+                TestCaseError,
+                ErrorMessage,
+            ) = self.extractInfo(i)
             # no feedback means testcase passed so don't run it again
-            if pd.isna(currFeedback) or currFeedback == "" or currFeedback is None:
+            # truncated from step before
+            # if (
+            #     "OK" in currFeedback
+            #     or pd.isna(currFeedback)
+            #     or currFeedback == ""
+            #     or currFeedback is None
+            # ):
+            #     print("Example", i, " has already passed")
+            #     c.write(
+            #         "Example "
+            #         + str(i)
+            #         + " has already passed\n=====================================\n"
+            #     )
+            #     continue
+            if Judgement == "True":
                 print("Example", i, " has already passed")
                 c.write(
                     "Example "
@@ -77,26 +97,17 @@ class TestFix:
                     + " has already passed\n=====================================\n"
                 )
                 continue
+
             try:
-                GenerationPostFeedback = self.UnitTestFeedbackChain.invoke(
+                GeneratedBugFix = self.BugFixChain.invoke(
                     {
                         "description": currDescription,
                         "code": currCode,
-                        "UnitTests": currGeneratedCode,
-                        "Feedback": currFeedback,
+                        "test_case_error": TestCaseError,
+                        "error_message": ErrorMessage,
+                        "explanaion": Explanation,
                     }
                 )
-                # if codeTobeRun is not None:
-                #     codeTobeRun = preprocessUnitTest(codeTobeRun)
-                #     feedback = runCode(code=codeTobeRun, myglobals=self.myglobals)
-                #     print("feedback is: ", feedback)
-                #     feedbackparsed = getFeedbackFromRun(feedback)
-                #     unittestCode = codeTobeRun[
-                #         (re.search(r"import unittest", codeTobeRun)).span()[0] :
-                #     ]
-                # else:
-                #     self.incompleteResponses += 1
-                #     continue
             except Exception as e:
                 print("ERROR in invoking Feedback Chain")
                 self.apiErrors += 1
@@ -108,7 +119,7 @@ class TestFix:
                 )
                 continue
             newUnitTestCode, isIncompleteResponse = getCodeFromResponse(
-                GenerationPostFeedback["text"], testFixing=True
+                GeneratedBugFix["text"], 3
             )
             if isIncompleteResponse:
                 self.incompleteResponses += 1
@@ -179,10 +190,22 @@ class TestFix:
         """
         currDescription = self.CasesLogs.iloc[i]["Description"]
         currCode = self.CasesLogs.iloc[i]["Code"]
-        currGeneratedCode = self.CasesLogs.iloc[i]["GeneratedCode"]
-        currFeedback = self.CasesLogs.iloc[i]["Feedback"]
+        Judgement = self.CasesLogs.iloc[i]["Judgement"]
+        Explanation = self.CasesLogs.iloc[i]["Explanation"]
+        TestCaseError = self.CasesLogs.iloc[i]["TestCaseError"]
+        ErrorMessage = self.CasesLogs.iloc[i]["ErrorMessage"]
+        # test_case_error
+        # error_message
+        # explanation
 
-        return currDescription, currCode, currGeneratedCode, currFeedback
+        return (
+            currDescription,
+            currCode,
+            Judgement,
+            Explanation,
+            TestCaseError,
+            ErrorMessage,
+        )
 
     def checkPaths(self):
         """
@@ -341,10 +364,9 @@ class TestFix:
         )
         print("Total failed testcases : ", self.failed_test_cases)
         print("Total error testcases : ", self.error_test_cases)
+        print("Tests to repeat : ", self.testsToRepeat)
         print("Incomplete Responses are : ", self.incompleteResponses)
         print("API Errors are : ", self.apiErrors)
-        print("Incomplete Responses are ", self.incompleteResponses)
-        print("Tests to repeat : ", self.testsToRepeat)
         with open(self.OutputFolder + "Res.txt", "w") as f:
             f.write(
                 "Total succeeded examples : " + str(self.successfulExamplesNum) + "\n"
@@ -369,3 +391,5 @@ class TestFix:
             )
             f.write("API Errors are : " + str(self.apiErrors) + "\n")
             f.write("Tests to repeat : " + str(self.testsToRepeat) + "\n")
+
+        print("Incomplete Responses are ", self.incompleteResponses)
