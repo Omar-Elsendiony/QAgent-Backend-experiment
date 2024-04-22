@@ -181,13 +181,17 @@ class TestGenerator:
             code = Utility + "\n" + funcDefiniton + code
             return description, code
         else:
-            example = self.data_JsonObj.iloc[i][0]
-            code = example["code_tokens"]
-            # preprocess it in form of function and replace all input() statements
-            code = replace_input(code)
-            # code = example[0]["code_tokens"]
-            description = example["description"]
-            # description = example[0]["description"]
+            # example = self.data_JsonObj.iloc[i][0]
+            # code = example["code_tokens"]
+            # # preprocess it in form of function and replace all input() statements
+            # code = replace_input(code)
+            # # code = example[0]["code_tokens"]
+            # description = example["description"]
+            # # description = example[0]["description"]
+            code = self.data_JsonObj.iloc[i]["AlteredCleanedCode"]
+            # exclude last 3 letters
+            code = code[:-3]
+            description = self.data_JsonObj.iloc[i]["Description"]
             return code, description
 
     def extractFewShots(self, code):
