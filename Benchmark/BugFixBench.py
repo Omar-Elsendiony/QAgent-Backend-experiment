@@ -2,7 +2,7 @@ from Imports import *
 from utils.CustomThread import *
 
 
-class BugFix:
+class BugFixBench:
 
     def __init__(
         self,
@@ -36,11 +36,8 @@ class BugFix:
         self.OutputFolder = "BugFixOutput/"
         self.JSONFile = self.OutputFolder + "RunningLogs.json"
         self.CasesJSONFile = self.OutputFolder + "Cases.json"
-        OldGeneratedTestsFolder = "OutputTest/"
-        JudgeFolder = "JudgeOutput/"
-        self.OldCasesFile = OldGeneratedTestsFolder + "Cases.json"
-        self.OldJsonFile = JudgeFolder + "JudgmentLogs.json"
-        self.CasesLogs = pd.read_json(self.OldJsonFile)
+        OldGeneratedTestsFolder = "Datasets/"
+        self.OldCasesFile = OldGeneratedTestsFolder + "Quix.json"
         self.OldCases = pd.read_json(self.OldCasesFile)
         self.logsDf = pd.DataFrame()
         self.casesDf = pd.DataFrame()
@@ -68,44 +65,27 @@ class BugFix:
 
             (
                 currDescription,
-                currCode,
-                Judgement,
-                Explanation,
-                TestCaseError,
-                ErrorMessage,
+                correctCode,
+                buggyCode,
+                tests,
             ) = self.extractInfo(i)
-            # no feedback means testcase passed so don't run it again
-            # truncated from step before
-            # if (
-            #     "OK" in currFeedback
-            #     or pd.isna(currFeedback)
-            #     or currFeedback == ""
-            #     or currFeedback is None
-            # ):
-            #     print("Example", i, " has already passed")
-            #     c.write(
-            #         "Example "
-            #         + str(i)
-            #         + " has already passed\n=====================================\n"
-            #     )
-            #     continue
-            if Judgement == "True":
-                print("Example", i, " has already passed")
-                c.write(
-                    "Example "
-                    + str(i)
-                    + " has already passed\n=====================================\n"
-                )
-                continue
+            buggyCodeToRun = buggyCode + "\n" + tests
+            firstFeedback = runCode(buggyCodeToRun, self.myglobals)
+            NonSucceedingCasesNames = getNonSucceedingTestcases(firstFeedback)
+            NonSucceedingCasesNamesList = (
+                NonSucceedingCasesNames["failed"] + NonSucceedingCasesNames["error"]
+            )
+            testsToRepeat = getEachTestCase(unittestCode, NonSucceedingCasesNamesList)
+            feedbackparsed = getFeedbackFromRun(feedback)
+            errorMsg = getOneError(feedbackparsed)
 
             try:
                 GeneratedBugFix = self.BugFixChain.invoke(
                     {
                         "description": currDescription,
-                        "code": currCode,
-                        "test_case_error": TestCaseError,
-                        "error_message": ErrorMessage,
-                        "explanation": Explanation,
+                        "code": buggyCode,
+                        "test_case_error": testsToRepeat,
+                        "error_message": errorMsg,
                     }
                 )
             except Exception as e:
@@ -118,7 +98,7 @@ class BugFix:
                     + " Didn't Run Due to Errorr\n=====================================\n"
                 )
                 continue
-            newUnitTestCode, isIncompleteResponse = getCodeFromResponse(
+            generated_code, isIncompleteResponse = getCodeFromResponse(
                 GeneratedBugFix["text"], 3
             )
             if isIncompleteResponse:
@@ -133,7 +113,7 @@ class BugFix:
                     + str(i)
                     + " Didn't Run Due to Incomplete Response\n=====================================\n"
                 )
-            unittestCode = preprocessUnitTest(newUnitTestCode)
+            unittestCode = preprocessUnitTest(generated_code)
             codeTobeRun = getRunningCode(currCode, unittestCode)
             feedback = runCode(codeTobeRun, self.myglobals)
             NonSucceedingCasesNames = getNonSucceedingTestcases(feedback)
@@ -188,23 +168,16 @@ class BugFix:
                 generatedCode (str): The generated code of the example
                 feedback (str): The feedback of the example
         """
-        currDescription = self.CasesLogs.iloc[i]["Description"]
-        currCode = self.CasesLogs.iloc[i]["Code"]
-        Judgement = self.CasesLogs.iloc[i]["Judgement"]
-        Explanation = self.CasesLogs.iloc[i]["Explanation"]
-        TestCaseError = self.CasesLogs.iloc[i]["TestCaseError"]
-        ErrorMessage = self.CasesLogs.iloc[i]["ErrorMessage"]
-        # test_case_error
-        # error_message
-        # explanation
+        currDescription = self.OldCasesFile.iloc[i]["description"]
+        correctCode = self.OldCasesFile.iloc[i]["correct"]
+        buggyCode = self.OldCasesFile.iloc[i]["buggy"]
+        tests = self.OldCasesFile.iloc[i]["tests"]
 
         return (
             currDescription,
-            currCode,
-            Judgement,
-            Explanation,
-            TestCaseError,
-            ErrorMessage,
+            correctCode,
+            buggyCode,
+            tests,
         )
 
     def checkPaths(self):
