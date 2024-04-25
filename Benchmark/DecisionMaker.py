@@ -15,7 +15,8 @@ class DecisionMaker:
         self.TotalExamples = 0
         self.incompleteResponses = 0
         self.codes = []
-        self.judgements = []
+        self.judgementsCodeBuggy = []
+        self.judgementsTestBuggy = [] 
         self.explanations = []
         self.descriptions = []
         self.OutputFolder = "JudgeOutput/"
@@ -94,7 +95,8 @@ class DecisionMaker:
                         "CaseNumber": i,
                         "Description": description,
                         "Code": code,
-                        "Judgement": None,
+                        "JudgementCodeBuggy": None,
+                        "JudgementTestBuggy": None,
                     },
                     index=[0],
                 )
@@ -111,7 +113,7 @@ class DecisionMaker:
                 "generatedJudgement: " + str(generatedJudgement["text"]) + "\n"
             )
 
-            judgement, explanation, isIncompleteResponse = getJudgmentFromGeneration(
+            judgementCodeBuggy,judgementTestBuggy, explanation, isIncompleteResponse = getJudgmentFromGeneration(
                 generatedJudgement["text"]
             )
             if isIncompleteResponse:
@@ -128,14 +130,16 @@ class DecisionMaker:
                 )
             self.TotalExamples += 1
             self.writeResults(
-                judgement,
+                judgementCodeBuggy,
+                judgementTestBuggy,
                 explanation,
                 FileHandle,
                 i,
             )
             self.descriptions.append(description)
             self.codes.append(code)
-            self.judgements.append(judgement)
+            self.judgementsCodeBuggy.append(judgementCodeBuggy)
+            self.judgementsTestBuggy.append(judgementTestBuggy)
             self.explanations.append(explanation)
             # codeRanList.append(codeTobeRun)
             newRow = pd.DataFrame(
@@ -143,7 +147,8 @@ class DecisionMaker:
                     "CaseNumber": i,
                     "Description": description,
                     "Code": code,
-                    "Judgement": judgement,
+                    "JudgementCodeBuggy": judgementCodeBuggy,
+                    "JudgementTestBuggy": judgementTestBuggy,
                     "Explanation": explanation,
                     "TestCaseError": errorTestCases,
                     "ErrorMessage": errorMsg,
@@ -233,7 +238,8 @@ class DecisionMaker:
 
     def writeResults(
         self,
-        judgement,
+        judgementCodeBuggy,
+        judgementTestBuggy,
         explanation,
         FileHandle,
         i,
@@ -246,12 +252,16 @@ class DecisionMaker:
 
         """
         print(f"Test example {i} Judgement\n======================================\n")
-        booljudgement = 1 if judgement == "True" else 0
-        finaljudge = "Code is buggy " if booljudgement == 0 else "Code is correct"
-        print("Judgement : ", finaljudge)
+        booljudgementCode = 1 if judgementCodeBuggy == "True" else 0
+        finaljudgeCode = "Code is buggy " if booljudgementCode == 0 else "Code is correct"
+        booljudgementTest = 1 if judgementTestBuggy == "True" else 0
+        finaljudgeTest = "Test is buggy " if booljudgementTest == 0 else "Test is correct"
+        print("Judgement Code : ", finaljudgeCode)
+        print("Judgement Test : ", finaljudgeTest)
         print("Explanation : ", explanation)
         FileHandle.write("Test example " + str(i) + " failed\n")
-        FileHandle.write("Judgement : : " + finaljudge + "\n")
+        FileHandle.write("Judgement Code : " + finaljudgeCode + "\n")
+        FileHandle.write("Judgement Test :  " + finaljudgeTest + "\n")
         FileHandle.write("Explanation " + str(explanation) + "\n")
 
     def printResults(self):
