@@ -1,3 +1,71 @@
-print(
-    "```python\ndef bitcount(n):\n    if n == 0:\n        return 0\n    count = 0\n    while n:\n        n ^= n - 1\n        count += 1\n    return count\n```\nThis function checks if `n` is `0` and returns `0` if it is. Otherwise, it behaves the same as the original function.\n\nHere are the test cases with the error message fixed:\n```python\nimport unittest\nclass Testbitcount(unittest.TestCase):\n    def test_0(self):\n        self.assertEqual(bitcount(127),  7)\n    def test_1(self):\n        self.assertEqual(bitcount(128),  1)\n    def test_2(self):\n        self.assertEqual(bitcount(3005),  9)\n    def test_3(self):\n        self.assertEqual(bitcount(13),  3)\n    def test_4(self):\n        self.assertEqual(bitcount(14),  3)\n    def test_5(self):\n        self.assertEqual(bitcount(27),  4)\n    def test_6(self):\n        self.assertEqual(bitcount(834),  4)\n    def test_7(self):\n        self.assertEqual(bitcount(254),  7)\n    def test_8(self):\n        self.assertEqual(bitcount(256),  1)\n    def test_9(self):\n        self.assertEqual(bitcount(0),  0)\nif __name__ == '__main__':\n    unittest.main()\n```\nNote that I added a new test case `test_9` to test the `bitcount` function with input `0`. This test case should pass with the repaired `bitcount` function."
-)
+from time import sleep
+import threading
+from _thread import interrupt_main
+import sys
+from io import StringIO
+
+
+class CustomThread(threading.Thread):
+    def __init__(self, *args, **kwargs):
+        super(CustomThread, self).__init__(*args, **kwargs)
+        self._stopper = threading.Event()
+
+    def stop(self):
+        self._stopper.set()
+
+    def stopped(self):
+        return self._stopper.is_set()
+
+    def run(self):
+        sleep(5)
+        while not self.stopped():
+            interrupt_main()
+
+
+code = """import unittest
+def lol():
+    return lol()
+
+
+class Testing(unittest.TestCase):
+    def test_string(self):
+        lol()
+
+    def test_boolean(self):
+        lol()
+
+
+if __name__ == "__main__":
+    unittest.main()"""
+
+
+def runCode(code, myglobals):
+    oldStdOUT = sys.stdout
+    redirectedOutput = sys.stdout = StringIO()
+    oldStdERR = sys.stderr
+    redirectedOutput2 = sys.stderr = StringIO()
+    result = ""
+    thread = CustomThread()
+    try:
+        thread.start()
+        exec(code, myglobals)
+        result = redirectedOutput.getvalue()
+    except Exception as e:
+        # print(repr(e))
+        result = repr(e)
+    except SystemExit as s:
+        # print(repr(s))
+        result = redirectedOutput2.getvalue()
+    except KeyboardInterrupt as k:
+        result = "timed out"
+    thread.stop()
+    myglobals.popitem()
+    sys.stdout = oldStdOUT
+    sys.stderr = oldStdERR
+    # print(result)
+    # print("maaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
+
+    return result
+
+
+print(runCode(code, globals()))

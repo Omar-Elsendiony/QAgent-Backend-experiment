@@ -277,6 +277,29 @@ class TestFix:
             self.totalTestCasesNum += numOfAssertions
 
         else:
+            if (
+                "syntaxerror" in feedbackparsed.lower()
+                or "indentationerror" in feedbackparsed.lower()
+                or "timed out" in feedbackparsed.lower()
+            ):
+                print(
+                    f"Test example {i} failed due to syntax or indentation or timeout\n======================================\n"
+                )
+                print("Number of Ran Tests : ", 0)
+                print("Number of failed Tests : ", 0)
+                print("Number of error Tests : ", 1)
+                print("Number of Succeeded Test : ", 0)
+                FileHanlde.write(
+                    "Test example "
+                    + str(i)
+                    + " failed due to syntax or indentation or timeout\n"
+                )
+                FileHanlde.write("Number of Ran Tests : " + str(numOfAssertions) + "\n")
+                FileHanlde.write("Number of failed Tests : " + str(0) + "\n")
+                FileHanlde.write("Number of Error Test : " + str(1) + "\n")
+                FileHanlde.write("Number of Succeeded Test : " + str(0) + "\n")
+                self.failedExamplesNum += 1
+                return
             self.failedExamplesNum += 1
             failedCasesNum, errorCasesNum = getNumNonSucceedingTestcases(feedback)
             numberOfSucceeded = numOfAssertions - failedCasesNum - errorCasesNum
@@ -322,8 +345,8 @@ class TestFix:
             casejsondata = self.casesDf.to_dict(orient="records")
             with open(self.CasesJSONFile, "w") as f:
                 json.dump(casejsondata, f, indent=4)
-            self.testsToRepeat += len(NonSucceedingCasesNamesList)
             self.totalTestCasesNum += numOfAssertions
+            self.testsToRepeat += len(NonSucceedingCasesNamesList)
             self.failed_test_cases += failedCasesNum
             self.error_test_cases += errorCasesNum
 

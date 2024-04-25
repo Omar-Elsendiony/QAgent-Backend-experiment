@@ -297,6 +297,29 @@ class BugFix:
             self.totalTestCasesNum += numOfAssertions
 
         else:
+            if (
+                "syntaxerror" in feedbackparsed.lower()
+                or "indentationerror" in feedbackparsed.lower()
+                or "timed out" in feedbackparsed.lower()
+            ):
+                print(
+                    f"Test example {i} failed due to syntax or indentation or timeout\n======================================\n"
+                )
+                print("Number of Ran Tests : ", 0)
+                print("Number of failed Tests : ", 0)
+                print("Number of error Tests : ", 1)
+                print("Number of Succeeded Test : ", 0)
+                c.write(
+                    "Test example "
+                    + str(i)
+                    + " failed due to syntax or indentation or timeout\n"
+                )
+                c.write("Number of Ran Tests : " + str(numOfAssertions) + "\n")
+                c.write("Number of failed Tests : " + str(0) + "\n")
+                c.write("Number of Error Test : " + str(1) + "\n")
+                c.write("Number of Succeeded Test : " + str(0) + "\n")
+                self.failedExamplesNum += 1
+                return
             self.failedExamplesNum += 1
             failedCasesNum, errorCasesNum = getNumNonSucceedingTestcases(feedback)
             numberOfSucceeded = numOfAssertions - failedCasesNum - errorCasesNum
