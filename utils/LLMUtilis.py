@@ -209,20 +209,25 @@ def getJudgmentFromGeneration(response):
     *_, lastMatch = s
     startIndex = lastMatch.span(0)[1]
     ExtractedResponse = response[startIndex:]
-    judgementMatch = re.search(r"Bug in the Code: (True|False)", ExtractedResponse)
-    if judgementMatch is None:
-        judgementMatch = re.search(
-            r"Bug in the Test Case: (True|False)", ExtractedResponse
-        )
-        if judgementMatch is None:
-            incompleteResponse = True
-            return (response[startIndex:], "", True)
-    judgement = judgementMatch.group(1)
-    explanationMatch = re.search(r"Explanation:", ExtractedResponse)
+    judgementMatchCodeBuggy = re.search(r"Bug in the Code: (True|False)", ExtractedResponse)
+    if judgementMatchCodeBuggy is None:
+        #assume he forgot to write Bug in the Code: False
+        judgementCodeBuggy = "False"
+    else:
+        judgementCodeBuggy = judgementMatchCodeBuggy.group(1)
+    
+    judgementMatchTestBuggy= re.search(r"Bug in the test case: (True|False)", ExtractedResponse)
+    if judgementMatchTestBuggy is None:
+        #assume he forgot to write Bug in the test case: False
+        judgementTestBuggy = "False"
+    else:
+        judgementTestBuggy = judgementMatchTestBuggy.group(1)
+    #if both are None, then the response is incomplete
+    if judgementMatchCodeBuggy is None and judgementMatchTestBuggy is None:
+        incompleteResponse = True
+        return (response[startIndex:],"", "", True)
 
-    # if judgementMatch is None:
-    #     return (response[startIndex:], "", True)
-    judgement = judgementMatch.group(1)
+    explanationMatch = re.search(r"Explanation:", ExtractedResponse)
     expIndex = explanationMatch.end()
     explanation = ExtractedResponse[expIndex:]
-    return judgement, explanation, incompleteResponse
+    return judgementCodeBuggy,judgementTestBuggy, explanation, incompleteResponse

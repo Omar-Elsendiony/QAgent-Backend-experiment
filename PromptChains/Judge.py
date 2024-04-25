@@ -59,16 +59,17 @@ judge_template = """Given the Python code below, its description, and an error-p
 
 Evaluate the provided information carefully before reaching a conclusion. Inspect the relevant portions of the code and the test case, and provide a reasoned explanation for your judgment. Consider the following:
 
-- If you identify a bug in the code, replace *IS_METHOD_UNDER_TEST_BUGGY* with True else replace it with False and provide an explanation
-- If the test case is incorrect, replace *IS_TEST_BUGGY* with True and explain why the test is invalid else replace it with False.
+- If you identify a bug in the code, replace *IS_METHOD_UNDER_TEST_BUGGY* with True, and if the code is correct so replace *IS_METHOD_UNDER_TEST_BUGGY* with False and provide an explanation in both cases.
+- If the test case is incorrect, replace *IS_TEST_BUGGY* with True and explain why the test is invalid, and if the test case is correct replace *IS_TEST_BUGGY* with False.
 
 Your explanation should be detailed and justified based on the evidence provided. Do not make assumptions beyond the given data.
 
+Please follow the following template for your response:
 Template output:
 
-Bug in the Code: *IS_METHOD_UNDER_TEST_BUGGY*
-bug in test case: *IS_TEST_BUGGY*
 Explanation: *EXPLANATION*
+Bug in the Code: *IS_METHOD_UNDER_TEST_BUGGY*
+Bug in the test case: *IS_TEST_BUGGY*
 
 Note: Provide complete and just reasoning. Avoid assumptions not supported by the given data.
 """
