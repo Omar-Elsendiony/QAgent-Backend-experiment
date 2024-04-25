@@ -71,7 +71,7 @@ class BugFix:
                 currCode,
                 Judgement,
                 Explanation,
-                TestCaseError,
+                ErrorTestCases,
                 ErrorMessage,
             ) = self.extractInfo(i)
             # no feedback means testcase passed so don't run it again
@@ -90,11 +90,11 @@ class BugFix:
             #     )
             #     continue
             if Judgement == "True":
-                print("Example", i, " has already passed")
+                print("Example", i, " has been judged to contain erroneous test cases")
                 c.write(
                     "Example "
                     + str(i)
-                    + " has already passed\n=====================================\n"
+                    + " has been judged to contain erroneous test cases\n=====================================\n"
                 )
                 continue
 
@@ -103,7 +103,7 @@ class BugFix:
                     {
                         "description": currDescription,
                         "code": currCode,
-                        "test_case_error": TestCaseError,
+                        "test_case_error": None,
                         "error_message": ErrorMessage,
                         "explanation": Explanation,
                     }
@@ -118,7 +118,7 @@ class BugFix:
                     + " Didn't Run Due to Errorr\n=====================================\n"
                 )
                 continue
-            newUnitTestCode, isIncompleteResponse = getCodeFromResponse(
+            newCode, isIncompleteResponse = getCodeFromResponse(
                 GeneratedBugFix["text"], 3
             )
             if isIncompleteResponse:
@@ -133,8 +133,8 @@ class BugFix:
                     + str(i)
                     + " Didn't Run Due to Incomplete Response\n=====================================\n"
                 )
-            unittestCode = preprocessUnitTest(newUnitTestCode)
-            codeTobeRun = getRunningCode(currCode, unittestCode)
+            unittestCode = preprocessUnitTest(ErrorTestCases)
+            codeTobeRun = getRunningCode(newCode, unittestCode)
             feedback = runCode(codeTobeRun, self.myglobals)
             NonSucceedingCasesNames = getNonSucceedingTestcases(feedback)
             NonSucceedingCasesNamesList = (
@@ -154,13 +154,12 @@ class BugFix:
             self.codes.append(currCode)
             self.resCodes.append(unittestCode)
             self.feedbacks.append(feedbackparsed)  # feedbackparsed
-            # codeRanList.append(codeTobeRun)
             newRow = pd.DataFrame(
                 {
                     "CaseNumber": i,
                     "Description": currDescription,
                     "Code": currCode,
-                    "GeneratedCode": unittestCode,
+                    "GeneratedCode": newCode,
                     "CodeRan": codeTobeRun,
                     "Feedback": feedbackparsed,
                     "FullFeedback": feedback,
