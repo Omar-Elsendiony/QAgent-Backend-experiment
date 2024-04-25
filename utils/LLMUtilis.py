@@ -89,9 +89,9 @@ def getCodeFromBugFixing(
             break
     # question mark is added to make the match non-greedy
     patterns = [
-        r"[^\"](?<=```python\n)(.*)?(?=```)",
-        r"[^\"](?<=```python\n)(.*)?(?=```\n)",
-        r"[^\"](?<=```python\n)(.*)?",
+        r"```python\n(.*?)```",
+        r"```python\n(.*?)```\n",
+        r"```python\n(.*?)",
     ]
     for i, pattern in enumerate(patterns):
         code_match = re.search(pattern, ExtractedResponse, re.DOTALL)
@@ -103,6 +103,7 @@ def getCodeFromBugFixing(
     if code_match is None:
         return (response[startIndex:], True)
     code = re.sub("from.*(?=class)", "", code_match.group(0), flags=re.DOTALL)
+    code = code.replace("```python\n", "").replace("```", "")
     return code, incompleteResponse
 
 

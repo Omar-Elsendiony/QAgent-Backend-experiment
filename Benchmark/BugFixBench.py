@@ -71,14 +71,21 @@ class BugFixBench:
             ) = self.extractInfo(i)
             buggyCodeToRun = buggyCode + "\n" + tests
             firstFeedback = runCode(buggyCodeToRun, self.myglobals)
-            NonSucceedingCasesNames = getNonSucceedingTestcases(firstFeedback)
-            NonSucceedingCasesNamesList = (
-                NonSucceedingCasesNames["failed"] + NonSucceedingCasesNames["error"]
-            )
-            testsToRepeat = getEachTestCase(tests, NonSucceedingCasesNamesList)
-            self.oldfailedCasesNum, self.olderrorCasesNum = (
-                getNumNonSucceedingTestcases(firstFeedback)
-            )
+            if (
+                "syntaxerror" in firstFeedback.lower()
+                or "indentationerror" in firstFeedback.lower()
+                or "timed out" in firstFeedback.lower()
+            ):
+                self.oldfailedCasesNum, self.olderrorCasesNum = "E", "E"
+            else:
+                NonSucceedingCasesNames = getNonSucceedingTestcases(firstFeedback)
+                NonSucceedingCasesNamesList = (
+                    NonSucceedingCasesNames["failed"] + NonSucceedingCasesNames["error"]
+                )
+                testsToRepeat = getEachTestCase(tests, NonSucceedingCasesNamesList)
+                self.oldfailedCasesNum, self.olderrorCasesNum = (
+                    getNumNonSucceedingTestcases(firstFeedback)
+                )
             firstfeedbackparsed = getFeedbackFromRun(firstFeedback)
             errorMsg = getOneError(firstfeedbackparsed)
 
@@ -101,6 +108,7 @@ class BugFixBench:
                     + " Didn't Run Due to Errorr\n=====================================\n"
                 )
                 continue
+            print(GeneratedBugFix["text"])
             generated_code, isIncompleteResponse = getCodeFromResponse(
                 GeneratedBugFix["text"], 3
             )
