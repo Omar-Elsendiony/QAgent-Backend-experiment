@@ -33,7 +33,7 @@ class BugFixBench:
         self.TotalCases = 0
         self.TotalFailedCases = 0
         self.incompleteResponses = 0
-        self.OutputFolder = "BugFixOutput/"
+        self.OutputFolder = "BugFixBenchOutput/"
         self.JSONFile = self.OutputFolder + "RunningLogs.json"
         self.CasesJSONFile = self.OutputFolder + "Cases.json"
         OldGeneratedTestsFolder = "Datasets/"
@@ -58,7 +58,7 @@ class BugFixBench:
         self.checkPaths()
         self.reset()
         c = open(self.OutputFolder + "Cases.txt", "w+")
-        for i in range(len(self.CasesLogs)):
+        for i in range(30):
             # if (i == 28):
             #     x = 9000
             print("Running Example ", i, "\n=====================\n")
@@ -75,9 +75,12 @@ class BugFixBench:
             NonSucceedingCasesNamesList = (
                 NonSucceedingCasesNames["failed"] + NonSucceedingCasesNames["error"]
             )
-            testsToRepeat = getEachTestCase(unittestCode, NonSucceedingCasesNamesList)
-            feedbackparsed = getFeedbackFromRun(feedback)
-            errorMsg = getOneError(feedbackparsed)
+            testsToRepeat = getEachTestCase(tests, NonSucceedingCasesNamesList)
+            self.oldfailedCasesNum, self.olderrorCasesNum = (
+                getNumNonSucceedingTestcases(firstFeedback)
+            )
+            firstfeedbackparsed = getFeedbackFromRun(firstFeedback)
+            errorMsg = getOneError(firstfeedbackparsed)
 
             try:
                 GeneratedBugFix = self.BugFixChain.invoke(
@@ -113,8 +116,8 @@ class BugFixBench:
                     + str(i)
                     + " Didn't Run Due to Incomplete Response\n=====================================\n"
                 )
-            unittestCode = preprocessUnitTest(generated_code)
-            codeTobeRun = getRunningCode(currCode, unittestCode)
+            unittestCode = preprocessUnitTest(testsToRepeat)
+            codeTobeRun = getRunningCode(generated_code, unittestCode)
             feedback = runCode(codeTobeRun, self.myglobals)
             NonSucceedingCasesNames = getNonSucceedingTestcases(feedback)
             NonSucceedingCasesNamesList = (
@@ -131,7 +134,7 @@ class BugFixBench:
                 i,
             )
             self.descriptions.append(currDescription)
-            self.codes.append(currCode)
+            self.codes.append(generated_code)
             self.resCodes.append(unittestCode)
             self.feedbacks.append(feedbackparsed)  # feedbackparsed
             # codeRanList.append(codeTobeRun)
@@ -139,8 +142,8 @@ class BugFixBench:
                 {
                     "CaseNumber": i,
                     "Description": currDescription,
-                    "Code": currCode,
-                    "GeneratedCode": unittestCode,
+                    "Code": buggyCode,
+                    "GeneratedCode": generated_code,
                     "CodeRan": codeTobeRun,
                     "Feedback": feedbackparsed,
                     "FullFeedback": feedback,
@@ -168,10 +171,10 @@ class BugFixBench:
                 generatedCode (str): The generated code of the example
                 feedback (str): The feedback of the example
         """
-        currDescription = self.OldCasesFile.iloc[i]["description"]
-        correctCode = self.OldCasesFile.iloc[i]["correct"]
-        buggyCode = self.OldCasesFile.iloc[i]["buggy"]
-        tests = self.OldCasesFile.iloc[i]["tests"]
+        currDescription = self.OldCases.iloc[i]["description"]
+        correctCode = self.OldCases.iloc[i]["correct"]
+        buggyCode = self.OldCases.iloc[i]["buggy"]
+        tests = self.OldCases.iloc[i]["tests"]
 
         return (
             currDescription,
@@ -243,13 +246,13 @@ class BugFixBench:
             oldTestsFailed = 0
             oldTestsError = 0
             if self.firstFeedback:
-                oldTotalTests = self.OldCases.iloc[i]["Total Tests"]
-                oldTestsFailed = self.OldCases.iloc[i]["Tests failed"]
-                oldTestsError = self.OldCases.iloc[i]["Error Tests"]
+                oldTotalTests = numOfAssertions
+                oldTestsFailed = self.oldfailedCasesNum
+                oldTestsError = self.olderrorCasesNum
             else:
-                oldTotalTests = self.OldCases.iloc[i]["Feedback Total Tests"]
-                oldTestsFailed = self.OldCases.iloc[i]["Feedback Tests failed"]
-                oldTestsError = self.OldCases.iloc[i]["Feedback Error Tests"]
+                oldTotalTests = numOfAssertions
+                oldTestsFailed = self.oldfailedCasesNum
+                oldTestsError = self.olderrorCasesNum
 
             newCaseRow = pd.DataFrame(
                 {
@@ -289,13 +292,13 @@ class BugFixBench:
             c.write("Number of Succeeded Test : " + str(numberOfSucceeded) + "\n")
 
             if self.firstFeedback:
-                oldTotalTests = self.OldCases.iloc[i]["Total Tests"]
-                oldTestsFailed = self.OldCases.iloc[i]["Tests failed"]
-                oldTestsError = self.OldCases.iloc[i]["Error Tests"]
+                oldTotalTests = numOfAssertions
+                oldTestsFailed = self.oldfailedCasesNum
+                oldTestsError = self.olderrorCasesNum
             else:
-                oldTotalTests = self.OldCases.iloc[i]["Feedback Total Tests"]
-                oldTestsFailed = self.OldCases.iloc[i]["Feedback Tests failed"]
-                oldTestsError = self.OldCases.iloc[i]["Feedback Error Tests"]
+                oldTotalTests = numOfAssertions
+                oldTestsFailed = self.oldfailedCasesNum
+                oldTestsError = self.olderrorCasesNum
             # print("Old Error Tests", oldTestsError)
 
             newCaseRow = pd.DataFrame(
