@@ -51,10 +51,46 @@ def getCodeFromTestFixing(
         else:
             break
     # question mark is added to make the match non-greedy
+    # the last ) is added to make sure the code ends with a closing bracket and that we are getting the test case code
     patterns = [
         r"[^\"](?<=```python\n)(.*)?\)\n(?=```)",
         r"[^\"](?<=```python\n)(.*)?\)\n\n(?=```)",
         r"[^\"](?<=```python\n)(.*)?\)(?=```)",
+        r"[^\"](?<=```python\n)(.*)?",
+    ]
+    for i, pattern in enumerate(patterns):
+        code_match = re.search(pattern, ExtractedResponse, re.DOTALL)
+        if code_match is not None:
+            if i == len(patterns) - 1:
+                incompleteResponse = True
+            break
+
+    if code_match is None:
+        return (response[startIndex:], True)
+    code = re.sub("from.*(?=class)", "", code_match.group(0), flags=re.DOTALL)
+    return code, incompleteResponse
+
+
+def getCodeFromBugFixing(
+    response,
+    promptStatementToCheck="</s> [/INST]",
+):
+    incompleteResponse = False
+
+    s = re.finditer(r"```python", response)
+    ExtractedResponse = ""
+    for st in s:
+        # pick a statement from the prompt template and ensure it's no in the chosen repsonse
+        startIndex = st.span(0)[0]
+        ExtractedResponse = response[startIndex:]
+        if promptStatementToCheck in ExtractedResponse:
+            continue
+        else:
+            break
+    # question mark is added to make the match non-greedy
+    patterns = [
+        r"[^\"](?<=```python\n)(.*)?(?=```)",
+        r"[^\"](?<=```python\n)(.*)?(?=```\n)",
         r"[^\"](?<=```python\n)(.*)?",
     ]
     for i, pattern in enumerate(patterns):
@@ -76,7 +112,8 @@ def getCodeFromResponse(response, testFixing=0):
     elif testFixing == 1:
         return getCodeFromTestFixing(response)
     else:
-        return getCodeFromTestFixing(response, "including the leading and trailing")
+        # for bug fixing
+        return getCodeFromBugFixing(response, "</s> [/INST]")
 
 
 def getEachTestCase(UnitTestsCode, functionNames):
