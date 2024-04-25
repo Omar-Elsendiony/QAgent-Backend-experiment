@@ -44,7 +44,7 @@ class DecisionMaker:
         """
         self.checkPaths()
         self.reset()
-        FileHandle = open(self.OutputFolder + "Cases.txt", "w+")
+        FileHandle = open(self.OutputFolder + "Cases.txt", "w+", encoding='utf-8')
         for i in range(len(self.CasesLogs)):
             if i == 3:
                 continue
@@ -109,9 +109,13 @@ class DecisionMaker:
                 continue
 
             print("generatedJudgement: ", generatedJudgement["text"])
-            FileHandle.write(
-                "generatedJudgement: " + str(generatedJudgement["text"]) + "\n"
-            )
+            try:
+                FileHandle.write(
+                    "generatedJudgement: " + str(generatedJudgement["text"]) + "\n"
+                )
+            except Exception as e:
+                print("Error in writing to file")
+                print(e)
 
             judgementCodeBuggy,judgementTestBuggy, explanation, isIncompleteResponse = getJudgmentFromGeneration(
                 generatedJudgement["text"]
@@ -253,9 +257,9 @@ class DecisionMaker:
         """
         print(f"Test example {i} Judgement\n======================================\n")
         booljudgementCode = 1 if judgementCodeBuggy == "True" else 0
-        finaljudgeCode = "Code is buggy " if booljudgementCode == 0 else "Code is correct"
+        finaljudgeCode = "Code is buggy " if booljudgementCode == 1 else "Code is correct"
         booljudgementTest = 1 if judgementTestBuggy == "True" else 0
-        finaljudgeTest = "Test is buggy " if booljudgementTest == 0 else "Test is correct"
+        finaljudgeTest = "Test is buggy " if booljudgementTest == 1 else "Test is correct"
         print("Judgement Code : ", finaljudgeCode)
         print("Judgement Test : ", finaljudgeTest)
         print("Explanation : ", explanation)
