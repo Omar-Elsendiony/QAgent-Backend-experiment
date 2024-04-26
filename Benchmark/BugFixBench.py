@@ -54,7 +54,6 @@ class BugFixBench:
         Args: None
         Return: None
         """
-        print(self.firstFeedback)
         self.checkPaths()
         self.reset()
         c = open(self.OutputFolder + "Cases.txt", "w+")
@@ -69,7 +68,8 @@ class BugFixBench:
                 buggyCode,
                 tests,
             ) = self.extractInfo(i)
-            buggyCodeToRun = buggyCode + "\n" + tests
+            tests = preprocessUnitTest(tests)
+            buggyCodeToRun = getRunningCode(buggyCode, tests)
             firstFeedback = runCode(buggyCodeToRun, self.myglobals)
             if (
                 "syntaxerror" in firstFeedback.lower()
@@ -77,6 +77,8 @@ class BugFixBench:
                 or "timed out" in firstFeedback.lower()
             ):
                 self.oldfailedCasesNum, self.olderrorCasesNum = "E", "E"
+                testsToRepeat = tests
+                errorMsg = firstFeedback
             else:
                 NonSucceedingCasesNames = getNonSucceedingTestcases(firstFeedback)
                 NonSucceedingCasesNamesList = (
@@ -108,7 +110,6 @@ class BugFixBench:
                     + " Didn't Run Due to Errorr\n=====================================\n"
                 )
                 continue
-            print(GeneratedBugFix["text"])
             generated_code, isIncompleteResponse = getCodeFromResponse(
                 GeneratedBugFix["text"], 3
             )
@@ -153,6 +154,7 @@ class BugFixBench:
                     "Code": buggyCode,
                     "GeneratedCode": generated_code,
                     "CodeRan": codeTobeRun,
+                    "firstFeedback": firstFeedback,
                     "Feedback": feedbackparsed,
                     "FullFeedback": feedback,
                     "TestsToRepeat": testsToRepeat,

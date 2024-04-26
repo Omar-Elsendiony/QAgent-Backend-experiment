@@ -102,7 +102,7 @@ def getCodeFromBugFixing(
 
     if code_match is None:
         return (response[startIndex:], True)
-    code = re.sub("from.*(?=class)", "", code_match.group(0), flags=re.DOTALL)
+    code = code_match.group(0)
     code = code.replace("```python\n", "").replace("```", "")
     return code, incompleteResponse
 
@@ -209,25 +209,29 @@ def getJudgmentFromGeneration(response):
     *_, lastMatch = s
     startIndex = lastMatch.span(0)[1]
     ExtractedResponse = response[startIndex:]
-    judgementMatchCodeBuggy = re.search(r"Bug in the Code: (True|False)", ExtractedResponse)
+    judgementMatchCodeBuggy = re.search(
+        r"Bug in the Code: (True|False)", ExtractedResponse
+    )
     if judgementMatchCodeBuggy is None:
-        #assume he forgot to write Bug in the Code: False
+        # assume he forgot to write Bug in the Code: False
         judgementCodeBuggy = "False"
     else:
         judgementCodeBuggy = judgementMatchCodeBuggy.group(1)
-    
-    judgementMatchTestBuggy= re.search(r"Bug in the test case: (True|False)", ExtractedResponse)
+
+    judgementMatchTestBuggy = re.search(
+        r"Bug in the test case: (True|False)", ExtractedResponse
+    )
     if judgementMatchTestBuggy is None:
-        #assume he forgot to write Bug in the test case: False
+        # assume he forgot to write Bug in the test case: False
         judgementTestBuggy = "False"
     else:
         judgementTestBuggy = judgementMatchTestBuggy.group(1)
-    #if both are None, then the response is incomplete
+    # if both are None, then the response is incomplete
     if judgementMatchCodeBuggy is None and judgementMatchTestBuggy is None:
         incompleteResponse = True
-        return (response[startIndex:],"", "", True)
+        return (response[startIndex:], "", "", True)
 
     explanationMatch = re.search(r"Explanation:", ExtractedResponse)
     expIndex = explanationMatch.end()
     explanation = ExtractedResponse[expIndex:]
-    return judgementCodeBuggy,judgementTestBuggy, explanation, incompleteResponse
+    return judgementCodeBuggy, judgementTestBuggy, explanation, incompleteResponse

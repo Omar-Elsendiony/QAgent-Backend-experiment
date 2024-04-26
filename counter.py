@@ -3,8 +3,8 @@ from utils.FeedbackUtils import *
 from utils.LLMUtilis import *
 
 OldFile = "Results_withSyntaxE/Mixtral-3Shot/"
-OldFile = "ResultsEachTest/SecondFeedbackMixtral-2Shot/"
-OldCasesFile = OldFile + "RunningLogs.json"
+OldFile = "BugFixBenchOutput/"
+OldCasesFile = OldFile + "Cases.json"
 # OldCasesFile = "humaneval.jsonl"
 OldCases = pd.read_json(OldCasesFile, lines=False)
 # OlTotal = 0
@@ -21,12 +21,20 @@ with open("Heval1.txt", "w") as f:
         #     OlTotal += OldCases.iloc[i]["Feedback Total Tests"]
         print("Test case {i}\n===================================\n".format(i=i))
         f.write("Test case {i}\n===================================\n".format(i=i))
+
+        oldTotal = OldCases.iloc[i]["Old Total Tests"]
+        oldFailed = OldCases.iloc[i]["Old Tests Failed"]
+        oldError = OldCases.iloc[i]["Old Tests Error"]
+        tottt += oldTotal
+        if oldFailed == "E" or oldError == "E":
+            continue
+        succ += oldTotal - oldFailed - oldError
         # print(OldCases.iloc[i]["GeneratedCode"])
         # f.write(OldCases.iloc[i]["GeneratedCode"] + "\n=====================\n")
-        print(OldCases.iloc[i]["Feedback"])
-        f.write(OldCases.iloc[i]["Feedback"])
-        f.write("\n=====================\n")
-        print("\n=====================\n")
+        # print(OldCases.iloc[i]["Feedback"])
+        # f.write(OldCases.iloc[i]["Feedback"])
+        # f.write("\n=====================\n")
+        # print("\n=====================\n")
         # FullFeedback = OldCases.iloc[i]["FullFeedback"]
         # print(FullFeedback, "\n=====================\n")
         # f.write(FullFeedback + "\n=====================\n")
@@ -45,3 +53,5 @@ with open("Heval1.txt", "w") as f:
     # print("Old Fail Total: ", OlFailTotal)
     # print("Now Total: ", NowTotal)
     # print("Now Fail Total: ", NowFailTotal)
+
+print(succ, tottt)
