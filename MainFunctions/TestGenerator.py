@@ -11,7 +11,7 @@ class TestGenerator:
         self.fewshotsnum = 3
         self.isFewShot = True
 
-    def generate(self, codeUnderTest, description):
+    def generate(self, codeUnderTest, description, isCodeBuggy):
         """
         This function is responsible for generating the test cases and running them
         It is the core of the TestGenerator class. It is responsible for:
@@ -48,7 +48,7 @@ class TestGenerator:
             NonSucceedingCasesNames["failed"] + NonSucceedingCasesNames["error"]
         )
         testsToRepeat = getEachTestCase(unittestCode, NonSucceedingCasesNamesList)
-        return codeUnderTest, unittestCode, feedbackparsed, testsToRepeat
+        return codeUnderTest, unittestCode, feedbackparsed, testsToRepeat, isCodeBuggy
 
     def getExamplesFromDB(self, codeUnderTest):
         """
