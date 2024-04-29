@@ -125,7 +125,7 @@ class BugFixBench:
                     + str(i)
                     + " Didn't Run Due to Incomplete Response\n=====================================\n"
                 )
-            unittestCode = preprocessUnitTest(testsToRepeat)
+            unittestCode = preprocessUnitTest(tests)
             codeTobeRun = getRunningCode(generated_code, unittestCode)
             feedback = runCode(codeTobeRun, self.myglobals)
             NonSucceedingCasesNames = getNonSucceedingTestcases(feedback)
@@ -290,7 +290,9 @@ class BugFixBench:
                 or "timed out" in feedbackparsed.lower()
             ):
                 print(
-                    f"Test example {i} failed due to syntax or indentation or timeout\n======================================\n"
+                    f"Test example "
+                    + str(i)
+                    + " failed due to syntax or indentation or timeout\n======================================\n"
                 )
                 print("Number of Ran Tests : ", 0)
                 print("Number of failed Tests : ", 0)
