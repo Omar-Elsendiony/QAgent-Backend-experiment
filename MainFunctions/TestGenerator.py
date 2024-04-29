@@ -4,17 +4,10 @@ from utils.CustomThread import *
 
 class TestGenerator:
 
-    def __init__(self, GenUnitTestChain, db, data_JsonObj, myglobals, isHumanEval=True):
-        self.reset()
+    def __init__(self, GenUnitTestChain, db, myglobals):
         self.GenUnitTestChain = GenUnitTestChain
         self.db = db
-        self.data_JsonObj = (
-            data_JsonObj  # data json object , previously humanEval_JsonObj
-        )
         self.myglobals = myglobals
-        self.isHumanEval = isHumanEval
-
-    def reset(self):
         self.fewshotsnum = 3
         self.isFewShot = True
 
@@ -29,7 +22,6 @@ class TestGenerator:
         Args: None
         Return: None
         """
-        self.reset()
         fewShotStr = self.getExamplesFromDB(codeUnderTest)
         try:
             unittest = self.GenUnitTestChain.invoke(
@@ -56,7 +48,7 @@ class TestGenerator:
             NonSucceedingCasesNames["failed"] + NonSucceedingCasesNames["error"]
         )
         testsToRepeat = getEachTestCase(unittestCode, NonSucceedingCasesNamesList)
-        return description, codeUnderTest, unittestCode, feedbackparsed, testsToRepeat
+        return codeUnderTest, unittestCode, feedbackparsed, testsToRepeat
 
     def getExamplesFromDB(self, codeUnderTest):
         """

@@ -10,7 +10,6 @@ class BugFix:
         myglobals,
         firstFeedback=True,
     ):
-        self.reset()
         self.BugFixChain = BugFixChain
         self.myglobals = myglobals
         self.firstFeedback = firstFeedback
@@ -83,4 +82,4 @@ class BugFix:
         )
         testsToRepeat = getEachTestCase(unittestCode, NonSucceedingCasesNamesList)
         feedbackparsed = getFeedbackFromRun(feedback)
-        return Description, newCode, unittestCode, feedbackparsed, testsToRepeat
+        return newCode, unittestCode, feedbackparsed, testsToRepeat

@@ -5,7 +5,6 @@ from Model import InitializeModel  # , InitializeGptModel, InitializeModelArbite
 from PromptChains.GenerateTest import InitializeTestChain  # , queryGptGenerateTest
 from PromptChains.Feedback import *
 from PromptChains.FixBug import *
-from PromptChains.FixBugBen import *
 from PromptChains.Judge import *
 from utils.PreprocessUtils import *
 from utils.FeedbackUtils import *

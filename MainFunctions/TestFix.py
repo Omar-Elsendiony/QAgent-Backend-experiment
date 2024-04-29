@@ -10,7 +10,6 @@ class TestFix:
         myglobals,
         firstFeedback=True,
     ):
-        self.reset()
         self.UnitTestFeedbackChain = UnitTestFeedbackChain
         self.myglobals = myglobals
         self.firstFeedback = firstFeedback
@@ -65,4 +64,4 @@ class TestFix:
         )
         testsToRepeat = getEachTestCase(unittestCode, NonSucceedingCasesNamesList)
         feedbackparsed = getFeedbackFromRun(feedback)
-        return Description, codeUnderTest, unittestCode, feedbackparsed, testsToRepeat
+        return codeUnderTest, unittestCode, feedbackparsed, testsToRepeat

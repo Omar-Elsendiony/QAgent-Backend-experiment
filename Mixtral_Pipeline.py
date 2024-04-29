@@ -1,24 +1,55 @@
 try:
     from Configuration import *
-    from Benchmark.TestGenerator import *
-    from Benchmark.TestFix import *
-    from Benchmark.DecisionMaker import *
-    from Benchmark.BugFixBench import *
-    from Benchmark.BugFix import *
+    from MainFunctions.TestGenerator import *
+    from MainFunctions.TestFix import *
+    from MainFunctions.DecisionMaker import *
+    from MainFunctions.BugFix import *
 
-    # llm_arb, chat_model_arb = InitializeModelArbiter(os.environ["HUGGINGFACEHUB_API_TOKEN"],repo_id='mistralai/Mixtral-8x7B-Instruct-v0.1')
-    # with open(r"Datasets/atcoder_problem_test_cases_description.jsonl", "r") as f:
-    #     data = f.read()
-    #     jsonObj = json.loads(data)
-    # jsonObj=pd.read_json(path_or_buf="Datasets/atcoder_problem_test_cases_description.jsonl")
-    # jsonObj=pd.read_json(path_or_buf="Datasets/cleanedhumaneval.json")
-    # # jsonObj = HEval_JsonObj
-    # testGenerator = TestGenerator(GenUnitTestChain, db, jsonObj, globals())
-    # testGenerator.isHumanEval=False
-    # testRegenerator = TestFix(UnitTestFeedbackChain,True,globals())
-    # judgeGenerator = DecisionMaker(judgeChain,globals())
-    # bugFixGenerator = BugFix(bugFixChain,True,globals())
-    bugFixGeneratorben = BugFixBench(bugFixChainben, True, globals())
+    print("All imports successful")
+    testGenerator = TestGenerator(GenUnitTestChain, db, globals())
+    testRegenerator = TestFix(
+        UnitTestFeedbackChain,
+        globals(),
+        True,
+    )
+    # judgeGenerator = DecisionMaker(judgeChain, globals())
+    bugFixGenerator = BugFix(bugFixChain, globals(), True)
 except Exception as e:
     print(e)
     exit(-1)
+
+
+# #TODO: IMPORTANT find a way to get the code and description from user later
+# for now they are hardcoded
+
+
+code = """ def add(a, b): \n   return a - b \n"""
+
+description = "This function adds two numbers"
+
+isCodeBuggy = True
+
+codeUnderTest, unitTestCode, feedbackParsed, testsToRepeat = testGenerator.generate(
+    code, description
+)
+print("Code Under Test: ", codeUnderTest)
+print("Unit Test Code: ", unitTestCode)
+print("Feedback Parsed: ", feedbackParsed)
+print("Tests to Repeat: ", testsToRepeat)
+
+# if isCodeBuggy:
+codeUnderTest, unitTestCode, feedbackParsed, testsToRepeat = bugFixGenerator.generate(
+    description, codeUnderTest, unitTestCode, testsToRepeat, feedbackParsed
+)
+# else:
+#     codeUnderTest, unitTestCode, feedbackParsed, testsToRepeat = (
+#         testRegenerator.generate(
+#             description, codeUnderTest, unitTestCode, feedbackParsed
+#         )
+#     )
+
+print("\n=============================================\nAfter Whichever: ")
+print("Code Under Test: ", codeUnderTest)
+print("Unit Test Code: ", unitTestCode)
+print("Feedback Parsed: ", feedbackParsed)
+print("Tests to Repeat: ", testsToRepeat)
