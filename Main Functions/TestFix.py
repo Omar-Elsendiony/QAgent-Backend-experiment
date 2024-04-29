@@ -7,18 +7,13 @@ class TestFix:
     def __init__(
         self,
         UnitTestFeedbackChain,
-        firstFeedback,
         myglobals,
+        firstFeedback=True,
     ):
         self.reset()
         self.UnitTestFeedbackChain = UnitTestFeedbackChain
         self.myglobals = myglobals
         self.firstFeedback = firstFeedback
-
-    def reset(self):
-        # self.testsToRepeat = 0  # Number of tests to repeat = Summation of all tests under failed examples whether they are failed or succeeded
-        # self.OKCases = 0
-        self.firstFeedback = True
 
     def generate(self, Description, codeUnderTest, oldGeneratedTestCode, oldFeedback):
         """
@@ -31,7 +26,6 @@ class TestFix:
         Args: None
         Return: None
         """
-        self.reset()
         # Description, codeUnderTest, oldGeneratedTestCode, oldFeedback = (
         #     self.extractInfo(i)
         # )
@@ -71,4 +65,4 @@ class TestFix:
         )
         testsToRepeat = getEachTestCase(unittestCode, NonSucceedingCasesNamesList)
         feedbackparsed = getFeedbackFromRun(feedback)
-        return
+        return Description, codeUnderTest, unittestCode, feedbackparsed, testsToRepeat

@@ -56,7 +56,7 @@ class TestGenerator:
             NonSucceedingCasesNames["failed"] + NonSucceedingCasesNames["error"]
         )
         testsToRepeat = getEachTestCase(unittestCode, NonSucceedingCasesNamesList)
-        return description, codeUnderTest, unittestCode, feedbackparsed
+        return description, codeUnderTest, unittestCode, feedbackparsed, testsToRepeat
 
     def getExamplesFromDB(self, codeUnderTest):
         """
