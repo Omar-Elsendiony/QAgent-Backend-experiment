@@ -5,7 +5,7 @@ try:
     from MainFunctions.DecisionMaker import *
     from MainFunctions.BugFix import *
 
-    print("All imports successful")
+    print("All imports successful!")
     testGenerator = TestGenerator(GenUnitTestChain, db, globals())
     testRegenerator = TestFix(
         UnitTestFeedbackChain,
@@ -29,13 +29,19 @@ description = "This function adds two numbers"
 
 isCodeBuggy = True
 
+# print(isCodeBuggy)
+# isCodeBuggy is accessible here
+
 codeUnderTest, unitTestCode, feedbackParsed, testsToRepeat = testGenerator.generate(
     code, description
 )
-print("Code Under Test: ", codeUnderTest)
-print("Unit Test Code: ", unitTestCode)
-print("Feedback Parsed: ", feedbackParsed)
-print("Tests to Repeat: ", testsToRepeat)
+# print("Code Under Test: ", codeUnderTest)
+# print("Unit Test Code: ", unitTestCode)
+# print("Feedback Parsed: ", feedbackParsed)
+# print("Tests to Repeat: ", testsToRepeat)
+
+
+# but isCodeBuggy is not accessible here
 
 # if isCodeBuggy:
 codeUnderTest, unitTestCode, feedbackParsed, testsToRepeat = bugFixGenerator.generate(
