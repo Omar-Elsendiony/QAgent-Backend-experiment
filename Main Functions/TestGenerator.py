@@ -65,7 +65,7 @@ class TestGenerator:
         Return: fewShotStr (str): The few shot code and test cases
         """
         # get the few shot code and test cases
-        codeOfFewShots, testCasesFewShots = getFewShots(self.db, code)
+        codeOfFewShots, testCasesFewShots = getFewShots(self.db, codeUnderTest)
         # take the most similar few shot other than the code itself
         codeOfFewShots = codeOfFewShots[1 : self.fewshotsnum]
         testCasesFewShots = testCasesFewShots[1 : self.fewshotsnum]
