@@ -52,6 +52,7 @@ def QAgent_product(code, description, testGenerator, testRegenerator, bugFixGene
                         description, codeUnderTest, unitTestCode, feedbackParsed
                     )
                 )
+                print("tests to repeat", testsToRepeat)
 
     print("\n=============================================\nAfter Whichever: ")
     print("Code Under Test: ", codeUnderTest)

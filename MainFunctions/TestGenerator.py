@@ -35,8 +35,9 @@ class TestGenerator:
             print("ERROR in invoking GenUnitTestChain")
 
         unittestCode, isIncompleteResponse = getCodeFromResponse(unittest["text"], 0)
+        print(unittestCode)
         if isIncompleteResponse:
-            self.incompleteResponses += 1
+            # self.incompleteResponses += 1
             print(
                 "Test Case Didn't Run Due to Incomplete Response\n=====================================\n"
             )

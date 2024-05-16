@@ -1,1 +1,1 @@
-testGenerator, testRegenerator, bugFixGenerator = setupQAgent()
+tests to repeat

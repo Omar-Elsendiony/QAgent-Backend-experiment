@@ -34,6 +34,7 @@ def run_python():
     if code:
         try:
             # execute the main function
+            print("Running QAgentAI")
             result = QAgent_product(code, description, testGenerator, testRegenerator, bugFixGenerator, judgeGenerator)
             print(result)
             return jsonify({'output': list(result)})
