@@ -84,8 +84,8 @@ def getNonSucceedingTestcases(feedback):
     failed_tests = re.findall(r"FAIL: (.*) \(", feedback)
     error_tests = re.findall(r"ERROR: (.*) \(", feedback)
     return {"failed": failed_tests, "error": error_tests}
-
-
+# res = getNumNonSucceedingTestcases("Ran 1 test in 0.000s\n\nFAILED (failures=1)\n")
+# print(res)
 def getNumAssertions(code_text):
     total_num = len(re.findall(r"self\.assert.", code_text, flags=re.MULTILINE))
     return total_num

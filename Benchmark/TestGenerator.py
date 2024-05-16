@@ -41,7 +41,7 @@ class TestGenerator:
         self.fewshotsnum = 3
         self.isFewShot = True
 
-    def generate(self):
+    def generate(self, sI, eI):
         """
         This function is responsible for generating the test cases and running them
         It is the core of the TestGenerator class. It is responsible for:
@@ -55,7 +55,7 @@ class TestGenerator:
         self.checkPaths()
         self.reset()
         FileHandle = open(self.OutputFolder + "Cases.txt", "w+")
-        for i in range(30, 80):
+        for i in range(sI, eI):
             # if (i == 10): continue
             print("Running Test Case ", i)
             FileHandle.write(
@@ -119,27 +119,29 @@ class TestGenerator:
                 )
             try:
                 feedback, feedbackparsed, codeTobeRun = self.runTest(code, unittestCode)
+
+                # print(feedbackparsed)
+                # feedback = "timed out"
+                # feedbackparsed = None
+                # if (feedback == "timed out") or (feedback == "API Error"):
+                #     pass
+
+                NonSucceedingCasesNames = getNonSucceedingTestcases(feedback)
+
+                NonSucceedingCasesNamesList = (
+                    NonSucceedingCasesNames["failed"] + NonSucceedingCasesNames["error"]
+                )
+                self.writeResults(
+                    feedback,
+                    feedbackparsed,
+                    unittestCode,
+                    FileHandle,
+                    NonSucceedingCasesNamesList,
+                    i,
+                )
+                testsToRepeat = getEachTestCase(unittestCode, NonSucceedingCasesNamesList)
             except KeyboardInterrupt:
                 pass
-            # print(feedbackparsed)
-            # feedback = "timed out"
-            # feedbackparsed = None
-            # if (feedback == "timed out") or (feedback == "API Error"):
-            #     pass
-
-            NonSucceedingCasesNames = getNonSucceedingTestcases(feedback)
-            NonSucceedingCasesNamesList = (
-                NonSucceedingCasesNames["failed"] + NonSucceedingCasesNames["error"]
-            )
-            self.writeResults(
-                feedback,
-                feedbackparsed,
-                unittestCode,
-                FileHandle,
-                NonSucceedingCasesNamesList,
-                i,
-            )
-            testsToRepeat = getEachTestCase(unittestCode, NonSucceedingCasesNamesList)
             self.descriptions.append(description)
             self.codes.append(code)
             self.resCodes.append(unittestCode)
@@ -267,8 +269,7 @@ class TestGenerator:
             feedback = "timed out"
 
         if feedback == "timed out":
-            # feedback = "API Error"
-            feedbackparsed = None
+            feedbackparsed = "FAIL: 7; ERROR: 0"
             return feedback, feedbackparsed, codeTobeRun
         feedbackparsed = getFeedbackFromRun(feedback)
         return feedback, feedbackparsed, codeTobeRun
