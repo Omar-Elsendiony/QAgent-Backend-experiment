@@ -1,13 +1,15 @@
 from flask import Flask, request, jsonify
-from flask_cors import CORS  # import flask_cors
 from Pipeline_Interface import QAgent_product
 app = Flask(__name__)
-CORS(app)  # enable CORS
+from flask_cors import CORS  # import flask_cors
 from Configuration import *
 from MainFunctions.TestGenerator import *
 from MainFunctions.TestFix import *
 from MainFunctions.DecisionMaker import *
 from MainFunctions.BugFix import *
+# from DB.deploy import *
+CORS(app)  # enable CORS
+
 
 def setupQAgent():
     try:
@@ -43,5 +45,16 @@ def run_python():
     else:
         return jsonify({'error': 'No code provided'}), 400
 
+# from DB.deploy import *
+# @app.route('/query', methods=['POST'])
+# def query():
+#     try: 
+        
+#         code = request.json['code']
+#         data = query_db(code)
+#         return jsonify({'data': data}) 
+#     except Exception as e:
+#         return jsonify({"error":str(e)})
+
 if __name__ == '__main__':
-    app.run(port=5000)
+    app.run(port=8080)
