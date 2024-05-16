@@ -55,7 +55,7 @@ class TestGenerator:
         self.checkPaths()
         self.reset()
         FileHandle = open(self.OutputFolder + "Cases.txt", "w+")
-        for i in range(38, 80):
+        for i in range(30, 80):
             # if (i == 10): continue
             print("Running Test Case ", i)
             FileHandle.write(
@@ -117,8 +117,13 @@ class TestGenerator:
                     + str(i)
                     + " Didn't Run Due to Incomplete Response\n=====================================\n"
                 )
-            feedback, feedbackparsed, codeTobeRun = self.runTest(code, unittestCode)
-            print(feedbackparsed)
+            try:
+                feedback, feedbackparsed, codeTobeRun = self.runTest(code, unittestCode)
+            except KeyboardInterrupt:
+                pass
+            # print(feedbackparsed)
+            # feedback = "timed out"
+            # feedbackparsed = None
             # if (feedback == "timed out") or (feedback == "API Error"):
             #     pass
 
@@ -256,7 +261,11 @@ class TestGenerator:
         """
         unittestCode = preprocessUnitTest(unittestCode)
         codeTobeRun = getRunningCode(code, unittestCode)
-        feedback = runCode(codeTobeRun, self.myglobals)
+        try:
+            feedback = runCode(codeTobeRun, self.myglobals)
+        except KeyboardInterrupt:
+            feedback = "timed out"
+
         if feedback == "timed out":
             # feedback = "API Error"
             feedbackparsed = None
