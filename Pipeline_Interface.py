@@ -18,16 +18,9 @@
 #     except Exception as e:
 #         print(e)
 #         exit(-1)
-def QAgent_product(code, description):
-
-
+def QAgent_product(testGenerator, code, description):
     # #TODO: IMPORTANT find a way to get the code and description from user later
     # for now they are hardcoded
-
-
-    # code = """def add(a, b):\n    return a - b \n"""
-
-    # description = "This function adds two numbers"
 
     isCodeBuggy = True
 

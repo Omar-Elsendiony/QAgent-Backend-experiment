@@ -3,25 +3,30 @@ from flask_cors import CORS  # import flask_cors
 from Pipeline_Interface import QAgent_product
 app = Flask(__name__)
 CORS(app)  # enable CORS
-try:
-    from .Configuration import *
-    from .MainFunctions.TestGenerator import *
-    from .MainFunctions.TestFix import *
-    from .MainFunctions.DecisionMaker import *
-    from .MainFunctions.BugFix import *
+from Configuration import *
+from MainFunctions.TestGenerator import *
+from MainFunctions.TestFix import *
+from MainFunctions.DecisionMaker import *
+from MainFunctions.BugFix import *
 
-    print("All imports successful!")
-    testGenerator = TestGenerator(GenUnitTestChain, db, globals())
-    testRegenerator = TestFix(
-        UnitTestFeedbackChain,
-        globals(),
-        True,
-    )
-    # judgeGenerator = DecisionMaker(judgeChain, globals())
-    bugFixGenerator = BugFix(bugFixChain, globals(), True)
-except Exception as e:
-    print(e)
-    exit(-1)
+def setupQAgent():
+    try:
+        print("All imports successful!")
+        testGenerator = TestGenerator(GenUnitTestChain, db, globals())
+        testRegenerator = TestFix(
+            UnitTestFeedbackChain,
+            globals(),
+            True,
+        )
+        # judgeGenerator = DecisionMaker(judgeChain, globals())
+        bugFixGenerator = BugFix(bugFixChain, globals(), True)
+        return testGenerator, testRegenerator, bugFixGenerator
+    except Exception as e:
+        print(e)
+        exit(-1)
+
+testGenerator, testRegenerator, bugFixGenerator = setupQAgent()
+
 @app.route('/run-qagentai', methods=['POST'])
 def run_python():
     code = request.json.get('code')
@@ -29,7 +34,7 @@ def run_python():
     if code:
         try:
             # execute the main function
-            result = QAgent_product(code,description)
+            result = QAgent_product(testGenerator, code,description)
             print(result)
             return jsonify({'output': result})
         except Exception as e:

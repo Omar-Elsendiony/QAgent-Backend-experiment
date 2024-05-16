@@ -17,7 +17,6 @@ def connectDB(
     db = Chroma.from_documents(data, embedding_function)
     return db
 
-
 def getOneShot(db, code):
     query = code
     docs = db.similarity_search(query)

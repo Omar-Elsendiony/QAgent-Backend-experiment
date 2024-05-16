@@ -1,0 +1,1 @@
+testGenerator, testRegenerator, bugFixGenerator = setupQAgent()
