@@ -225,8 +225,6 @@ class TestFix:
         Responsible for writing results to cases.txt and cases.json
 
         Args: feedbackparsed (str): The parsed feedback from the test case
-
-
         """
         numOfAssertions = getNumAssertions(unittestCode)
         if feedbackparsed == "" or feedbackparsed is None:

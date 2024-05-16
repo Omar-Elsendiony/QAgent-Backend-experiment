@@ -55,7 +55,7 @@ class TestGenerator:
         self.checkPaths()
         self.reset()
         FileHandle = open(self.OutputFolder + "Cases.txt", "w+")
-        for i in range(30):
+        for i in range(0, 30):
             # if (i == 10): continue
             print("Running Test Case ", i)
             FileHandle.write(
@@ -179,7 +179,7 @@ class TestGenerator:
                 funcDefiniton
             )  # does not need entry point at the end of the day
             code = Utility + "\n" + funcDefiniton + code
-            return description, code
+            return code, description
         else:
             # example = self.data_JsonObj.iloc[i][0]
             # code = example["code_tokens"]
