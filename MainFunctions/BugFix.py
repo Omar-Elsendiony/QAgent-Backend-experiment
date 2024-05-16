@@ -55,7 +55,6 @@ class BugFix:
         #         + str(i)
         #         + " has been judged to contain erroneous test cases\n=====================================\n"
         #     )
-
         try:
             GeneratedBugFix = self.BugFixChain.invoke(
                 {

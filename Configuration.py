@@ -20,7 +20,7 @@ GenUnitTestChain = InitializeTestChain(llm, True)
 UnitTestFeedbackChain = InitializeFeedbackChain(llm)
 
 
-# judgeChain = InitializeJudgeChain(llm)
+judgeChain = InitializeJudgeChain(llm)
 
 bugFixChain = InitializeBugFixChain(llm)
 

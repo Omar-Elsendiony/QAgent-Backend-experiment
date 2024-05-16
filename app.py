@@ -18,14 +18,14 @@ def setupQAgent():
             globals(),
             True,
         )
-        # judgeGenerator = DecisionMaker(judgeChain, globals())
+        judgeGenerator = DecisionMaker(judgeChain, globals())
         bugFixGenerator = BugFix(bugFixChain, globals(), True)
-        return testGenerator, testRegenerator, bugFixGenerator
+        return testGenerator, testRegenerator, bugFixGenerator, judgeGenerator
     except Exception as e:
         print(e)
         exit(-1)
 
-testGenerator, testRegenerator, bugFixGenerator = setupQAgent()
+testGenerator, testRegenerator, bugFixGenerator, judgeGenerator = setupQAgent()
 
 @app.route('/run-qagentai', methods=['POST'])
 def run_python():
@@ -34,7 +34,7 @@ def run_python():
     if code:
         try:
             # execute the main function
-            result = QAgent_product(testGenerator, code,description)
+            result = QAgent_product(code, description, testGenerator, testRegenerator, bugFixGenerator, judgeGenerator)
             print(result)
             return jsonify({'output': result})
         except Exception as e:

@@ -18,7 +18,7 @@
 #     except Exception as e:
 #         print(e)
 #         exit(-1)
-def QAgent_product(testGenerator, code, description):
+def QAgent_product(code, description, testGenerator, testRegenerator, bugFixGenerator, judgeGenerator):
     # #TODO: IMPORTANT find a way to get the code and description from user later
     # for now they are hardcoded
 
@@ -35,21 +35,22 @@ def QAgent_product(testGenerator, code, description):
     print("Feedback Parsed: ", feedbackParsed)
     print("Tests to Repeat: ", testsToRepeat)
 
-
+    isCodeBuggy, isTestCaseBuggy, explanation, isIncompleteResponse = judgeGenerator.generate(code, description, feedbackParsed)
     # but isCodeBuggy is not accessible here
 
-    # if isCodeBuggy:
-    #     codeUnderTest, unitTestCode, feedbackParsed, testsToRepeat = (
-    #         bugFixGenerator.generate(
-    #             description, codeUnderTest, unitTestCode, testsToRepeat, feedbackParsed
-    #         )
-    #     )
-    # else:
-    #     codeUnderTest, unitTestCode, feedbackParsed, testsToRepeat = (
-    #         testRegenerator.generate(
-    #             description, codeUnderTest, unitTestCode, feedbackParsed
-    #         )
-    #     )
+    if not isIncompleteResponse:
+        if isCodeBuggy == 'True':
+            codeUnderTest, unitTestCode, feedbackParsed, testsToRepeat = (
+                bugFixGenerator.generate(
+                    description, codeUnderTest, unitTestCode, testsToRepeat, feedbackParsed
+                )
+            )
+        else:
+            codeUnderTest, unitTestCode, feedbackParsed, testsToRepeat = (
+                testRegenerator.generate(
+                    description, codeUnderTest, unitTestCode, feedbackParsed
+                )
+            )
 
     print("\n=============================================\nAfter Whichever: ")
     print("Code Under Test: ", codeUnderTest)
