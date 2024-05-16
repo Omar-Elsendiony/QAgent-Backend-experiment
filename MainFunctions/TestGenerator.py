@@ -10,6 +10,7 @@ class TestGenerator:
         self.myglobals = myglobals
         self.fewshotsnum = 3
         self.isFewShot = True
+        self.incompleteResponses = 0
 
     def generate(self, codeUnderTest, description, isCodeBuggy):
         """
@@ -37,7 +38,7 @@ class TestGenerator:
         unittestCode, isIncompleteResponse = getCodeFromResponse(unittest["text"], 0)
         print(unittestCode)
         if isIncompleteResponse:
-            # self.incompleteResponses += 1
+            self.incompleteResponses = 1
             print(
                 "Test Case Didn't Run Due to Incomplete Response\n=====================================\n"
             )
