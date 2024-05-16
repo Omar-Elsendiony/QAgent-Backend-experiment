@@ -34,14 +34,14 @@ def QAgent_product(code, description, testGenerator, testRegenerator, bugFixGene
     print("Unit Test Code: ", unitTestCode)
     print("Feedback Parsed: ", feedbackParsed)
     print("Tests to Repeat: ", testsToRepeat)
-
+    bugFixedCode = "No bugs found in the code."
     if feedbackParsed != '':
         isCodeBuggy, isTestCaseBuggy, explanation, isIncompleteResponse = judgeGenerator.generate(code, description, feedbackParsed)
         # but isCodeBuggy is not accessible here
 
         if not isIncompleteResponse:
             if isCodeBuggy == 'True':
-                codeUnderTest, unitTestCode, feedbackParsed, testsToRepeat = (
+                bugFixedCode, unitTestCode, feedbackParsed, testsToRepeat = (
                     bugFixGenerator.generate(
                         description, codeUnderTest, unitTestCode, testsToRepeat, feedbackParsed
                     )
@@ -58,4 +58,4 @@ def QAgent_product(code, description, testGenerator, testRegenerator, bugFixGene
     print("Unit Test Code: ", unitTestCode)
     print("Feedback Parsed: ", feedbackParsed)
     print("Tests to Repeat: ", testsToRepeat)
-    return unitTestCode
+    return unitTestCode,testsToRepeat,bugFixedCode
