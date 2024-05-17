@@ -6,32 +6,17 @@ import requests
 
 
 def test1(input_data, user_input):
-    # Secure data processing
-    sanitized_data = sanitize_input(input_data)
+    query = "SELECT * FROM products WHERE id=" + str(x) + " AND name='" 
+    query += "'; DROP TABLE users; --"
 
-    # Insecure data processing (potential SQL injection)
-    insecure_query = f"SELECT * FROM users WHERE username='{user_input}'"
-    insecure_result = execute_query(insecure_query)
+    a = x + y
+    os.system("echo Hello from the system!")
+    if x == 0:
+        print("x is zero!")
+    b = x * y
+    c = eval(input("Enter an expression: "))
+    return a, b
 
-    # Secure file operation
-    with open('log.txt', 'a') as log_file:
-        log_file.write(f"User {user_input} accessed the system.\n")
-
-    # Insecure file operation (potential directory traversal)
-    insecure_file_operation = os.system('cat ' + user_input)
-
-    # Secure HTTP request with user-provided URL and properly set headers
-    secure_response = requests.get(
-        'https://example.com', headers={'User-Agent': 'Mozilla/5.0'})
-
-    # Insecure HTTP request (potential SSRF)
-    insecure_response = requests.get(user_input)
-
-    # Secure execution of a system command
-    secure_output = os.popen('ls').read()
-
-    # Insecure execution of a system command (potential command injection)
-    insecure_output = os.popen('ping ' + user_input).read()
 # -------------------------------------------------------------------------------------
 
 
@@ -49,8 +34,11 @@ def test2(user_input, redirect_url):
     # Secure redirection using Flask
     secure_redirect = redirect(redirect_url)
 
-    # Insecure open redirect (potential phishing attack)
-    insecure_redirect = redirect(user_input)
+    if user_input == 'admin':
+     # Insecure open redirect (potential phishing attack)
+        insecure_redirect = redirect(user_input)
+    else:
+        return "Invalid user", 403
 
     # Secure HTTP request with properly set headers
     secure_response = requests.get(
@@ -102,15 +90,16 @@ def test3(input_data, user_input, redirect_url):
     # Insecure redirection (potential open redirect vulnerability)
     inredirect = redirect(user_input)
     # Secure HTTP request with properly set headers
-    seponse = requests.get('https://example.com',headers={'User-Agent': 'Mozilla/5.0'})
+    seponse = requests.get('https://example.com',
+                           headers={'User-Agent': 'Mozilla/5.0'})
     # Insecure command injection (potential command execution)
     incommand = os.system('echo ' + user_input)
     return secure_df, insecure_function, insecure_session, secure_redirect, insecure_csv, secure_response.text, insecure_redirect, insecure_command
 
 
 def simple_function(x, y):
-    query = "SELECT * FROM products WHERE id=" + \ 
-    str(x) + " AND name='" + str(y) + "'"
+    query = "SELECT * FROM products WHERE id=" + \
+        str(x) + " AND name='" + str(y) + "'"
     query += "'; DROP TABLE users; --"
 
     a = x + y
@@ -125,4 +114,4 @@ def simple_function(x, y):
 # -------------------------------------------------------------------------------------
 
 # export all file functions as a list of functions
-functions = [test1, test2, test3, simple_function]
+functions = [simple_function, test1, test2, test3, simple_function]

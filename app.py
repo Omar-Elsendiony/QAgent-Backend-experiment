@@ -2,12 +2,14 @@ from flask import Flask, request, jsonify
 from Pipeline_Interface import QAgent_product
 app = Flask(__name__)
 from flask_cors import CORS  # import flask_cors
-from Configuration import *
-from MainFunctions.TestGenerator import *
-from MainFunctions.TestFix import *
-from MainFunctions.DecisionMaker import *
-from MainFunctions.BugFix import *
-# from DB.deploy import *
+# from Configuration import *
+# from MainFunctions.TestGenerator import *
+# from MainFunctions.TestFix import *
+# from MainFunctions.DecisionMaker import *
+# from MainFunctions.BugFix import *
+from vul_detection.vul_main import *
+
+from DB.deploy import *
 CORS(app)  # enable CORS
 
 
