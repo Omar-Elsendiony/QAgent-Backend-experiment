@@ -1,4 +1,6 @@
 import random
+import sys
+sys.path.append("..") #
 from Graph import Graph, Vertex
 import numpy as np
 import pandas as pd
@@ -195,6 +197,8 @@ class VecDB:
 
             TopK= self.Greedy_Search_Online(self.DBGraph.medoid,query, k)
             ClustersResults.extend([(self.index_to_distance(VertexId, query), VertexId) for VertexId in TopK])
+        ClustersResults.sort()
+        ClustersResults = [element[1] for element in ClustersResults[:k]]
         return ClustersResults
         # self.offset+=len(self.DBGraph.verticies)
         # pool = Pool()

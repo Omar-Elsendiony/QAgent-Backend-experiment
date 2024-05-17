@@ -45,16 +45,17 @@ def run_python():
     else:
         return jsonify({'error': 'No code provided'}), 400
 
-# from DB.deploy import *
-# @app.route('/query', methods=['POST'])
-# def query():
-#     try: 
+# from DBRet import DiskANN,Graph,unixcoder
+from DBRet.deploy import *
+@app.route('/query', methods=['POST'])
+def query():
+    try: 
         
-#         code = request.json['code']
-#         data = query_db(code)
-#         return jsonify({'data': data}) 
-#     except Exception as e:
-#         return jsonify({"error":str(e)})
+        code = request.json['code']
+        codes,tests = query_db(code)
+        return jsonify({'codes': codes, 'tests': tests}) 
+    except Exception as e:
+        return jsonify({"error":str(e)})
 
 if __name__ == '__main__':
     app.run(port=8080)
