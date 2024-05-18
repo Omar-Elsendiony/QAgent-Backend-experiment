@@ -1,9 +1,10 @@
 import torch
 import torch.nn as nn
-from preprocessing import Preprocess
-from tests import functions
+from .preprocessing import Preprocess
+from .tests import functions
+import os
 
-
+current_dir = os.path.dirname(__file__)
 
 
 class BertForLineClassification(torch.nn.Module):
@@ -15,7 +16,6 @@ class BertForLineClassification(torch.nn.Module):
         # self.preprocessor = preprocessing.Preprocessor()
         self.preprocessor = Preprocess()
 
-
     def forward(self, input_tensor):
         # outputs = self.bert(input_ids=input_ids, attention_mask=attention_mask)
         # pooled_output = outputs.pooler_output
@@ -23,28 +23,34 @@ class BertForLineClassification(torch.nn.Module):
         logits = self.classifier(pooled_output)
         return logits
 
-def infere(model,lines_tensor):
+
+def infere(model, lines_tensor):
     logits = model(lines_tensor)
     _, predicted = torch.max(logits, 1)
-    return predicted   
-    
+    return predicted
+
+
 def main_vul(function):
     # Load the saved model
     model = BertForLineClassification()
-    model.load_state_dict(torch.load('bert_model_generic_2.pth'))
+    PATH_bert = os.path.join(current_dir, 'bert_model_generic_2.pth')
+
+    model.load_state_dict(torch.load(PATH_bert))
     model.eval()  # Put the model in evaluation mode for inference
-    # train model after load it 
-    lines_tensors =  model.preprocessor.generate_embeddings(function)
+    # train model after load it
+    lines_tensors = model.preprocessor.generate_embeddings(function)
     # cleaned_func = model.preprocessor.clean_function_source(functions)
-    vul_lines = dict()
+    vul_lines = list()
     for i in range(len(lines_tensors)):
-        predicted = infere(model,lines_tensors[i])
-        norm_prediction = int(predicted // 2) 
+        predicted = infere(model, lines_tensors[i])
+        norm_prediction = int(predicted // 2)
         if norm_prediction == 1 or norm_prediction == 2:
-            vul_lines[i] = norm_prediction
+            lol = dict()
+            lol['line_number'] = i
+            lol['vul_level'] = norm_prediction
+            vul_lines.append(lol)
     return vul_lines
 
-print(functions[1])
-print(main_vul(functions[1]))       
-         
-            
+
+# print(functions[1])
+print(main_vul(functions[1]))
