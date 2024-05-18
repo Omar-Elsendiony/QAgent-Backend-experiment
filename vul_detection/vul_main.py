@@ -53,4 +53,4 @@ def main_vul(function):
 
 
 # print(functions[1])
-print(main_vul(functions[1]))
+# print(main_vul(functions[1]))

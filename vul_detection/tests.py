@@ -98,8 +98,7 @@ def test3(input_data, user_input, redirect_url):
 
 
 def simple_function(x, y):
-    query = "SELECT * FROM products WHERE id=" + \
-        str(x) + " AND name='" + str(y) + "'"
+    query = "SELECT * FROM products WHERE id=" +  str(x) + " AND name='" + str(y) + "'"
     query += "'; DROP TABLE users; --"
 
     a = x + y

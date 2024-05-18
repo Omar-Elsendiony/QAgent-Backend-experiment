@@ -1,14 +1,14 @@
-from DBRet.deploy import *
+# from DBRet.deploy import *
 from vul_detection.vul_main import *
 from flask_cors import CORS  # import flask_cors
 from flask import Flask, request, jsonify
 from Pipeline_Interface import QAgent_product
 app = Flask(__name__)
-# from Configuration import *
-# from MainFunctions.TestGenerator import *
-# from MainFunctions.TestFix import *
-# from MainFunctions.DecisionMaker import *
-# from MainFunctions.BugFix import *
+from Configuration import *
+from MainFunctions.TestGenerator import *
+from MainFunctions.TestFix import *
+from MainFunctions.DecisionMaker import *
+from MainFunctions.BugFix import *
 
 CORS(app)  # enable CORS
 
@@ -33,7 +33,7 @@ def setupQAgent():
 testGenerator, testRegenerator, bugFixGenerator, judgeGenerator = setupQAgent()
 
 
-@app.route('/run-qagentai', methods=['POST'])
+@app.route('/qagentai', methods=['POST'])
 def run_python():
     code = request.json.get('code')
     description = request.json.get('description')
@@ -51,7 +51,7 @@ def run_python():
         return jsonify({'error': 'No code provided'}), 400
 
 
-# from DBRet import DiskANN,Graph,unixcoder
+from DBRet import DiskANN,Graph,unixcoder
 
 
 @app.route('/query', methods=['POST'])
@@ -65,15 +65,31 @@ def query():
         return jsonify({"error": str(e)})
 
 
-@app.route('/vul-detect', methods=['POST'])
+@app.route('/vuldetect', methods=['POST'])
 def query():
     try:
+
         code = request.json['code']
+        print(type(code))
         vuls = main_vul(code)
         return jsonify(vuls)
     except Exception as e:
         return jsonify({"error": str(e)})
 
+
+code = """def simple_function(x, y):
+    query = "SELECT * FROM products WHERE id=" +  str(x) + " AND name='" + str(y) + "'"
+    query += "'; DROP TABLE users; --"
+
+    a = x + y
+    os.system("echo Hello from the system!")
+    if x == 0:
+        print("x is zero!")
+    b = x * y
+    c = eval(input("Enter an expression: "))
+    return a, b
+ """
+# print(main_vul(code))
 
 if __name__ == '__main__':
     app.run(port=8080)

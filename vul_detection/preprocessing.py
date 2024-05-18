@@ -16,7 +16,8 @@ class Preprocess:
     def clean_function_source(self, input_function):
         # Get the source code of the function
 
-        source_code = inspect.getsource(input_function)
+        # source_code = inspect.getsource(input_function)
+        source_code = input_function
 
         # Find all variables in the function definition
         def_pattern = r'def\s+\w+\((.*?)\):'
