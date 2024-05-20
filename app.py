@@ -51,8 +51,8 @@ def run_python():
         return jsonify({'error': 'No code provided'}), 400
 
 
-from DBRet import DiskANN,Graph,unixcoder
-
+# from DBRet import DiskANN,unixcoder
+from DBRet.deploy import *
 
 @app.route('/query', methods=['POST'])
 def query():
@@ -66,9 +66,8 @@ def query():
 
 
 @app.route('/vuldetect', methods=['POST'])
-def query():
+def vulDetect():
     try:
-
         code = request.json['code']
         print(type(code))
         vuls = main_vul(code)
