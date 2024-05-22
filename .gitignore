@@ -10,9 +10,6 @@ Results/
 Output/
 
 *.bin
-.classical/inputfunction.py
-.classical/fitness/localsfiles/testforlocals.py
-.classical/fitness/localsfiles/testforlocals2.py
-.classical/outputtests/randomtest.py
-.classical/outputtests/test.py
+classical/inputfunctions/
+classical/fitness/localsfiles/
 .coverage
