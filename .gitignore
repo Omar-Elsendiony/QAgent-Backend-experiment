@@ -12,4 +12,6 @@ Output/
 *.bin
 classical/inputfunctions/
 classical/fitness/localsfiles/
+classical/outputtests/
+inputfunction.py
 .coverage
