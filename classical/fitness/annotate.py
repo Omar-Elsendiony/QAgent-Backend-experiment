@@ -11,14 +11,13 @@ from ..generationAlg.coveragetarget import CoverageTarget
 from .insertionlocalsprint import insert_print_locals_using_ast,insert_print_locals_lineno_using_ast
 def get_uncovered_targets_indices(project_path:str):
     missing_branches_index=[]
-    coverage_file = open(f"{project_path}classical/coverage/coverage.json")
-    
+    coverage_file = open(f"{project_path}/classical/coverage/coverage.json")
     # dictionary
     data = json.load(coverage_file)
     
     # Iterating through the json
     # list
-    for branch in data['files']['/classical/outputtests/test.py']['missing_branches']:
+    for branch in data['files']['classical/outputtests/test.py']['missing_branches']:
         missing_branches_index.append(branch[0])
     #remove the branch of __main__, (it is the last branch)
     missing_branches_index=missing_branches_index[:-1]
@@ -27,14 +26,14 @@ def get_uncovered_targets_indices(project_path:str):
     return set(missing_branches_index)
 def get_executed_branches_indices(project_path:str):
     executed_branches_indices=[]
-    coverage_file = open(f"{project_path}classical/coverage/coverage.json")
+    coverage_file = open(f"{project_path}/classical/coverage/coverage.json")
     
     # dictionary
     data = json.load(coverage_file)
     
     # Iterating through the json
     # list
-    for branch in data['files']['/classical/outputtests/test.py']['executed_branches']:
+    for branch in data['files']['classical/outputtests/test.py']['executed_branches']:
         executed_branches_indices.append(branch[0])
     #remove the branch of __main__, (it is the last branch)
     executed_branches_indices=executed_branches_indices[:-1]
@@ -78,7 +77,7 @@ def insert_print_locals(missing_branches_index:set,project_path):
     # file = open(f"{project_path}classical/fitness/testforlocals.py", "w")
     uncovered_targets = []
     test_file_string=""
-    with open(f"{project_path}classical/outputtests/test.py", "r") as f:
+    with open(f"{project_path}/classical/outputtests/test.py", "r") as f:
         # file.write("")
         for i, line in enumerate(f):
             test_file_string+=line
@@ -99,16 +98,16 @@ def insert_print_locals(missing_branches_index:set,project_path):
             #     file.write(after_definition+ "\n")
     f.close()
     new_test_file_string,new_test_file_string2=insert_print_locals_lineno_using_ast(test_file_string,missing_branches_index,project_path)
-    with open(f"{project_path}classical/fitness/localsfiles/testforlocals.py", 'w') as file:
+    with open(f"{project_path}/classical/fitness/localsfiles/testforlocals.py", 'w') as file:
         file.write(new_test_file_string)
     file.close()
-    with open(f"{project_path}classical/fitness/localsfiles/testforlocals2.py", 'w') as file2:
+    with open(f"{project_path}/classical/fitness/localsfiles/testforlocals2.py", 'w') as file2:
         file2.write(new_test_file_string2)
     file2.close()
     return uncovered_targets
 
 def get_targets_string(branches_index:set,project_path:str):
-    f = open(f"{project_path}classical/outputtests/test.py", "r")
+    f = open(f"{project_path}/classical/outputtests/test.py", "r")
     targets = [] 
     if len(branches_index)==0:
         return []
@@ -127,8 +126,8 @@ def get_locals_dict(project_path):
     list_of_dicts = []
     list_of_lineno=[]
     # Path to the text file containing dictionaries
-    file_path = f"{project_path}classical/fitness/localsfiles/localsdictionary.txt"
-    file_path2=f"{project_path}classical/fitness/localsfiles/localslineno.txt"
+    file_path = f"{project_path}/classical/fitness/localsfiles/localsdictionary.txt"
+    file_path2=f"{project_path}/classical/fitness/localsfiles/localslineno.txt"
     # Read the file line by line
     with open(file_path, 'r') as file:
         for line in file:

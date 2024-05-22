@@ -1,34 +1,21 @@
 import unittest
 
-def solve(s: str) -> str:
-    JSONFile = 'D:/CUFE/grad project/gp2/classical/Unit-Tests-Generation/src/fitness/localsfiles/localsdictionary.txt'
+def triangle(x: int) -> str:
+    JSONFile = 'D:\\CUFE\\grad project\\gp2\\pipeline\\QAgent-product\\LLM-Test-Generator/classical/fitness/localsfiles/localsdictionary.txt'
     with open(JSONFile, 'w') as anotate_f:
         anotate_f.write('')
-    flg = 0
-    idx = 0
-    new_str = list(s)
-    for i in s:
-        with open(JSONFile, 'a') as anotate_f:
-            anotate_f.write(str(locals()))
-            anotate_f.write('\n')
-        if i.isalpha():
-            new_str[idx] = i.swapcase()
-            flg = 1
-        idx += 1
-    s = ''
-    for i in new_str:
-        s += i
     with open(JSONFile, 'a') as anotate_f:
         anotate_f.write(str(locals()))
         anotate_f.write('\n')
-    if flg == 0:
-        return s[len(s)::-1]
-    return s
+    if x > 40:
+        return 'x>40 yes'
+    else:
+        return 'no x is not >40'
 
 class TestClass(unittest.TestCase):
 
     def test_case_9(self):
-        str_0 = '/--'
-        self.assertEqual('--/', solve(str_0))
+        int_0 = 4
+        self.assertEqual('no x is not >40', triangle(int_0))
 if __name__ == '__main__':
     unittest.main()

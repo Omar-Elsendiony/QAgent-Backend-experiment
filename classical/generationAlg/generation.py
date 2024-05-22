@@ -261,7 +261,7 @@ def generate_unit_tests(test_cluster:TestCluster,log_file):
         print("Error: No test cases have been generated")
         return None
     # Write the resulting string to a file
-    with open(f'{test_cluster.project_path}classical/outputtests/randomtest.py', 'w') as file:
+    with open(f'{test_cluster.project_path}/classical/outputtests/randomtest.py', 'w') as file:
         file.write(testClass)
     print("Test file 'randomtest.py' has been created.")
     return test_cases_list
@@ -321,7 +321,7 @@ def create_test_file_from_testcase_string(project_path,file_name,method_under_te
     testClass+="""if __name__ == '__main__':
     unittest.main()
     """
-    file_path = f'{project_path}classical/outputtests/{file_name}'
+    file_path = f'{project_path}/classical/outputtests/{file_name}'
     # Write the resulting string to a file
     with open(file_path, 'w') as file:
         file.write(testClass)

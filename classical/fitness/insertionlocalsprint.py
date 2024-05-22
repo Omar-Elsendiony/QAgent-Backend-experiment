@@ -105,7 +105,7 @@ def insert_print_locals_using_ast(code,indices,project_path,new_node_create_file
 
 def insert_print_locals_lineno_using_ast(code,indices,project_path):
     old_create_file=f"""
-JSONFile='{project_path}classical/fitness/localsfiles/localsdictionary.txt'
+JSONFile='{project_path}/classical/fitness/localsfiles/localsdictionary.txt'
 with open(JSONFile, 'w') as anotate_f:
     anotate_f.write('')"""
     old_write_file="""with open(JSONFile, 'a') as anotate_f:
@@ -116,7 +116,7 @@ with open(JSONFile, 'w') as anotate_f:
     code_print_locals1=insert_print_locals_using_ast(code,indices,project_path,new_node_create_file_old,new_node_old)
     
     create_file=f"""from inspect import currentframe, getframeinfo
-JSONFile='{project_path}classical/fitness/localsfiles/localslineno.txt'
+JSONFile='{project_path}/classical/fitness/localsfiles/localslineno.txt'
 with open(JSONFile, 'w') as anotate_f:
     anotate_f.write('')"""
     write_file="""with open(JSONFile, 'a') as anotate_f:

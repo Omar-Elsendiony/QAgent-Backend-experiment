@@ -203,7 +203,7 @@ def analyse_module(module_name:str,project_path:str,log_file):
 def infere_types(project_path,log_file)->bool:
     """Infere the types of the function parameters and return type"""
     #send request to the server
-    with open(f"{project_path}classical/inputfunction.py") as f:
+    with open(f"{project_path}/classical/inputfunction.py") as f:
         try:
             r=requests.post("http://localhost:5001/api/predict?tc=0", f.read())
         except Exception as e:
@@ -215,7 +215,7 @@ def infere_types(project_path,log_file)->bool:
             all_param_types = {}
             response_json=r.json()
             #create a json file to store the response_json
-            with open(f"{project_path}classical/analysis/typesinfered.json", "w") as json_file:
+            with open(f"{project_path}/classical/analysis/typesinfered.json", "w") as json_file:
                 json.dump(response_json, json_file)
             json_file.close()
             # Extract values of 'params_p' and 'ret_type_p'
