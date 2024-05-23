@@ -12,7 +12,7 @@ app = Flask(__name__)
 from classical.main import main_for_api
 from SearchBasedBugFixing.bugFixLogic import *
 CORS(app)  # enable CORS
-
+import subprocess
 
 # def setupQAgent():
 #     try:
@@ -117,8 +117,6 @@ def generate_fixbugs():
     inputs = request.json.get('test_cases_inputs')
     for i, input in enumerate(inputs):
         for j, inp in enumerate(input):
-            print(type(inputs[i][j]))
-            print(inputs[i][j])
             inputs[i][j] = eval(inputs[i][j])
             
     outputs = request.json.get('test_cases_outputs')
@@ -126,20 +124,36 @@ def generate_fixbugs():
         for j, inp in enumerate(output):
             outputs[i][j] = eval(outputs[i][j])
     
-    print(inputs)
-    print(outputs)
+    # print(inputs)
+    # print(outputs)
     function_name = request.json.get('function_name')
-    print(function_name)
-    print(code)
+    # print(function_name)
+    # print(code)
     if code:
         try:
-            # print('hahhhhhhhhhhhhhhhhhhh')
-            outputs = bugFix(code, function_name, inputs, outputs)
+        #     print('loll')
+        #     try:
+        #         # result = subprocess.run(['ls'])
+        #         result = subprocess.run(["python3", "/root/BugFix/LLM-Test-Generator/SearchBasedBugFixing/main.py", code, function_name, inputs, outputs], shell=True, capture_output=True, text=True, check=True)
+        #         # Access the stdout and stderr attributes of the result
+        #         stdout = result.stdout
+        #         stderr = result.stderr
+                
+        #         result = stdout
+        #     except subprocess.CalledProcessError as e:
+        #         print("Error:", e)
+            # try:
+            #     outs, errs = p.communicate(timeout=3)
+            # except TimeoutExpired:
+            #     kill(p.pid)
+            #     return -1; # means there is error incurred
+            # return 0 # means no error
+            result = bugFix(code, function_name, inputs, outputs)
             # result = main_vul(code)
-            # print(result)
+            print(result)
             if (outputs == ''):
                 return jsonify({'output': 'No Fixes found'})
-            return jsonify({'output': outputs})
+            return jsonify({'output': result})
         except Exception as e:
             return jsonify({'error': str(e)}), 400
     else:

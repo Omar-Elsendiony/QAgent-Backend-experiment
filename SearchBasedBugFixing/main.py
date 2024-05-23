@@ -1,10 +1,11 @@
 import sys
-import bugFixLogic
+from bugFixLogic import *
 
 
 
 def main():
     # Access command-line arguments
+    print('enterrrrrrrrrrrrrrrrrrrrrr')
     arguments = sys.argv[1:]
     code = arguments[0]
     function_name = arguments[1]
@@ -13,9 +14,7 @@ def main():
     # code = arguments[0]
     # Process the arguments
     # TODO: Add your code here
-    
-    # Example: Print the arguments
-    print("Arguments:", arguments)
+    return bugFix(code, function_name, inputs, outputs)
 
 if __name__ == "__main__":
     main()
