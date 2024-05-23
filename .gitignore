@@ -15,3 +15,5 @@ classical/fitness/localsfiles/
 classical/outputtests/
 inputfunction.py
 .coverage
+
+*.index
