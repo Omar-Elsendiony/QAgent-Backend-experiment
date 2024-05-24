@@ -5,7 +5,7 @@ from bugFixLogic import *
 
 def main():
     # Access command-line arguments
-    print('enterrrrrrrrrrrrrrrrrrrrrr')
+    # print('enterrrrrrrrrrrrrrrrrrrrrr')
     arguments = sys.argv[1:]
     code = arguments[0]
     function_name = arguments[1]
@@ -14,7 +14,7 @@ def main():
     # code = arguments[0]
     # Process the arguments
     # TODO: Add your code here
-    return bugFix(code, function_name, inputs, outputs)
+    bugFix(code, function_name, inputs, outputs)
 
 if __name__ == "__main__":
     main()

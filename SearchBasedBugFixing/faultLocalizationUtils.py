@@ -52,9 +52,10 @@ def deleteFolder(folder_path):
     # Delete the folder if it exists
     if fauxpy_folder:
         shutil.rmtree(os.path.join(folder_path, fauxpy_folder))
-        print(f"The folder '{fauxpy_folder}' has been deleted.")
+        # print(f"The folder '{fauxpy_folder}' has been deleted.")
     else:
-        print("No folder starting with 'FauxPy' found.")
+        # print("No folder starting with 'FauxPy' found.")
+        pass
 
 
 def copyFolder(source_folder, destination_folder, file_id):
@@ -70,7 +71,7 @@ def copyFolder(source_folder, destination_folder, file_id):
     # Copy the file from the source folder to the destination folder
     shutil.copy(source_file_path, destination_file_path)
 
-    print(f"File '{file_name}' copied from '{source_folder}' to '{destination_folder}'.")
+    # print(f"File '{file_name}' copied from '{source_folder}' to '{destination_folder}'.")
 
 
 def get_value(test_item, hint):
@@ -127,6 +128,8 @@ def create_py_test(inputs, outputs, function_name, destination_folder):
         fn = f"""def test_{i}(): pass"""
 
         fn_ast = ast.parse(fn).body[0]
+        # print(outputs)
+        # print(inputs)
         for j in range(len(inputs[i])):
             # print(inputs[i][j])
             # print('-----------------------------------')
@@ -142,6 +145,9 @@ def create_py_test(inputs, outputs, function_name, destination_folder):
             input_node = ast.parse(input_str).body[0]
             fn_ast.body.append(input_node)
         
+        
+        # print(i)
+        # print(outputs[i])
         for j in range(len(outputs[i])):
             # val_output = get_value(outputs[i][j], outputHints[j])
             val_output = (outputs[i][j])
@@ -174,7 +180,7 @@ def create_py_test(inputs, outputs, function_name, destination_folder):
     if not os.path.exists(destination_folder):
         # Create the destination folder if it doesn't exist
         os.makedirs(destination_folder)
-        print(f"The folder '{destination_folder}' has been created.")
+        # print(f"The folder '{destination_folder}' has been created.")
 
     # Create the file within the destination folder
     file_path = os.path.join(destination_folder, "test.py")
@@ -183,7 +189,7 @@ def create_py_test(inputs, outputs, function_name, destination_folder):
         python_code = ast.unparse(module_ast)
         file.write(python_code)
 
-        print(f"File 'test.py' created in '{destination_folder}' with the converted Python code.")
+        # print(f"File 'test.py' created in '{destination_folder}' with the converted Python code.")
     # print(ast.unparse(module_ast))
     # print(ast.dump(module_ast, indent=4))
 def runFaultLocalization(test_path, src_path):
@@ -201,7 +207,7 @@ def main(code, inputs, outputs, function_name, destination_folder):
     folder_path = '..'
     deleteFolder(folder_path)
 
-    print(os.path.join(os.getcwd(), destination_folder, 'source_code.py'))
+    # print(os.path.join(os.getcwd(), destination_folder, 'source_code.py'))
     with open(os.path.join(os.getcwd(), destination_folder, 'source_code.py'), 'w') as file:
         file.write(code)
 

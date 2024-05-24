@@ -2,15 +2,15 @@
 # from vul_detection.vul_main import *
 from flask_cors import CORS  # import flask_cors
 from flask import Flask, request, jsonify
-# from Pipeline_Interface import QAgent_product
 app = Flask(__name__)
+# from Pipeline_Interface import QAgent_product
 # from Configuration import *
 # from MainFunctions.TestGenerator import *
 # from MainFunctions.TestFix import *
 # from MainFunctions.DecisionMaker import *
 # from MainFunctions.BugFix import *
 from classical.main import main_for_api
-from SearchBasedBugFixing.bugFixLogic import *
+# from SearchBasedBugFixing.bugFixLogic import *
 CORS(app)  # enable CORS
 import subprocess
 
@@ -131,27 +131,32 @@ def generate_fixbugs():
     # print(code)
     if code:
         try:
-        #     print('loll')
-        #     try:
-        #         # result = subprocess.run(['ls'])
-        #         result = subprocess.run(["python3", "/root/BugFix/LLM-Test-Generator/SearchBasedBugFixing/main.py", code, function_name, inputs, outputs], shell=True, capture_output=True, text=True, check=True)
-        #         # Access the stdout and stderr attributes of the result
-        #         stdout = result.stdout
-        #         stderr = result.stderr
+            try:
+                # result = subprocess.run(['ls'])
+                result = subprocess.run(["python3", "/root/BugFix/LLM-Test-Generator/SearchBasedBugFixing/main.py", str(code), str(function_name), str(inputs), str(outputs)], capture_output=True, text=True)
+                # Access the stdout and stderr attributes of the result
                 
-        #         result = stdout
-        #     except subprocess.CalledProcessError as e:
-        #         print("Error:", e)
+                stdout = result.stdout
+                print(stdout)
+                stderr = result.stderr
+                print(stderr)
+                
+                result = stdout
+                print(result)
+            except subprocess.CalledProcessError as e:
+                print("Error:", e)
+            except Exception as e:
+                print("Error:", e)
             # try:
             #     outs, errs = p.communicate(timeout=3)
             # except TimeoutExpired:
             #     kill(p.pid)
             #     return -1; # means there is error incurred
             # return 0 # means no error
-            result = bugFix(code, function_name, inputs, outputs)
+            # result = bugFix(code, function_name, inputs, outputs)
             # result = main_vul(code)
             print(result)
-            if (outputs == ''):
+            if (result == ''):
                 return jsonify({'output': 'No Fixes found'})
             return jsonify({'output': result})
         except Exception as e:
@@ -161,6 +166,7 @@ def generate_fixbugs():
 
 # generate_fixbugs()
 
-
 if __name__ == '__main__':
+    # app.run(port=8080,debug=True, use_reloader=False)
     app.run(port=8080)
+

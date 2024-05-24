@@ -4,7 +4,7 @@ The main pipeline resides here
 """
 import ast
 import re
-from .operators import *
+from operators import *
 import SearchBasedBugFixing.utils as utils
 import random
 from typing import List, Set, Dict, Callable
@@ -59,7 +59,7 @@ def runCode(code: str, myglobals):
         # print('timey')
     # thread.stop()
     # signal.alarm(0)
-    signal.setitimer(signal.ITIMER_REAL, 0)
+    # signal.setitimer(signal.ITIMER_REAL, 0)
     if (myglobals.get('testcase')):
         del myglobals['testcase']
     sys.stdout = oldStdOUT
@@ -188,7 +188,7 @@ def passesNegTests(program:str, program_name:str, inputs:List, outputs:List) -> 
                 editedProgram = program + '\n' + inputStrings + f'\nres = {program_name}({outputStrings})\n\nprint(res)'
             
                 res, isError = runCode(editedProgram, globals())
-                print(res)
+                # print(res)
                 if (isError):
                     return False
                 res = res.strip()
@@ -424,7 +424,7 @@ def main(BugProgram:str,
     # print(len(Pop))
     number_of_iterations = 0
     while len(Solutions) < M and number_of_iterations < 4:
-        print(number_of_iterations)
+        # print(number_of_iterations)
         for p_index, p in enumerate(Pop):
             if p not in Solutions:
                 if passesNegTests(p, MethodUnderTestName, inputs, outputs):
@@ -444,9 +444,11 @@ def main(BugProgram:str,
 def bugFix(buggyProgram, methodUnderTestName, inputs, outputs):
     ops = utils.mutationsCanBeApplied # ALIAS to operations that can be applied 
     destinationLocalizationPath = 'SearchBasedBugFixing/testcases/GeneratedTests'
-    # inputs = ast.literal_eval(inputs)
-    # outputs = ast.literal_eval(outputs)
+    inputs = ast.literal_eval(inputs)
+    outputs = ast.literal_eval(outputs)
 
+    print(inputs)
+    print(outputs)
 
     error = faultLocalizationUtils.main(
         code=buggyProgram,
@@ -455,7 +457,7 @@ def bugFix(buggyProgram, methodUnderTestName, inputs, outputs):
         function_name= methodUnderTestName, 
         destination_folder= destinationLocalizationPath)
     
-    print('returned from fault localization\n')
+    # print('returned from fault localization\n')
     if (error == 0): # 0 means no error
         faultLocations, weightsFaultyLocations = faultLocalizationUtils.getFaultyLines('..') # fauly locations are in the parent directory
         destination_folder = destinationLocalizationPath
@@ -483,13 +485,13 @@ def bugFix(buggyProgram, methodUnderTestName, inputs, outputs):
     for solution in solutions:
         print(solution)
     print("************************************************************")
-    print(len(population))
-    i = 0
-    for p in population:
-        splt = p.split()
-        print(population[i + 100])
-        i += 1
-        if (i == 10):
-            break
+    # print(len(population))
+    # i = 0
+    # for p in population:
+    #     splt = p.split()
+    #     print(population[i + 100])
+    #     i += 1
+    #     if (i == 10):
+    #         break
     
     return '\n'.join(list(solutions))
