@@ -17,8 +17,8 @@ class baseOperator(ast.NodeVisitor):
         return cls.identifiers
 
     @classmethod
-    def set_functionIdentifiers(cls, identifiers):
-        cls.functionArgumentsIdentifiers = identifiers
+    def set_functionIdentifiers(cls, fnidentifiers):
+        cls.functionArgumentsIdentifiers = fnidentifiers
 
     @classmethod
     def get_functionIdentifiers(cls):

@@ -1,6 +1,6 @@
 import ast
 import re
-from SearchBasedBugFixing.operators import standard_operators, experimental_operators
+from SearchBasedBugFixing.operatorsX import standard_operators, experimental_operators
 # import random
 
 def build_name_to_operator_map():
@@ -354,7 +354,7 @@ def mutationsCanBeApplied(setTokens: set):
     if ':' in setTokens: lstMutations.append('SIR'); lstToBeMutated.append(':'); weights.append(4) # make sure it is encompassed between square brackets
     if 'NUM' in setTokens: lstMutations.append('CNR'); lstToBeMutated.append('NUM'); weights.append(6)
     if 'return' in setTokens: lstMutations.append('RER'); lstToBeMutated.append('return'); weights.append(7)
-    if '==' in setTokens: lstMutations.append('MER'); lstToBeMutated.append('=='); weights.append(12)
+    if '==' in setTokens: lstMutations.append('MER'); lstToBeMutated.append('=='); weights.append(7)
 
     return lstMutations, weights, lstToBeMutated
 

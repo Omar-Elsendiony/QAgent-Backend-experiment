@@ -1,6 +1,6 @@
 import ast
 from random import choices
-from .utils import parentify
+from .utilsX import parentify
 
 def isInBody(node):
     parentBody = node.parent.body
