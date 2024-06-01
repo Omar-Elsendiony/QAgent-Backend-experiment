@@ -254,6 +254,7 @@ def update(cand, faultyLineLocations, weightsFaultyLineLocations, ops, name_to_o
         if f in idOcc.keys():
             op_f_list.append("IDR")
             op_f_weights.append(2)
+        
         if (op_f_list == []):
             continue
         
