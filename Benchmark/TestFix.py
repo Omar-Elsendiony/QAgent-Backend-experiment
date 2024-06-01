@@ -36,7 +36,7 @@ class TestFix:
         self.OutputFolder = "FeedbackOutput/"
         self.JSONFile = self.OutputFolder + "RunningLogs.json"
         self.CasesJSONFile = self.OutputFolder + "Cases.json"
-        OldGeneratedTestsFolder = "OutputTest/"
+        OldGeneratedTestsFolder = "Mixtral0Shots/OutputTest140-End/"
         self.OldCasesFile = OldGeneratedTestsFolder + "Cases.json"
         self.OldJsonFile = OldGeneratedTestsFolder + "RunningLogs.json"
         self.CasesLogs = pd.read_json(self.OldJsonFile)
