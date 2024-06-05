@@ -58,7 +58,6 @@ import subprocess
 @app.route('/query', methods=['POST'])
 def query():
     try:
-
         code = request.json['code']
         codes, tests = query_db(code)
         return jsonify({'codes': codes, 'tests': tests})

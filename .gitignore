@@ -9,6 +9,10 @@ __pycache__
 Results/
 Output/
 
+DBRet/M2TestCode
+DBRet/M2Testindex
+DBRet/CatlasJIndex8_clusters
+DBRet/catlasM2UniDedup
 *.bin
 classical/inputfunctions/
 classical/fitness/localsfiles/

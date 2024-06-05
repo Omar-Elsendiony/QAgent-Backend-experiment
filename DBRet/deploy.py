@@ -10,12 +10,13 @@ import re
 current_dir = os.path.dirname(__file__)
 PATH_M2Test=os.path.join(current_dir,'M2Testindex')
 
-# db = VecDB()
-# rng = np.random.default_rng(50)
-# vectors = rng.random((10**4, 70), dtype=np.float32)
-# records_dict = [{"id": i, "embed": list(row)} for i, row in enumerate(vectors)]
-# db.insert_records(records_dict)
-db = VecDB(file_path = PATH_M2Test,new_db=False)
+Path_CatlasJ=os.path.join(current_dir,'CatlasJIndex8_clusters')
+Path_CatlasPy=os.path.join(current_dir,'CatlasPyIndex5_clusters')
+
+if os.path.exists(Path_CatlasJ):
+  Jdb = VecDB(file_path = Path_CatlasJ,new_db=False)
+  Pydb=VecDB(file_path = Path_CatlasPy,new_db=False)
+
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 model = UniXcoder("microsoft/unixcoder-base")
 model.to(DEVICE)
@@ -30,22 +31,22 @@ def get_embeddings(model,tokens,device=DEVICE):
 
 # # Get the directory where Graph.py is located
 M2TestCodeDir = os.path.join(current_dir, "M2TestCode")
-M2CodeFiles=os.listdir(M2TestCodeDir)
 # the files in the directory are named as test1.py, test2.py, test3.py, ... We sort according to number
-M2CodeFiles=sorted(M2CodeFiles, key=lambda x: int(re.search(r'\d+', x).group()))
+# M2CodeFiles=sorted(M2CodeFiles, key=lambda x: int(re.search(r'\d+', x).group()))
 
+CatlasJCodeDir = os.path.join(current_dir, "catlasM2UniDedup")
 
 def query_db(code):
-    global db, model, DEVICE
+    global Jdb,Pydb, model, DEVICE
     query = get_embeddings(model, code, DEVICE)
     query = query.numpy()
-    db_ids = db.retrieve(query, 3)
+    db_ids = Jdb.retrieve(query, 3)
     # print(db_ids)
     codes=[]
     tests=[]
     for id in db_ids:
         # open json
-        with open(os.path.join(M2TestCodeDir, M2CodeFiles[id])) as f:
+        with open(os.path.join(CatlasJCodeDir, f"test{id}.json")) as f:
             data = json.load(f)
             codes.append(data["code"])
             test=data["test_cases"]
