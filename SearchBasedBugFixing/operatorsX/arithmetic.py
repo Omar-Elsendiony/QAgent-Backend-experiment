@@ -275,7 +275,7 @@ class AugmentedAssignReplacement(ArithmeticOperator):
         else:
             return node
     
-        
+
 
     @classmethod
     def name(cls):
