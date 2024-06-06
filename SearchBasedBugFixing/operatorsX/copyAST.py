@@ -38,6 +38,12 @@ class copyMutation(ast.NodeTransformer):
     def visit_Dict(self, node):
         return ast.copy_location(ast.Dict(keys=[self.visit(x) for x in node.keys], values=[self.visit(x) for x in node.values]), node)
 
+    def visit_Load(self, node):
+        return ast.copy_location(ast.Load(), node)
+    
+    def visit_func(self, node):
+        return ast.copy_location(ast.FunctionType(name=node.name, args=node.args, body=[self.visit(x) for x in node.body], decorator_list=[self.visit(x) for x in node.decorator_list]), node)
+
     def visit_Attribute(self, node):
         return ast.copy_location(ast.Attribute(value=self.visit(node.value), attr=node.attr, ctx=node.ctx), node)
 

@@ -90,7 +90,14 @@ class baseOperator(ast.NodeVisitor):
         """
         This method is responsible for checking if the current line is the line we want to mutate.
         """
+        if (specifiedOp == 'FAR'):
+
+            if (line_no == self.target_node_lineno):
+                return True
+            else:
+                return False
         if line_no == self.target_node_lineno:
+
             if (specifiedOp is not None):
                 if (self.specifiedOperator == specifiedOp):
                     if (self.indexMutation == self.currentIndex):

@@ -114,9 +114,13 @@ def generate_fixbugs():
     # print(outputs)
     code = request.json.get('code')
     inputs = request.json.get('test_cases_inputs')
+    print(inputs)
     for i, input in enumerate(inputs):
         for j, inp in enumerate(input):
-            inputs[i][j] = eval(inputs[i][j])
+            if inputs[i][j].lower() == 'void':
+                inputs[i][j] = 'void'
+            else:
+                inputs[i][j] = eval(inputs[i][j])
             
     outputs = request.json.get('test_cases_outputs')
     for i, output in enumerate(outputs):
