@@ -41,6 +41,7 @@ def insertNode(parent_node):
         candInsertNode = choice(candInsertNodes)
         if (candInsertNode.__class__.__name__ != "While" and candInsertNode.__class__.__name__ != "If"):
             break
+
     if vesselNode.parent == candInsertNode or vesselNode is candInsertNode:
         return False
     # choose a random line in the vessel to insert your new code into

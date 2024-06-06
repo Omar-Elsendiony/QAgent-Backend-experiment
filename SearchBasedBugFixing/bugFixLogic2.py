@@ -212,7 +212,7 @@ def update(cand, faultyLineLocations, weightsFaultyLineLocations, ops, name_to_o
     limitKPossible = len(faultyLineLocations)
     locationsExtracted = limitKPossible  if (limitKPossible < limitLocations) else limitLocations
     # choose from the locations based on a parameter sent by the user which sould not exceed max length, that is why a limit cap is present
-    locs = random.choices(faultyLineLocations, weights = weightsFaultyLineLocations, k=1)
+    locs = random.choices(faultyLineLocations, weights = weightsFaultyLineLocations, k=locationsExtracted)
 
     # candidate that will be mutated
     cand_dash = None
@@ -328,10 +328,14 @@ def insert(cand:str, pool:set):  # helper function to mutate the code
     isOk = InsertVisitor.insertNode(cand_ast)
     # add to the possible candidates
     if (isOk):
-        pool.append(cand_ast)
         cand_ast.type_ignores = []
         # add the line numbers
-        ast.fix_missing_locations(cand_ast)
+        try:
+            ast.fix_missing_locations(cand_ast)
+        except RecursionError as e:
+        # print(f"Maximum recursion depth reached: {n}")
+            return
+        pool.append(cand_ast)
     return
 
 def swap(cand:str, pool:set):  # helper function to mutate the code
@@ -355,7 +359,7 @@ def mutate(cand:str, ops:Callable, name_to_operator:Dict, faultyLineLocations: L
     availableChoices = {"1": "Insertion", "2": "Swap", "3": "Update"}
     weightsMutation = [0.01, 0.01, 0.98]
     choiceMutation = random.choices(list(availableChoices.keys()), weights=weightsMutation, k=1)[0]
-    if availableChoices[choiceMutation] == "Update" or availableChoices[choiceMutation] == "Insertion":
+    if availableChoices[choiceMutation] == "Update":
         update(
             cand=cand,
             faultyLineLocations=faultyLineLocations,

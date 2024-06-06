@@ -4,6 +4,7 @@ import keyword
 
 class IdentifierVisitor(ast.NodeVisitor):
     def __init__(self):
+        self.types = ['int', 'str', 'list', 'set', 'tuple', 'bool', 'True', 'False']
         # self.assignmentIdentifiers = set()
         # self.unknownIdentifiers = set()
         # self.unknownIdentifiersOccurences = dict()
@@ -14,7 +15,7 @@ class IdentifierVisitor(ast.NodeVisitor):
 
     def visit_Name(self, node):
         # print(node.lineno)
-        if (isinstance(node.parent, ast.Call) and node is not node.parent.func) or (isinstance(node.parent, ast.Tuple) and hasattr(node.parent, 'dims')):
+        if (isinstance(node.parent, ast.Call) and node is not node.parent.func) or (isinstance(node.parent, ast.Tuple) and hasattr(node.parent, 'dims') and node.id not in keyword.kwlist and node.id not in self.types):
             self.functionIdentifiers.append(node.id)
             if self.functionIdentifiersOccurences.get(node.lineno) is None:
                 self.functionIdentifiersOccurences[node.lineno] = 0
@@ -27,7 +28,7 @@ class IdentifierVisitor(ast.NodeVisitor):
             else:
                 self.identifiersOccurences[node.lineno] += 1
         else:
-            if (isinstance(node.parent, ast.Call) or isinstance(node.parent, ast.FunctionDef) or isinstance(node.parent, ast.Subscript) or node.id in keyword.kwlist):
+            if (isinstance(node.parent, ast.Call) or isinstance(node.parent, ast.FunctionDef) or isinstance(node.parent, ast.Subscript) or node.id in keyword.kwlist or node.id in self.types):
                 return node
             
             self.identifiers.append(node.id)
