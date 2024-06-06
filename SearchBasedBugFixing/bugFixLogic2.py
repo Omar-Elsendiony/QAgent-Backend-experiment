@@ -134,7 +134,9 @@ def fitness_testCasesPassed(program:str, program_name:str, inputs:List, outputs:
                 if (compare_input_output(eval(res), outputs[i])):
                     passedTests += 1
         except Exception as e:
-            print(e)
+            # print(res)
+            # print(editedProgram)
+            # print(e)
             return 0
     # print(eval(res))
     # if (eval(res) is None and passedTests == 0):
@@ -516,6 +518,11 @@ def bugFix(buggyProgram, methodUnderTestName, inputs, outputs):
     # print(inputs)
     # print(outputs)
 
+    try:
+        ast.parse(buggyProgram)
+    except:
+        print('Syntax Error in the code')
+        return 0
     error = faultLocalizationUtilities.main(
         code=buggyProgram,
         inputs = inputs, 

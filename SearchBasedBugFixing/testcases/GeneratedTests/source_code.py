@@ -1,7 +1,6 @@
-def return_list_1_to_10_except_5():
-    lst = []
-    for i in range(1, 11):
-        if i != 5:
-            break        
-        lst.append(i)
-    return lst
+def find_even(numbers):
+    for num in numbers:
+        if isinstance(num, int):  # Check if the element is an integer
+            if num % 2 == 0:
+                break
+    return num

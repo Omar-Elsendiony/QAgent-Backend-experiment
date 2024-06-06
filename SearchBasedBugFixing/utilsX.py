@@ -272,8 +272,8 @@ def mutationsCanBeApplied(setTokens: set):
     if 'if' in setTokens: lstMutations.append('COD') ; lstToBeMutated.append('if'); weights.append(0.01)
     if 'for' in setTokens: lstMutations.append('LOD'); lstToBeMutated.append('for'); weights.append(0.01)
     if 'while' in setTokens: lstMutations.append('LOD'); lstToBeMutated.append('while'); weights.append(0.01)
-    # if 'for' in setTokens: lstMutations.extend(['OIL', 'RIL', 'ZIL']); lstToBeMutated.extend(['for', 'for', 'for']); weights.extend([0.01, 0.01, 0.01])
-    # if 'while' in setTokens: lstMutations.extend(['OIL', 'RIL', 'ZIL']); lstToBeMutated.extend(['while', 'while', 'while']); weights.extend([0.01, 0.01, 0.01])
+    if 'for' in setTokens: lstMutations.extend(['OIL', 'RIL', 'ZIL']); lstToBeMutated.extend(['for', 'for', 'for']); weights.extend([0.01, 0.01, 0.01])
+    if 'while' in setTokens: lstMutations.extend(['OIL', 'RIL', 'ZIL']); lstToBeMutated.extend(['while', 'while', 'while']); weights.extend([0.01, 0.01, 0.01])
 
     ################ ARITHMETIC OPERATORS ###########################
     if '+' in setTokens: lstMutations.append('ADD'); lstToBeMutated.extend(['+', '+']); lstMutations.append('ARD')

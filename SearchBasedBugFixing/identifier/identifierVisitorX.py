@@ -1,4 +1,6 @@
 import ast
+import keyword
+
 
 class IdentifierVisitor(ast.NodeVisitor):
     def __init__(self):
@@ -25,7 +27,7 @@ class IdentifierVisitor(ast.NodeVisitor):
             else:
                 self.identifiersOccurences[node.lineno] += 1
         else:
-            if (isinstance(node.parent, ast.Call) or isinstance(node.parent, ast.FunctionDef) or isinstance(node.parent, ast.Subscript)):
+            if (isinstance(node.parent, ast.Call) or isinstance(node.parent, ast.FunctionDef) or isinstance(node.parent, ast.Subscript) or node.id in keyword.kwlist):
                 return node
             
             self.identifiers.append(node.id)
