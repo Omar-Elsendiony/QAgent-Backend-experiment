@@ -10,10 +10,14 @@ app = Flask(__name__)
 # from MainFunctions.DecisionMaker import *
 # from MainFunctions.BugFix import *
 from classical.main import main_for_api
+# from DBRet import DiskANN,unixcoder
+from DBRet.deploy import *
+from cluster import Cluster
 # from SearchBasedBugFixing.bugFixLogic import *
 CORS(app)  # enable CORS
 import subprocess
 
+#region QAgent
 # def setupQAgent():
 #     try:
 #         print("All imports successful!")
@@ -51,9 +55,8 @@ import subprocess
 #     else:
 #         return jsonify({'error': 'No code provided'}), 400
 
+#endregion
 
-# from DBRet import DiskANN,unixcoder
-# from DBRet.deploy import *
 
 @app.route('/query', methods=['POST'])
 def query():
@@ -90,19 +93,7 @@ def generate_classical():
         return jsonify({'error': 'No code provided'}), 400
 
 
-code = """def simple_function(x, y):
-    query = "SELECT * FROM products WHERE id=" +  str(x) + " AND name='" + str(y) + "'"
-    query += "'; DROP TABLE users; --"
 
-    a = x + y
-    os.system("echo Hello from the system!")
-    if x == 0:
-        print("x is zero!")
-    b = x * y
-    c = eval(input("Enter an expression: "))
-    return a, b
- """
-# print(main_vul(code))
 
 @app.route('/run-fixbugs', methods=['POST'])
 def generate_fixbugs():
@@ -160,6 +151,20 @@ def generate_fixbugs():
     else:
         return jsonify({'error': 'No code provided'}), 400
 
+
+code = """def simple_function(x, y):
+    query = "SELECT * FROM products WHERE id=" +  str(x) + " AND name='" + str(y) + "'"
+    query += "'; DROP TABLE users; --"
+
+    a = x + y
+    os.system("echo Hello from the system!")
+    if x == 0:
+        print("x is zero!")
+    b = x * y
+    c = eval(input("Enter an expression: "))
+    return a, b
+ """
+# print(main_vul(code))
 # generate_fixbugs()
 
 if __name__ == '__main__':
