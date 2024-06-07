@@ -140,24 +140,17 @@ def generate_fixbugs():
                 # Access the stdout and stderr attributes of the result
                 
                 stdout = result.stdout
-                print(stdout)
+                # print(stdout)
                 stderr = result.stderr
                 print(stderr)
                 
                 result = stdout
-                print(result)
+                # print(result)
             except subprocess.CalledProcessError as e:
                 print("Error:", e)
             except Exception as e:
                 print("Error:", e)
-            # try:
-            #     outs, errs = p.communicate(timeout=3)
-            # except TimeoutExpired:
-            #     kill(p.pid)
-            #     return -1; # means there is error incurred
-            # return 0 # means no error
-            # result = bugFix(code, function_name, inputs, outputs)
-            # result = main_vul(code)
+            
             print(result)
             if (result == ''):
                 return jsonify({'output': 'No Fixes found'})

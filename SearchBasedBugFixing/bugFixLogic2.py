@@ -18,10 +18,14 @@ import sys
 from io import StringIO
 import signal
 import sys
+# import time
+
 
 def handler(signum, frame):
     # print('Signal handler called with signal', signum)
     raise Exception("Infinite loop may occured!")
+
+signal.signal(signal.SIGALRM, handler)
 
 def runCode(code: str, myglobals):
     # save the old stdout that is reserved
@@ -36,18 +40,24 @@ def runCode(code: str, myglobals):
     isError = False
     if (myglobals.get('res')):
         del myglobals['res']
+    # start = time.time()
     try:
         # thread.start()
-        signal.signal(signal.SIGALRM, handler)
-        signal.setitimer(signal.ITIMER_REAL, 0.05)
+        signal.setitimer(signal.ITIMER_REAL, 0.03)
         exec(code, myglobals)
         # signal.alarm(0)
         signal.setitimer(signal.ITIMER_REAL, 0)
 
         result = redirectedOutput.getvalue()
     except Exception as e:
+        signal.setitimer(signal.ITIMER_REAL, 0)
         isError = True
         result = repr(e)
+        if (myglobals.get('testcase')):
+            del myglobals['testcase']
+        sys.stdout = oldStdOUT
+        sys.stderr = oldStdERR
+        return result, isError
     except SystemExit as s:
         isError = True
         result = redirectedOutput2.getvalue()
@@ -64,6 +74,58 @@ def runCode(code: str, myglobals):
     sys.stderr = oldStdERR
 
     return result, isError
+
+
+# import sys
+# import signal
+# import multiprocessing
+# from io import StringIO
+
+# Function to execute the code with timeout handling
+# def execute_code(code, myglobals, return_dict):
+#     # Redirect stdout and stderr
+#     old_stdout = sys.stdout
+#     old_stderr = sys.stderr
+#     sys.stdout = StringIO()
+#     sys.stderr = StringIO()
+#     result = ""
+#     is_error = False
+
+#     try:
+#         exec(code, myglobals)
+#         result = sys.stdout.getvalue()
+#     except Exception as e:
+#         is_error = True
+#         result = repr(e)
+#     except SystemExit as s:
+#         is_error = True
+#         result = sys.stderr.getvalue()
+#     except KeyboardInterrupt as k:
+#         is_error = True
+#         result = "timed out"
+#     finally:
+#         # Restore stdout and stderr
+#         sys.stdout = old_stdout
+#         sys.stderr = old_stderr
+
+#     return_dict['result'] = result
+#     return_dict['is_error'] = is_error
+
+# # Function to run the code with a timeout
+# def runCode(code: str, myglobals, timeout=0.05):
+#     manager = multiprocessing.Manager()
+#     return_dict = manager.dict()
+#     process = multiprocessing.Process(target=execute_code, args=(code, myglobals, return_dict))
+    
+#     process.start()
+#     process.join(timeout)
+
+#     if process.is_alive():
+#         process.terminate()
+#         return "timed out", True
+    
+#     return return_dict['result'], return_dict['is_error']
+
 ####################################################################
 def editFreq(cand):
     ## TODO ##
@@ -104,7 +166,10 @@ def fitness_testCasesPassed(program:str, program_name:str, inputs:List, outputs:
                     editedProgram = program + f'\n\nres = {program_name}()\n\nprint(res)'
                 else:
                     editedProgram = program + f'\n\ntestcase = {testcase}\nres = {program_name}({testcase})\n\nprint(res)'
-                res, isError = runCode(editedProgram, globals())
+                try:
+                    res, isError = runCode(editedProgram, globals())
+                except:
+                    pass
                 if (isError):
                     return 0
                 res = res.strip()
@@ -122,8 +187,10 @@ def fitness_testCasesPassed(program:str, program_name:str, inputs:List, outputs:
                     output_out = f'input_{argIndex},'
                     outputStrings += output_out
                 editedProgram = program + '\n' + inputStrings + f'\nres = {program_name}({outputStrings})\n\nprint(res)'
-
-                res, isError = runCode(editedProgram, globals())
+                try:
+                    res, isError = runCode(editedProgram, globals())
+                except:
+                    pass
                 res = res.strip()
                 # this mutation is of no avail and caused error
                 if (isError):
@@ -193,7 +260,6 @@ def passesNegTests(program:str, program_name:str, inputs:List, outputs:List) -> 
                     return False
         except Exception as e:
             return False
-    # print(eval(res))
     return True
 
 
@@ -441,22 +507,21 @@ def main(BugProgram:str,
                 parsedCand = candpool
             poolMod.append(parsedCand)
             scores.append(fitness_testCasesPassed(parsedCand, MethodUnderTestName, inputs, outputs) * 10 + 1) # why +10, just to make it non-zero and also relatively, it stays the same.
-            # except Exception as e:
-                # print('1')
-                # print(e)
-                # print(candpool)
-                # print(parsedCand)
-                # print('--------------------------')
-                # pass
-        # if (poolMod == []):
-        #     return cand
-        choice = random.choices(range(len(poolMod)), weights = scores, k=1)[0]
-        Pop.append((poolMod[choice]))  # mutate the population
+            # except:
+            #     pass
+        if (poolMod == []):
+            Pop.append(BugProgram)
+        else:
+            choice = random.choices(range(len(poolMod)), weights = scores, k=1)[0]
+            Pop.append((poolMod[choice]))  # mutate the population
 
     # print(len(Pop))
     number_of_iterations = 0
     mutationCandidates = []
-    while len(Solutions) < M and number_of_iterations < 4:
+    
+    # print('ok')
+
+    while len(Solutions) < M and number_of_iterations < 1:
         # print(number_of_iterations)
         for p_index, p in enumerate(Pop):
             # if not passesTests[p_index]:
@@ -481,28 +546,32 @@ def main(BugProgram:str,
                         scores = [] # list of scores that will be used to choose the candidate to be selected
                         poolMod = []
                         for candpool in mutationCandidates:
-                            try:
-                                if (type(candpool) is not str):
-                                    parsedCand = ast.unparse(candpool)
-                                else: parsedCand = candpool
-                                poolMod.append(parsedCand)
-                                scores.append(fitness_testCasesPassed(parsedCand, MethodUnderTestName, inputs, outputs) * 10 + 1) # why +10, just to make it non-zero and also relatively, it stays the same.
-                            except Exception as e:
-                                print('2')
-                                print(e)
-                                pass
+                            # try:
+                            if (type(candpool) is not str):
+                                parsedCand = ast.unparse(candpool)
+                            else: parsedCand = candpool
+                            poolMod.append(parsedCand)
+                            scores.append(fitness_testCasesPassed(parsedCand, MethodUnderTestName, inputs, outputs) * 10 + 1) # why +10, just to make it non-zero and also relatively, it stays the same.
+                            # except Exception as e:
+                            #     # print('2')
+                            #     # print(e)
+                            #     pass
                         # if (poolMod == []):
                         #     return cand
-                        choice = random.choices(range(len(poolMod)), weights = scores, k=10)
+                        numberMutate = 10
+                        if (len(poolMod) < 10):
+                            numberMutate = len(poolMod)
+                        choice = random.choices(range(len(poolMod)), weights = scores, k=numberMutate)
                         # print(choice)
                         addedindex = 0
-                        for i in range(0, 10):
-                            if Pop[p_index - i] in Solutions:
+                        for i in range(0, numberMutate):
+                            while Pop[p_index - i - addedindex] in Solutions:
                                 addedindex += 1
                             Pop[p_index - (i+addedindex)] = (poolMod[choice[i]])
                         mutationCandidates = []
                     
         number_of_iterations += 1
+        # print(number_of_iterations)
     # print(Pop)
     return Solutions, Pop
 
@@ -517,7 +586,6 @@ def bugFix(buggyProgram, methodUnderTestName, inputs, outputs):
     outputs = ast.literal_eval(outputs)
     # print(inputs)
     # print(outputs)
-
     try:
         ast.parse(buggyProgram)
     except:
@@ -568,4 +636,5 @@ def bugFix(buggyProgram, methodUnderTestName, inputs, outputs):
         if (i == 10):
             break
     
+
     return '\n'.join(list(solutions))

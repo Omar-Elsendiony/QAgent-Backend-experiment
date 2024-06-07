@@ -262,16 +262,21 @@ class UnaryOperator(ast.NodeTransformer):
     
 
 class AugmentedAssignReplacement(ArithmeticOperator):
-    mutations = [ast.BitXor(), ast.Add(), ast.Sub(), ast.Mult(), ast.Div(), ast.FloorDiv(), ast.Mod(), ast.Pow(), ast.BitAnd(), ast.BitOr(), ast.LShift(), ast.RShift()]
-
+    mutations = [ast.Add, ast.Sub, ast.Mult, ast.Div, ast.FloorDiv, ast.Mod, ast.Pow]
+    mutations2 = [ast.BitXor, ast.BitOr, ast.LShift, ast.RShift, ast.BitAnd]
+    
     def visit_AugAssign(self, node):
         lineno = getattr(node, 'lineno', None)
         if (lineno is None): parent = getattr(node, 'parent', None); lineno = getattr(parent, 'lineno', None)
         if self.wanted_line(lineno):
             self.finishedMutation = True
-            # self.mutatedSet.add(node)
-            mutation = self.choose_mutation_random_dist(AugmentedAssignReplacement.mutations)
-            return ast.AugAssign(target=self.visit(node.target), op=mutation, value=self.visit(node.value))
+            # print(type(node.op))
+            # print(ast.Add)
+            if (type(node.op) in AugmentedAssignReplacement.mutations2):
+                mutation = self.choose_mutation_random_dist(AugmentedAssignReplacement.mutations2)
+            else:
+                mutation = self.choose_mutation_random_dist(AugmentedAssignReplacement.mutations)
+            return ast.AugAssign(target=self.visit(node.target), op=mutation(), value=self.visit(node.value))
         else:
             return node
     

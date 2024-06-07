@@ -4,8 +4,13 @@ from .utilsX import parentify
 
 
 def isInBody(node):
-    for child in node.parent.body:
-        if (child is node):
+    parentBody = node.parent.body
+    if (isinstance(parentBody, list)):
+        for child in parentBody:
+            if (child is node):
+                return True
+    else:
+        if (parentBody is node):
             return True
     return False
 
@@ -15,7 +20,7 @@ class InsertionVisitor(ast.NodeVisitor):
     handleLst = [] # handles for candidates that can be inserted in the body of the parent node
     setBodyNodes = set()  # set of nodes that can be the vessel for another statements
     def visit(self, node):
-        if (hasattr(node.parent, 'body') and node.__class__.__name__ != "FunctionDef" and node.__class__.__name__ != "Name"):  # check if it falls directly under a node that has body attr that can encompass it
+        if (hasattr(node.parent, 'body') and node.__class__.__name__ != "FunctionDef" and node.__class__.__name__ != "Name" and node.__class__.__name__ != "Call"):  # check if it falls directly under a node that has body attr that can encompass it
             if (isInBody(node)):
                 self.setBodyNodes.add(node.parent)
                 self.handleLst.append(node)

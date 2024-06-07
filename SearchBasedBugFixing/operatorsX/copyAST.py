@@ -28,6 +28,9 @@ class copyMutation(ast.NodeTransformer):
 
     def visit_List(self, node):
         return ast.copy_location(ast.List(elts=[self.visit(x) for x in node.elts], ctx=node.ctx), node)
+    
+    def visit_ListComp(self, node):
+        return ast.copy_location(ast.ListComp(elt=self.visit(node.elt), generators=[self.visit(x) for x in node.generators]), node)
 
     def visit_Tuple(self, node):
         return ast.copy_location(ast.Tuple(elts=[self.visit(x) for x in node.elts], ctx=node.ctx), node)
@@ -275,7 +278,7 @@ class copyMutation(ast.NodeTransformer):
         return ast.copy_location(ast.NotIn(), node)
     
     def visit_comprehension(self, node: ast.comprehension):
-        return ast.copy_location(ast.comprehension(target=self.visit(node.target), iter=self.visit(node.iter), ifs=[self.visit(x) for x in node.ifs]), node)
+        return ast.copy_location(ast.comprehension(target=self.visit(node.target), iter=self.visit(node.iter), ifs=[self.visit(x) for x in node.ifs], is_async = node.is_async), node)
     
     def visit_MatchAs(self, node: ast.MatchAs):
         return ast.copy_location(ast.MatchAs(), node)
