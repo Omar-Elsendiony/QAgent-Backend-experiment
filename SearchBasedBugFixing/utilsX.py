@@ -1,6 +1,6 @@
 import ast
 import re
-from SearchBasedBugFixing.operatorsX import standard_operators, experimental_operators
+from operatorsX import standard_operators, experimental_operators
 # import random
 
 def build_name_to_operator_map():
@@ -272,9 +272,11 @@ def mutationsCanBeApplied(setTokens: set):
     if 'if' in setTokens: lstMutations.append('COD') ; lstToBeMutated.append('if'); weights.append(0.01)
     if 'for' in setTokens: lstMutations.append('LOD'); lstToBeMutated.append('for'); weights.append(0.01)
     if 'while' in setTokens: lstMutations.append('LOD'); lstToBeMutated.append('while'); weights.append(0.01)
-    if 'for' in setTokens: lstMutations.extend(['OIL', 'RIL', 'ZIL']); lstToBeMutated.extend(['for', 'for', 'for']); weights.extend([0.01, 0.01, 0.01])
-    if 'while' in setTokens: lstMutations.extend(['OIL', 'RIL', 'ZIL']); lstToBeMutated.extend(['while', 'while', 'while']); weights.extend([0.01, 0.01, 0.01])
-
+    # if 'for' in setTokens: lstMutations.extend(['OIL', 'RIL', 'ZIL']); lstToBeMutated.extend(['for', 'for', 'for']); weights.extend([0.01, 0.01, 0.01])
+    # if 'while' in setTokens: lstMutations.extend(['OIL', 'RIL', 'ZIL']); lstToBeMutated.extend(['while', 'while', 'while']); weights.extend([0.01, 0.01, 0.01])
+    if 'for' in setTokens: lstMutations.extend(['RIL']); lstToBeMutated.extend(['for']); weights.extend([0.01])
+    if 'while' in setTokens: lstMutations.extend(['RIL']); lstToBeMutated.extend(['while']); weights.extend([0.01])
+    
     ################ ARITHMETIC OPERATORS ###########################
     if '+' in setTokens: lstMutations.append('ADD'); lstToBeMutated.extend(['+', '+']); lstMutations.append('ARD')
     if '-' in setTokens: lstMutations.append('SUB'); lstToBeMutated.extend(['-', '-']) ; lstMutations.append('ARD')
@@ -354,7 +356,7 @@ def mutationsCanBeApplied(setTokens: set):
     if ':' in setTokens: lstMutations.append('SIR'); lstToBeMutated.append(':'); weights.append(4) # make sure it is encompassed between square brackets
     if 'NUM' in setTokens: lstMutations.append('CNR'); lstToBeMutated.append('NUM'); weights.append(6)
     if 'return' in setTokens: lstMutations.append('RER'); lstToBeMutated.append('return'); weights.append(7)
-    if '==' in setTokens: lstMutations.append('MER'); lstToBeMutated.append('=='); weights.append(7)
+    if '!=' in setTokens: lstMutations.append('MER'); lstToBeMutated.append('!='); weights.append(7)
 
     return lstMutations, weights, lstToBeMutated
 

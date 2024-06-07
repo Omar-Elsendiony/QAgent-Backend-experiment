@@ -7,11 +7,14 @@ def find_first_even(numbers):
                 break
     return 0
 
-c = find_first_even([2,4, 9])  # Expected output: 0
-print(c)
 
-import keyword
-if 'str' in keyword.kwlist:
-    print('ok')
+def is_prime(n:int)->bool:
+    if n < 2:
+        return False
+    for k in range(2, n - 1):
+        if n / k == 2:
+            return False
+    return True
 
-print(keyword.kwlist)
+
+print(is_prime(8))

@@ -39,7 +39,7 @@ def runCode(code: str, myglobals):
     try:
         # thread.start()
         signal.signal(signal.SIGALRM, handler)
-        signal.setitimer(signal.ITIMER_REAL, 0.15)
+        signal.setitimer(signal.ITIMER_REAL, 0.05)
         exec(code, myglobals)
         # signal.alarm(0)
         signal.setitimer(signal.ITIMER_REAL, 0)
@@ -65,9 +65,6 @@ def runCode(code: str, myglobals):
 
     return result, isError
 ####################################################################
-
-
-
 def editFreq(cand):
     ## TODO ##
     pass
@@ -398,7 +395,6 @@ def mutate(cand:str, ops:Callable, name_to_operator:Dict, faultyLineLocations: L
 
 
 
-# @profile
 def main(BugProgram:str, 
         MethodUnderTestName:str, 
         FaultLocations:List,
@@ -407,7 +403,7 @@ def main(BugProgram:str,
         outputs:List, 
         FixPar:Callable,
         ops:Callable,
-        popSize:int = 2510, 
+        popSize:int = 3000, 
         M:int = 1,
         E:int = 10, 
         L:int = 5):
@@ -460,7 +456,7 @@ def main(BugProgram:str,
     # print(len(Pop))
     number_of_iterations = 0
     mutationCandidates = []
-    while len(Solutions) < M and number_of_iterations < 3:
+    while len(Solutions) < M and number_of_iterations < 4:
         # print(number_of_iterations)
         for p_index, p in enumerate(Pop):
             # if not passesTests[p_index]:
