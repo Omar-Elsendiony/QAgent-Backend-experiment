@@ -323,7 +323,10 @@ def update(cand, faultyLineLocations, weightsFaultyLineLocations, ops, name_to_o
 def insert(cand:str, pool:set):  # helper function to mutate the code
     # insert will be updated once more to add in certain locations
     # parse the candidate
-    cand_ast = ast.parse(cand)
+    try:
+        cand_ast = ast.parse(cand)
+    except:
+        return
     # add type ignores
     cand_ast.type_ignores = []
     # call the function that will insert the node and this function is present in the library insert visitor
@@ -425,6 +428,7 @@ def main(BugProgram:str,
     E : int :  number of seeded candidates to the initial population
     L: int: number of locations considered in the mutation step
     """
+    storedBugProgram = "".join((c for c in BugProgram)) 
     Solutions = set() # set of solutions
     # passesTests = [0] * popSize
     Pop = []  # population
@@ -458,7 +462,7 @@ def main(BugProgram:str,
     number_of_iterations = 0
     mutationCandidates = []
     
-    while len(Solutions) < M and number_of_iterations < 1:
+    while len(Solutions) < M and number_of_iterations < 4:
         # print(number_of_iterations)
         for p_index, p in enumerate(Pop):
             # print(p_index)
