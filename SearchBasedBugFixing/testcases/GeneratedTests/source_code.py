@@ -1,9 +1,12 @@
-def knapsack(capacity, items): 
-    from collections import defaultdict 
-    memo = defaultdict(int) 
-    for i in range(1, len(items) + 1): 
-        weight, value = items[i - 1] 
-        for j in range(1, capacity + 1):
-            memo[i, j] = memo[i - 1, j] 
-            if weight < j: memo[i, j] = max( memo[i, j], value + memo[i - 1, j - weight] )
-    return memo[len(items), capacity]
+def find_in_sorted(arr, x):
+    def binsearch(start, end):
+        if start == end:
+            return -1
+        mid = start + (end - start) // 2
+        if x < arr[mid]:
+            return binsearch(start, mid)
+        elif x > arr[mid]:
+            return binsearch(mid, end)
+        else:
+            return mid
+    return binsearch(0, len(arr))

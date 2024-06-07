@@ -408,12 +408,12 @@ def main(BugProgram:str,
         FaultLocations:List,
         weightsFaultyLocations:List,
         inputs:List, 
-        outputs:List, 
+        outputs:List,
         FixPar:Callable,
         ops:Callable,
         popSize:int = 3000, 
         M:int = 1,
-        E:int = 10, 
+        E:int = 400, 
         L:int = 5):
     """
     Inputs:
@@ -513,7 +513,6 @@ def main(BugProgram:str,
         number_of_iterations += 1
         # print('------------------------------------------------------------------------------')
         # print(number_of_iterations)
-    # print(Pop)
     return Solutions, Pop
 
 

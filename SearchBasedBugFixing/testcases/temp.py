@@ -35,14 +35,40 @@ def knapsack(capacity, items):
     return memo[len(items), capacity]
 
 
-def lcs_length(s, t):
-    from collections import Counter
-    dp = Counter()
-    for i in range(len(s)):
-        for j in range(len(t)):
-            if s[i] == t[j]:
-                dp[i, j] = dp[i - 1, j] + 1
-    return max(dp.values()) if dp else 0
+def find_in_sorted(arr, x):
+    def binsearch(start, end):
+        if start == end:
+            return -1
+        mid = start + (end - start) // 2
+        if x < arr[mid]:
+            return binsearch(start, mid)
+        elif x > arr[mid]:
+            return binsearch(mid, end)
+        else:
+            return mid
+
+    return binsearch(0, len(arr))
+
+def flatten(arr):
+    for x in arr:
+        if isinstance(x, list):
+            for y in flatten(x):
+                yield y
+        else:
+            yield flatten(x)
+
+def find_first_in_sorted(arr, x):
+    lo = 0
+    hi = len(arr)
+    while lo <= hi:
+        mid = (lo + hi) // 2
+        if x == arr[mid] and (mid == 0 or x != arr[mid - 1]):
+            return mid
+        elif x <= arr[mid]:
+            hi = mid
+        else:
+            lo = mid + 1
+    return -1
 
 
 def is_prime(n:int)->bool:
