@@ -33,7 +33,7 @@ def runCode(code: str, myglobals):
     # get the redirected output instance
     redirectedOutput = sys.stdout = StringIO()
     oldStdERR = sys.stderr
-    redirectedOutput2 = sys.stderr = StringIO()
+    # redirectedOutput2 = sys.stderr = StringIO()
     # result is initially empty
     result = ""
     # there is error
@@ -43,11 +43,9 @@ def runCode(code: str, myglobals):
     # start = time.time()
     try:
         # thread.start()
-        signal.setitimer(signal.ITIMER_REAL, 0.03)
+        signal.setitimer(signal.ITIMER_REAL, 0.05)
         exec(code, myglobals)
-        # signal.alarm(0)
         signal.setitimer(signal.ITIMER_REAL, 0)
-
         result = redirectedOutput.getvalue()
     except Exception as e:
         signal.setitimer(signal.ITIMER_REAL, 0)
@@ -58,81 +56,20 @@ def runCode(code: str, myglobals):
         sys.stdout = oldStdOUT
         sys.stderr = oldStdERR
         return result, isError
-    except SystemExit as s:
-        isError = True
-        result = redirectedOutput2.getvalue()
-    except KeyboardInterrupt as k:
-        isError = True
-        result = "timed out"
-        # print('timey')
-    # thread.stop()
-    # signal.alarm(0)
-    signal.setitimer(signal.ITIMER_REAL, 0)
+
     if (myglobals.get('testcase')):
         del myglobals['testcase']
     sys.stdout = oldStdOUT
     sys.stderr = oldStdERR
-
     return result, isError
-
-
-# import sys
-# import signal
-# import multiprocessing
-# from io import StringIO
-
-# Function to execute the code with timeout handling
-# def execute_code(code, myglobals, return_dict):
-#     # Redirect stdout and stderr
-#     old_stdout = sys.stdout
-#     old_stderr = sys.stderr
-#     sys.stdout = StringIO()
-#     sys.stderr = StringIO()
-#     result = ""
-#     is_error = False
-
-#     try:
-#         exec(code, myglobals)
-#         result = sys.stdout.getvalue()
-#     except Exception as e:
-#         is_error = True
-#         result = repr(e)
-#     except SystemExit as s:
-#         is_error = True
-#         result = sys.stderr.getvalue()
-#     except KeyboardInterrupt as k:
-#         is_error = True
-#         result = "timed out"
-#     finally:
-#         # Restore stdout and stderr
-#         sys.stdout = old_stdout
-#         sys.stderr = old_stderr
-
-#     return_dict['result'] = result
-#     return_dict['is_error'] = is_error
-
-# # Function to run the code with a timeout
-# def runCode(code: str, myglobals, timeout=0.05):
-#     manager = multiprocessing.Manager()
-#     return_dict = manager.dict()
-#     process = multiprocessing.Process(target=execute_code, args=(code, myglobals, return_dict))
-    
-#     process.start()
-#     process.join(timeout)
-
-#     if process.is_alive():
-#         process.terminate()
-#         return "timed out", True
-    
-#     return return_dict['result'], return_dict['is_error']
 
 ####################################################################
 def editFreq(cand):
     ## TODO ##
     pass
 
+
 def compare_input_output(res, output):
-    
     outputMod = output
     if (type(output) is list):
         if len(output) == 1:
@@ -231,6 +168,7 @@ def passesNegTests(program:str, program_name:str, inputs:List, outputs:List) -> 
                     editedProgram = program + f'\n\nres = {program_name}()\n\nprint(res)'
                 else:
                     editedProgram = program + f'\n\ntestcase = {testcase}\nres = {program_name}(testcase)\n\nprint(res)'
+                
                 res, isError = runCode(editedProgram, globals())
                 if (isError):
                     return False
@@ -250,7 +188,6 @@ def passesNegTests(program:str, program_name:str, inputs:List, outputs:List) -> 
                     output_out = f'input_{argIndex},'
                     outputStrings += output_out
                 editedProgram = program + '\n' + inputStrings + f'\nres = {program_name}({outputStrings})\n\nprint(res)'
-            
                 res, isError = runCode(editedProgram, globals())
                 # print(res)
                 if (isError):
@@ -259,6 +196,8 @@ def passesNegTests(program:str, program_name:str, inputs:List, outputs:List) -> 
                 if (not compare_input_output(eval(res), outputs[i])):
                     return False
         except Exception as e:
+            return False
+        except:
             return False
     return True
 
@@ -519,11 +458,10 @@ def main(BugProgram:str,
     number_of_iterations = 0
     mutationCandidates = []
     
-    # print('ok')
-
     while len(Solutions) < M and number_of_iterations < 1:
         # print(number_of_iterations)
         for p_index, p in enumerate(Pop):
+            # print(p_index)
             # if not passesTests[p_index]:
             #     mutationCandidate = mutate(p, ops, name_to_operator, FaultLocations, weightsFaultyLocations, L, MethodUnderTestName, inputs, outputs)
             #     if passesNegTests(mutationCandidate, MethodUnderTestName, inputs, outputs):
@@ -537,40 +475,39 @@ def main(BugProgram:str,
                     Solutions.add(p)
                 else:
                     res = mutate(p, ops, name_to_operator, FaultLocations, weightsFaultyLocations, L, MethodUnderTestName, inputs, outputs)
-                    # print(res)
-                    if (type(res) is list):
+                    if (isinstance(res,list)):
                         mutationCandidates.extend(res)
                     else:
                         mutationCandidates.append(res)
+                    
                     if (p_index % 10 == 9):
                         scores = [] # list of scores that will be used to choose the candidate to be selected
                         poolMod = []
                         for candpool in mutationCandidates:
-                            # try:
-                            if (type(candpool) is not str):
-                                parsedCand = ast.unparse(candpool)
-                            else: parsedCand = candpool
-                            poolMod.append(parsedCand)
-                            scores.append(fitness_testCasesPassed(parsedCand, MethodUnderTestName, inputs, outputs) * 10 + 1) # why +10, just to make it non-zero and also relatively, it stays the same.
-                            # except Exception as e:
-                            #     # print('2')
-                            #     # print(e)
-                            #     pass
-                        # if (poolMod == []):
-                        #     return cand
+                            try:
+                                if (type(candpool) is not str):
+                                    parsedCand = ast.unparse(candpool)
+                                else: parsedCand = candpool
+                                poolMod.append(parsedCand)
+                                # print('99')
+                                scores.append(fitness_testCasesPassed(parsedCand, MethodUnderTestName, inputs, outputs) * 10 + 1) # why +10, just to make it non-zero and also relatively, it stays the same.
+                                # print('100')
+                            except Exception as e:
+                                pass
                         numberMutate = 10
                         if (len(poolMod) < 10):
                             numberMutate = len(poolMod)
                         choice = random.choices(range(len(poolMod)), weights = scores, k=numberMutate)
-                        # print(choice)
                         addedindex = 0
                         for i in range(0, numberMutate):
-                            while Pop[p_index - i - addedindex] in Solutions:
+                            if Pop[p_index - i - addedindex] in Solutions:
                                 addedindex += 1
                             Pop[p_index - (i+addedindex)] = (poolMod[choice[i]])
+                        
                         mutationCandidates = []
                     
         number_of_iterations += 1
+        # print('------------------------------------------------------------------------------')
         # print(number_of_iterations)
     # print(Pop)
     return Solutions, Pop
@@ -591,6 +528,27 @@ def bugFix(buggyProgram, methodUnderTestName, inputs, outputs):
     except:
         print('Syntax Error in the code')
         return 0
+    
+    # pr = """def kth(arr, k):
+    # pivot = arr[0]
+    # below = [x for x in arr if x < pivot]
+    # above = [x for x in arr if x > pivot]
+
+    # num_less = len(below)
+    # num_lessoreq = len(arr) - len(above)
+
+    # if k < num_less:
+    #     return kth(below, k)
+    # elif k >= num_lessoreq:
+    #     return kth(above, k - num_lessoreq)
+    # else:
+    #     return pivot"""
+    # x = passesNegTests(pr, 'kth', inputs, outputs)
+    # print(x)
+    
+    
+    # return
+    
     error = faultLocalizationUtilities.main(
         code=buggyProgram,
         inputs = inputs, 
