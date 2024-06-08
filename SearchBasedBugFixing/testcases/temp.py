@@ -80,4 +80,84 @@ def is_prime(n:int)->bool:
     return True
 
 
-print(is_prime(8))
+# print(is_prime(8))
+
+
+def rpn_eval(tokens):
+    def op(symbol, a, b):
+        return {
+            '+': lambda a, b: a + b,
+            '-': lambda a, b: a - b,
+            '*': lambda a, b: a * b,
+            '/': lambda a, b: a / b
+        }[symbol](a, b)
+    stack = []
+    for token in tokens:
+        if isinstance(token, float):
+            stack.append(token)
+        else:
+            a = stack.pop()
+            b = stack.pop()
+            stack.append(
+                op(token, b, a)
+            )
+    return stack.pop()
+
+x = rpn_eval([5.0, 1.0, 2.0, '+', 4.0, '*', '+', 3.0, '-'])
+print(x)
+
+x = '-14.0'
+x.strip()
+print(x)
+
+
+def sieve(max):
+    primes = []
+    for n in range(2, max + 1):
+        if any(n % p > 0 for p in primes):
+            primes.append(n)
+    return primes
+
+
+import string
+def to_base(num, b):
+    result = ''
+    alphabet = string.digits + string.ascii_uppercase
+    while num > 0:
+        i = num % b
+        num = num // b
+        result = result + alphabet[i]
+    return result
+
+def subsequences(a, b, k):
+    if k == 0:
+        return [[]]
+    ret = []
+    for i in range(a, b + 1 - k):
+        ret.extend(
+            [i] + rest for rest in subsequences(i + 1, b, k - 1)
+        )
+    return ret
+
+
+def pascal(n):
+    rows = [[1]]
+    for r in range(1, n):
+        row = []
+        for c in range(0, r):
+            upleft = rows[r - 1][c - 1] if c > 0 else 0
+            upright = rows[r - 1][c] if c < r else 0
+            row.append(upleft + upright)
+        rows.append(row)
+
+    return rows
+
+
+def quicksort(arr):
+    if not arr:
+        return []
+
+    pivot = arr[0]
+    lesser = quicksort([x for x in arr[1:] if x < pivot])
+    greater = quicksort([x for x in arr[1:] if x > pivot])
+    return lesser + [pivot] + greater

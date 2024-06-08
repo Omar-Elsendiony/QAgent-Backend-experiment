@@ -2,36 +2,20 @@ from source_code import *
 
 def test_0():
     pass
-    input_0 = [3, 4, 5, 5, 5, 5, 6]
-    input_1 = 5
-    assert find_in_sorted(input_0, input_1) == 3
+    input_0 = [1, 2, 6, 72, 7, 33, 4]
+    assert quicksort(input_0) == [1, 2, 4, 6, 7, 33, 72]
 
 def test_1():
     pass
-    input_0 = [1, 2, 3, 4, 6, 7, 8]
-    input_1 = 5
-    assert find_in_sorted(input_0, input_1) == -1
+    input_0 = [5, 4, 3, 2, 1]
+    assert quicksort(input_0) == [1, 2, 3, 4, 5]
 
 def test_2():
     pass
-    input_0 = [1, 2, 3, 4, 6, 7, 8]
-    input_1 = 4
-    assert find_in_sorted(input_0, input_1) == 3
+    input_0 = [10, 16, 6, 1, 14, 19, 15, 2, 9, 4, 18]
+    assert quicksort(input_0) == [1, 2, 4, 6, 9, 10, 14, 15, 16, 18, 19]
 
 def test_3():
     pass
-    input_0 = [2, 4, 6, 8, 10, 12, 14, 16, 18, 20]
-    input_1 = 18
-    assert find_in_sorted(input_0, input_1) == 8
-
-def test_4():
-    pass
-    input_0 = [3, 5, 6, 7, 8, 9, 12, 13, 14, 24, 26, 27]
-    input_1 = 0
-    assert find_in_sorted(input_0, input_1) == -1
-
-def test_5():
-    pass
-    input_0 = [3, 5, 6, 7, 8, 9, 12, 12, 14, 24, 26, 27]
-    input_1 = 12
-    assert find_in_sorted(input_0, input_1) == 6
+    input_0 = [10, 16, 6, 1, 14, 19, 15, 2, 9, 4, 18, 17, 12, 3, 11, 8, 13, 5, 7]
+    assert quicksort(input_0) == [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]

@@ -9,12 +9,13 @@ app = Flask(__name__)
 # from MainFunctions.TestFix import *
 # from MainFunctions.DecisionMaker import *
 # from MainFunctions.BugFix import *
-from classical.main import main_for_api
+# from classical.main import main_for_api
 # from DBRet import DiskANN,unixcoder
-from DBRet.deploy import *
-from cluster import Cluster
+# from DBRet.deploy import *
+# from cluster import Cluster
 # from SearchBasedBugFixing.bugFixLogic import *
 CORS(app)  # enable CORS
+
 import subprocess
 
 #region QAgent

@@ -213,6 +213,14 @@ class returnReplacement(baseOperator):
         # valueChosen = random.choice([s, a, p])
         # else:  
         #     valueChosen = None
+        
+        if (isinstance(node.value, ast.List) and node.value.elts == []):
+            valueChosen = ast.Return(value=ast.List(elts=[ast.List(elts=[],ctx=ast.Load())], ctx=ast.Load()))
+            return ast.Return(value=valueChosen)
+        elif isinstance(node.value, ast.List) and isinstance(node.value.elts, ast.List) and node.value.elts.elts == []:
+            valueChosen = ast.Return(value=ast.List(elts=[[]]), ctx=ast.Load())
+            return ast.Return(value=valueChosen)
+
         if valueChosen == p:
             return ast.Return()
         return ast.Return(value=valueChosen)

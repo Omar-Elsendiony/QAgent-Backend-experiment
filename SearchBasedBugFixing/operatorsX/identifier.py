@@ -14,13 +14,19 @@ class FunctionArgumentReplacement(baseOperator):
                 num = random.randint(0, 2)
                 if (num == 1):
                     node.args[0] , node.args[1] = node.args[1], node.args[0]
+            elif len(node.args) == 3:
+                num = random.randint(0, 2)
+                if (num == 1):
+                    node.args[1] , node.args[2] = node.args[2], node.args[1]
         node.func = self.visit(node.func)
         node.args = [self.visit(arg) for arg in node.args]
         node.keywords = [self.visit(kw) for kw in node.keywords]
         return node
         
     def visit_Name(self, node):
-
+        if (node.id == 'any'):
+            node.id = 'all'
+            return node
         if (node.id in self.get_functionIdentifiers()):
             if (self.wanted_line(node.lineno)):
                 # print(node.parent)

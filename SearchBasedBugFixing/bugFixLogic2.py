@@ -23,9 +23,10 @@ import sys
 
 def handler(signum, frame):
     # print('Signal handler called with signal', signum)
+    # signal.setitimer(signal.ITIMER_REAL, 0)
     raise Exception("Infinite loop may occured!")
 
-signal.signal(signal.SIGALRM, handler)
+oldHandle = signal.signal(signal.SIGALRM, handler)
 
 def runCode(code: str, myglobals):
     # save the old stdout that is reserved
@@ -79,6 +80,9 @@ def compare_input_output(res, output):
 
     if (res == outputMod):
         return True
+    if (isinstance(outputMod, str)):
+        if (str(res) == outputMod):
+            return True
     return False
 
 
@@ -105,7 +109,7 @@ def fitness_testCasesPassed(program:str, program_name:str, inputs:List, outputs:
                     editedProgram = program + f'\n\ntestcase = {testcase}\nres = {program_name}({testcase})\n\nprint(res)'
                 try:
                     res, isError = runCode(editedProgram, globals())
-                except:
+                except Exception as e:
                     pass
                 if (isError):
                     return 0
@@ -126,7 +130,7 @@ def fitness_testCasesPassed(program:str, program_name:str, inputs:List, outputs:
                 editedProgram = program + '\n' + inputStrings + f'\nres = {program_name}({outputStrings})\n\nprint(res)'
                 try:
                     res, isError = runCode(editedProgram, globals())
-                except:
+                except Exception as e:
                     pass
                 res = res.strip()
                 # this mutation is of no avail and caused error
@@ -168,8 +172,10 @@ def passesNegTests(program:str, program_name:str, inputs:List, outputs:List) -> 
                     editedProgram = program + f'\n\nres = {program_name}()\n\nprint(res)'
                 else:
                     editedProgram = program + f'\n\ntestcase = {testcase}\nres = {program_name}(testcase)\n\nprint(res)'
-                
-                res, isError = runCode(editedProgram, globals())
+                try:
+                    res, isError = runCode(editedProgram, globals())
+                except Exception as e:
+                    pass
                 if (isError):
                     return False
                 # res = res.strip()
@@ -188,7 +194,10 @@ def passesNegTests(program:str, program_name:str, inputs:List, outputs:List) -> 
                     output_out = f'input_{argIndex},'
                     outputStrings += output_out
                 editedProgram = program + '\n' + inputStrings + f'\nres = {program_name}({outputStrings})\n\nprint(res)'
-                res, isError = runCode(editedProgram, globals())
+                try:
+                    res, isError = runCode(editedProgram, globals())
+                except Exception as e:
+                    pass
                 # print(res)
                 if (isError):
                     return False
@@ -257,7 +266,7 @@ def update(cand, faultyLineLocations, weightsFaultyLineLocations, ops, name_to_o
             op_f_weights.append(10)
         if f in idOcc.keys():
             op_f_list.append("IDR")
-            op_f_weights.append(2)
+            op_f_weights.append(1)
         
         if (op_f_list == []):
             continue
@@ -411,9 +420,9 @@ def main(BugProgram:str,
         outputs:List,
         FixPar:Callable,
         ops:Callable,
-        popSize:int = 3000, 
+        popSize:int = 3500, 
         M:int = 1,
-        E:int = 400, 
+        E:int = 500, 
         L:int = 5):
     """
     Inputs:
@@ -532,26 +541,18 @@ def bugFix(buggyProgram, methodUnderTestName, inputs, outputs):
         print('Syntax Error in the code')
         return 0
     
-    # pr = """def kth(arr, k):
-    # pivot = arr[0]
-    # below = [x for x in arr if x < pivot]
-    # above = [x for x in arr if x > pivot]
+    pr = """def subsequences(a, b, k):
+    if k == 0:
+        return []
+    ret = []
+    for i in range(a, b + 1 - k):
+        ret.extend(
+            [i] + rest for rest in subsequences(i + 1, b, k - 1)
+        )
+    return ret"""
+    x = passesNegTests(pr, 'subsequences', inputs, outputs)
+    print(x)
 
-    # num_less = len(below)
-    # num_lessoreq = len(arr) - len(above)
-
-    # if k < num_less:
-    #     return kth(below, k)
-    # elif k >= num_lessoreq:
-    #     return kth(above, k - num_lessoreq)
-    # else:
-    #     return pivot"""
-    # x = passesNegTests(pr, 'kth', inputs, outputs)
-    # print(x)
-    
-    
-    # return
-    
     error = faultLocalizationUtilities.main(
         code=buggyProgram,
         inputs = inputs, 
@@ -585,10 +586,11 @@ def bugFix(buggyProgram, methodUnderTestName, inputs, outputs):
                     outputs=outputs, 
                     FixPar=None,
                     ops=ops)
-    print("************************************************************")
+    print("*************Solution(s)***************************")
     for solution in solutions:
         print(solution)
-    print("************************************************************")
+    print("***************************************************")
+    print("*************Sample of mutations****************")
     print(len(population))
     i = 0
     for p in population:
