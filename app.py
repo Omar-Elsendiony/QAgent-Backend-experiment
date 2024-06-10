@@ -59,6 +59,7 @@ import subprocess
 
 # from DBRet.unixcoder import UniXcoder
 # from DBRet.deploy import *
+from DBRet.test import *
 
 @app.route('/query', methods=['POST'])
 def query():

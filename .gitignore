@@ -7,6 +7,7 @@ __pycache__
 *.gz
 *.rar
 *.pkl
+*.index
 Results/
 Output/
 
