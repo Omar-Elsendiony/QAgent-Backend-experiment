@@ -22,7 +22,7 @@ import signal
 import numpy as np
 import faiss
 
-index = faiss.read_index('../flatIP_index_all.index')
+index = faiss.read_index('../../flatIP_index_all.index')
 import torch
 from unixcoder import UniXcoder
 import numpy as np
@@ -43,22 +43,20 @@ def batch_tokenize(token_list, max_length=512, mode="<encoder-only>"):
     # Tokenize multiple tokens in batches
     token_ids = model.tokenize(token_list, max_length=max_length, mode=mode)
     
-    return torch.tensor(token_ids)
+    # Ensure token_ids are converted to a tensor and moved to GPU
+    return torch.tensor(token_ids).to(DEVICE)
 
+def fitness_bug_code(tokens,device=DEVICE):
+  tokens_ids = model.tokenize([tokens],max_length=512,mode="<encoder-only>")
+  source_ids = torch.tensor(tokens_ids).to(device)
+  _ , embeddings = model(source_ids)
+  normEmb =  torch.nn.functional.normalize(embeddings, dim=1)
+  n = normEmb.detach().cpu()
+  D, I = index.search(n, k=1)
+  
+  # print(D[0][0])
 
-
-def fitness_bug_code(tokens_list, device=DEVICE, batch_size=256):
-    dataloader = DataLoader(tokens_list, batch_size=batch_size)
-    similarities = []
-    for batch_tokens in dataloader:
-        token_ids = batch_tokenize(batch_tokens).to(device)
-        _, embeddings = model(token_ids)
-        normEmb =  torch.nn.functional.normalize(embeddings, dim=1)   
-        similarities.append(normEmb.detach().cpu())
-    similarities = torch.cat(similarities)
-    D, I = index.search(similarities, k=1)
-    # print(D[0][0])
-    return D[0][0]
+  return D[0][0]
 
 
 
@@ -89,18 +87,18 @@ def runCode(code: str, myglobals):
 
         result = redirectedOutput.getvalue()
     except Exception as e:
+        signal.setitimer(signal.ITIMER_REAL, 0)
         isError = True
         result = repr(e)
-    except SystemExit as s:
-        isError = True
-        result = redirectedOutput2.getvalue()
-    except KeyboardInterrupt as k:
-        isError = True
-        result = "timed out"
+    # except SystemExit as s:
+    #     isError = True
+    #     result = redirectedOutput2.getvalue()
+    # except KeyboardInterrupt as k:
+    #     isError = True
+    #     result = "timed out"
         # print('timey')
     # thread.stop()
     # signal.alarm(0)
-    signal.setitimer(signal.ITIMER_REAL, 0)
     if (myglobals.get('testcase')):
         del myglobals['testcase']
     sys.stdout = oldStdOUT
@@ -114,7 +112,6 @@ def editFreq(cand):
     pass
 
 def compare_input_output(res, output):
-    
     outputMod = output
     if (type(output) is list):
         if len(output) == 1:
@@ -182,7 +179,7 @@ def fitness_testCasesPassed(program:str, program_name:str, inputs:List, outputs:
     #     passedTests = 0
     return passedTests
 
-
+pooolooo = 0
 
 def passesNegTests(program:str, program_name:str, inputs:List, outputs:List) -> bool:
     """
@@ -192,9 +189,11 @@ def passesNegTests(program:str, program_name:str, inputs:List, outputs:List) -> 
     outputs : List :  outputs of the program
     """
     # let's try by capturing the name of the function in regex and the list of names is compared with the name of the function
+    global pooolooo
+    print(pooolooo)
+    pooolooo += 1
     editedProgram = ""
     res = None
-
     for i in range(len(inputs)):
         try:
             testcase = inputs[i]
@@ -207,8 +206,9 @@ def passesNegTests(program:str, program_name:str, inputs:List, outputs:List) -> 
                 res, isError = runCode(editedProgram, globals())
                 if (isError):
                     return False
-                # res = res.strip()
-
+                res = res.strip()
+                # print(res)
+                # print(outputs[0][0])
                 if (not compare_input_output(eval(res), outputs[i])):
                     return False
             else:
@@ -223,9 +223,9 @@ def passesNegTests(program:str, program_name:str, inputs:List, outputs:List) -> 
                     output_out = f'input_{argIndex},'
                     outputStrings += output_out
                 editedProgram = program + '\n' + inputStrings + f'\nres = {program_name}({outputStrings})\n\nprint(res)'
-            
+
                 res, isError = runCode(editedProgram, globals())
-                # print(res)
+
                 if (isError):
                     return False
                 res = res.strip()
@@ -305,7 +305,7 @@ def update(cand, faultyLineLocations, weightsFaultyLineLocations, ops, name_to_o
     limitKPossible = len(faultyLineLocations)
     locationsExtracted = limitKPossible  if (limitKPossible < limitLocations) else limitLocations
     # choose from the locations based on a parameter sent by the user which sould not exceed max length, that is why a limit cap is present
-    locs = random.choices(faultyLineLocations, weights = weightsFaultyLineLocations, k=locationsExtracted)
+    locs = random.choices(faultyLineLocations, weights = weightsFaultyLineLocations, k=1)
 
     # candidate that will be mutated
     cand_dash = None
@@ -470,11 +470,11 @@ def mutate(cand:str, ops:Callable, name_to_operator:Dict, faultyLineLocations: L
     scores = [] # list of scores that will be used to choose the candidate to be selected
     candI = 0
     for cand in pool:
-        try:
-            scores.append(1 * 100 * fitness_bug_code(linesMutated[candI]) + 1) # why +10, just to make it non-zero and also relatively, it stays the same.
-        except:
-            scores.append(0.000000000000001)
-        candI += 1
+        # try:
+        scores.append(10 * fitness_bug_code(linesMutated[candI]) + 1) # why +10, just to make it non-zero and also relatively, it stays the same.
+        # except:
+        #     scores.append(0.000000000000001)
+        # candI += 1
     choice = random.choices(range(len(pool)), weights = scores, k=1)[0]
     returnedVal = ast.unparse(pool[choice])
     # print(returnedVal)
@@ -482,7 +482,6 @@ def mutate(cand:str, ops:Callable, name_to_operator:Dict, faultyLineLocations: L
 
 
 
-# @profile
 def main(BugProgram:str, 
         MethodUnderTestName:str, 
         FaultLocations:List,
@@ -491,7 +490,7 @@ def main(BugProgram:str,
         outputs:List, 
         FixPar:Callable,
         ops:Callable,
-        popSize:int = 2500, 
+        popSize:int = 5900, 
         M:int = 1,
         E:int = 10, 
         L:int = 5):
@@ -514,9 +513,12 @@ def main(BugProgram:str,
         Pop.append(BugProgram)  # seeding the population with candidates that were not exposed to mutation
     
     name_to_operator = utilsX.getNameToOperatorMap()
+    ilo = 0
     while len(Pop) < popSize:
         newMutation= mutate(BugProgram, ops, name_to_operator, FaultLocations, weightsFaultyLocations, L, MethodUnderTestName, inputs, outputs)
         # if not errorOccured:
+        # print(ilo)
+        ilo += 1
         Pop.append(newMutation)  # mutate the population
 
     # print(len(Pop))
@@ -548,12 +550,13 @@ def bugFix():
     inputCasesPath = 'testcases/Inputs'
     outputCasesPath = 'testcases/Outputs'
     metaDataPath = 'testcases/MetaData'
-    file_id = 2
+    file_id = 19
     file_name = f'{file_id}.txt'
     typeHintsInputs = []
     typeHintsOutputs = []
     methodUnderTestName = None
 
+    # print('Helloooooooooooooooooo')
     try:
         with open(f'{inputProgramPath}/{file_name}', 'r') as file:
             buggyProgram = file.read()
@@ -622,22 +625,17 @@ def bugFix():
     print(inputs)
     print(outputs)
 
-    # pr = """def kth(arr, k):
-    # pivot = arr[0]
-    # below = [x for x in arr if x < pivot]
-    # above = [x for x in arr if x > pivot]
-
-    # num_less = len(below)
-    # num_lessoreq = len(arr) - len(above)
-
-    # if k < num_less:
-    #     return kth(below, k)
-    # elif k >= num_lessoreq:
-    #     return kth(above, k - num_lessoreq)
-    # else:
-    #     return pivot"""
-    # x = passesNegTests(pr, 'kth', inputs, outputs)
+    # pr = """def return_list_1_to_10_except_5():
+    # lst = []
+    # for i in range(1, 11):
+    #     if i == 5:
+    #         continue
+    #     lst.append(i)
+    # return lst"""
+    # x = passesNegTests(pr, 'return_list_1_to_10_except_5', inputs, outputs)
     # print(x)
+    # return
+
 
     error = faultLocalizationUtils.main(
         inputs = inputs, 
