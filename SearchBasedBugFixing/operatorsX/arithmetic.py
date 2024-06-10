@@ -66,16 +66,19 @@ class ArithmeticOperatorDeletion(ArithmeticOperator):
 
 class AdditionOperatorReplacement(ArithmeticOperator):
 
-    # def visit_BinOp(self, node):
-    #     """
-    #     function targets the addition and subtraction operators that are considered infix operators
-    #     """
-    #     if self.wanted_line(node.lineno, node.col_offset):
-    #         self.finishedMutation = True
-    #         self.mutatedSet.add(node)
-    #         return ast.BinOp(left=self.visit(node.left), op=ast.Sub(), right=self.visit(node.right))
-    #     else:
-    #         return node # if you do not want to continue visiting child nodes, if not self.generic_visit(node)
+    def visit_BinOp(self, node):
+        """
+        function targets the addition and subtraction operators that are considered infix operators
+        """
+        if (isinstance(node.right, ast.Subscript) and isinstance(node.left, ast.Name) and node.left.id == 'result'):
+            # print('enterrrr')
+            node.right, node.left = (node.left) , (node.right)
+            return node
+        
+        node.left = self.visit(node.left)
+        node.right = self.visit(node.right)
+        return node
+        
 
     @classmethod
     def name(cls):

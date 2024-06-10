@@ -290,14 +290,9 @@ def mutationsCanBeApplied(setTokens: set):
     ################## Augmented Assign #####################
     if 'AugAssign' in setTokens: lstMutations.append('AUG'); lstToBeMutated.append('AugAssign')
 
-    ################ RELATIONAL OPERATORS ################
-    if '<' in setTokens: lstMutations.append('ROR'); lstToBeMutated.append('<') # relational operator replacement
-    if '>' in setTokens: lstMutations.append('ROR'); lstToBeMutated.append('>') # relational operator replacement
-    if '<=' in setTokens: lstMutations.append('ROR'); lstToBeMutated.append('<=') # relational operator replacement
-    if '>=' in setTokens: lstMutations.append('ROR'); lstToBeMutated.append('>=') 
+
 
     ################ ASSIGNMENT OPERATORS ################
-    if '!=' in setTokens: lstMutations.append('MER'); lstToBeMutated.append('!=')
 
     ################ LOGICAL OPERATORS ################
     if 'and' in setTokens: lstMutations.append('LOR') ; lstToBeMutated.append('and')
@@ -358,7 +353,11 @@ def mutationsCanBeApplied(setTokens: set):
     if 'return' in setTokens: lstMutations.append('RER'); lstToBeMutated.append('return'); weights.append(3)
     if '!=' in setTokens: lstMutations.append('MER'); lstToBeMutated.append('!='); weights.append(5)
     if '==' in setTokens: lstMutations.append('MER'); lstToBeMutated.append('=='); weights.append(5)
-
+    ################ RELATIONAL OPERATORS ################
+    if '<' in setTokens: lstMutations.append('ROR'); lstToBeMutated.append('<'); weights.append(2) # relational operator replacement
+    if '>' in setTokens: lstMutations.append('ROR'); lstToBeMutated.append('>'); weights.append(2) # relational operator replacement
+    if '<=' in setTokens: lstMutations.append('ROR'); lstToBeMutated.append('<='); weights.append(2) # relational operator replacement
+    if '>=' in setTokens: lstMutations.append('ROR'); lstToBeMutated.append('>='); weights.append(2) 
 
     return lstMutations, weights, lstToBeMutated
 

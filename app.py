@@ -9,12 +9,12 @@ app = Flask(__name__)
 # from MainFunctions.TestFix import *
 # from MainFunctions.DecisionMaker import *
 # from MainFunctions.BugFix import *
-from classical.main import main_for_api
-# from DBRet import DiskANN,unixcoder
-from DBRet.deploy import *
-from cluster import Cluster
+# from classical.main import main_for_api
+
+# from cluster import Cluster
 # from SearchBasedBugFixing.bugFixLogic import *
 CORS(app)  # enable CORS
+
 import subprocess
 
 #region QAgent
@@ -57,12 +57,29 @@ import subprocess
 
 #endregion
 
+# from DBRet.unixcoder import UniXcoder
+from DBRet.deploy import *
 
 @app.route('/query', methods=['POST'])
 def query():
     try:
+        print(request.json)
         code = request.json['code']
-        codes, tests = query_db(code)
+        programmingLangugae=request.json['language']
+        print(programmingLangugae)
+        if programmingLangugae=='python':
+            isPython=True
+            isJava=False
+        elif programmingLangugae=='java':
+            isPython=False
+            isJava=True
+        else:
+            isPython=False
+            isJava=False
+        thresholdSameLanguage = request.json['thresholSameLang']
+        thresholdDifferentLanguage = request.json['thresholdDiffLang']
+        codes, tests = query_db(code,isJava,isPython,thresholdSameLanguage,thresholdDifferentLanguage)
+        # print("codes is", codes)
         return jsonify({'codes': codes, 'tests': tests})
     except Exception as e:
         return jsonify({"error": str(e)})
@@ -131,7 +148,7 @@ def generate_fixbugs():
                 # Access the stdout and stderr attributes of the result
                 
                 stdout = result.stdout
-                # print(stdout)
+                print(stdout)
                 stderr = result.stderr
                 print(stderr)
                 

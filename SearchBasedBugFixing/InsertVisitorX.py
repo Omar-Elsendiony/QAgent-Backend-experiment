@@ -1,6 +1,6 @@
 import ast
 from random import choice, randint
-from .utilsX import parentify
+from utilsX import parentify
 
 
 def isInBody(node):
@@ -50,11 +50,10 @@ def insertNode(parent_node):
     if vesselNode.parent == candInsertNode or vesselNode is candInsertNode:
         return False
     # choose a random line in the vessel to insert your new code into
-    indexBody = randint(0, len(vesselNode.body) - 1)
-    vesselNode.body.insert(indexBody, candInsertNode)
-    # try:
-    #     ast.unparse(parent_node)
-    # except:
-    #     return False
+    try:
+        indexBody = randint(0, len(vesselNode.body) - 1)
+        vesselNode.body.insert(indexBody, candInsertNode)
+    except:
+        return False
     return True
 

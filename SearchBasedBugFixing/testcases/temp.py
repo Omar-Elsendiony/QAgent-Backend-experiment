@@ -35,14 +35,40 @@ def knapsack(capacity, items):
     return memo[len(items), capacity]
 
 
-def lcs_length(s, t):
-    from collections import Counter
-    dp = Counter()
-    for i in range(len(s)):
-        for j in range(len(t)):
-            if s[i] == t[j]:
-                dp[i, j] = dp[i - 1, j] + 1
-    return max(dp.values()) if dp else 0
+def find_in_sorted(arr, x):
+    def binsearch(start, end):
+        if start == end:
+            return -1
+        mid = start + (end - start) // 2
+        if x < arr[mid]:
+            return binsearch(start, mid)
+        elif x > arr[mid]:
+            return binsearch(mid, end)
+        else:
+            return mid
+
+    return binsearch(0, len(arr))
+
+def flatten(arr):
+    for x in arr:
+        if isinstance(x, list):
+            for y in flatten(x):
+                yield y
+        else:
+            yield flatten(x)
+
+def find_first_in_sorted(arr, x):
+    lo = 0
+    hi = len(arr)
+    while lo <= hi:
+        mid = (lo + hi) // 2
+        if x == arr[mid] and (mid == 0 or x != arr[mid - 1]):
+            return mid
+        elif x <= arr[mid]:
+            hi = mid
+        else:
+            lo = mid + 1
+    return -1
 
 
 def is_prime(n:int)->bool:
@@ -54,4 +80,94 @@ def is_prime(n:int)->bool:
     return True
 
 
-print(is_prime(8))
+# print(is_prime(8))
+
+
+def rpn_eval(tokens):
+    def op(symbol, a, b):
+        return {
+            '+': lambda a, b: a + b,
+            '-': lambda a, b: a - b,
+            '*': lambda a, b: a * b,
+            '/': lambda a, b: a / b
+        }[symbol](a, b)
+    stack = []
+    for token in tokens:
+        if isinstance(token, float):
+            stack.append(token)
+        else:
+            a = stack.pop()
+            b = stack.pop()
+            stack.append(
+                op(token, b, a)
+            )
+    return stack.pop()
+
+x = rpn_eval([5.0, 1.0, 2.0, '+', 4.0, '*', '+', 3.0, '-'])
+print(x)
+
+x = '-14.0'
+x.strip()
+print(x)
+
+
+def sieve(max):
+    primes = []
+    for n in range(2, max + 1):
+        if any(n % p > 0 for p in primes):
+            primes.append(n)
+    return primes
+
+
+import string
+def to_base(num, b):
+    result = ''
+    alphabet = string.digits + string.ascii_uppercase
+    while num > 0:
+        i = num % b
+        num = num // b
+        result = result + alphabet[i]
+    return result
+
+def subsequences(a, b, k):
+    if k == 0:
+        return [[]]
+    ret = []
+    for i in range(a, b + 1 - k):
+        ret.extend(
+            [i] + rest for rest in subsequences(i + 1, b, k - 1)
+        )
+    return ret
+
+
+def pascal(n):
+    rows = [[1]]
+    for r in range(1, n):
+        row = []
+        for c in range(0, r):
+            upleft = rows[r - 1][c - 1] if c > 0 else 0
+            upright = rows[r - 1][c] if c < r else 0
+            row.append(upleft + upright)
+        rows.append(row)
+
+    return rows
+
+
+def quicksort(arr):
+    if not arr:
+        return []
+
+    pivot = arr[0]
+    lesser = quicksort([x for x in arr[1:] if x < pivot])
+    greater = quicksort([x for x in arr[1:] if x > pivot])
+    return lesser + [pivot] + greater
+
+
+
+
+import torch
+import faiss
+data = torch.load('BugEmbeddings_All.pt', map_location=torch.device('cpu'))
+dimension = data.shape[1]  
+index = faiss.IndexFlatIP(dimension)
+index.add(data.numpy())
