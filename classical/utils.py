@@ -7,6 +7,8 @@ from .generationAlg.utils import create_final_test_file
 def test_cases_for_branchless_module(test_cases_list, test_cluster,log_file):
     """If the input code has no branches, return random test cases."""
     if not test_cluster.get_contains_conditions():
+        log_file.write("No branch exists in the module under test.\n")
+        print("No branch exists in the module under test.")
         # Final reporting 
         time_consumed_minutes = (time.time() - test_cluster.get_start_time()) / 60
         log_file.write(f"Time consumed: {time_consumed_minutes:.2f} minutes\n")
@@ -15,7 +17,7 @@ def test_cases_for_branchless_module(test_cases_list, test_cluster,log_file):
         results_wrapper=CovergaeResults(time_consumed_minutes,0)
         results_wrapper.set_statistics(100,0,0)
         results_wrapper.set_is_branch_exists(0)
-        test_file_string,err_msg=create_final_test_file(test_cases_list,test_cluster,log_file,results_wrapper)
+        test_file_string,results_wrapper,err_msg=create_final_test_file(test_cases_list,test_cluster,log_file,results_wrapper)
         return test_file_string,results_wrapper, err_msg
     return None, None, None
 

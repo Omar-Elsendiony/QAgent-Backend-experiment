@@ -1,5 +1,6 @@
 from .coveragetarget import CoverageTarget
 from ..fitness.annotate import get_uncovered_targets_data,objective_score_uncovered_targets,get_excluded_targets_indices,get_targets_string
+import sys
 class TestCase:
     """class to represent a test case."""
     
@@ -14,6 +15,7 @@ class TestCase:
         self.crowding_distance=0
         self.project_path=""
         self.expected_output=None
+        self.agg_objective_score=sys.maxsize
 
     def repair_variables_dict(self):
         #remove duplicates vars of each type if found

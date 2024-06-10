@@ -22,3 +22,6 @@ inputfunction.py
 .coverage
 
 *.index
+
+*.pt
+*.zip

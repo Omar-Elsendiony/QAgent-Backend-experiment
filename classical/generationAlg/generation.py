@@ -3,11 +3,12 @@ import random
 import string
 import threading
 import typing
+import json
 from typing import List,Dict,Set,Tuple,Any
 from .constants import LIST_OF_TYPES
 from ..analysis.analysemodule import TestCluster
 from .testcase import TestCase
-
+from ..coverage.runcoveragepy import run_coveragepy
 
 
 def generate_int_value(min,max):
@@ -264,7 +265,34 @@ def generate_unit_tests(test_cluster:TestCluster,log_file):
     with open(f'{test_cluster.project_path}/classical/outputtests/randomtest.py', 'w') as file:
         file.write(testClass)
     print("Test file 'randomtest.py' has been created.")
+    # run the coverage py to get the branches count from coverage.json file 
+    # so that if the input code has no branches, return random test cases to the user
+    # else run the MOSA algorithm to find the best test case
+    is_branchless_module(test_cluster)
     return test_cases_list
+
+def is_branchless_module(test_cluster:TestCluster):
+    """If the input code has no branches, return true else false."""
+    #run coverage py
+    run_coveragepy(test_cluster.project_path,"randomtest.py")
+    branches_count=0
+    coverage_file = open(f"{test_cluster.project_path}/classical/coverage/coverage.json")
+    
+    # dictionary
+    data = json.load(coverage_file)
+    branches_count= data['files']['classical/outputtests/randomtest.py']['summary']['num_branches']
+     
+    # Closing file
+    coverage_file.close()
+    if branches_count>2: # 2 because of  the "if __name__ == '__main__': unittest.main()"
+        #it has branches
+        test_cluster.set_actual_targets_count(branches_count-2)
+        test_cluster.set_contains_conditions(True)
+        return False
+    # it is branchless
+    test_cluster.set_actual_targets_count(0)
+    test_cluster.set_contains_conditions(False)
+    return True
 
 def generate_random_test_case(test_cluster:TestCluster,unit_test_index,log_file):
     test_case,test_case_str=create_testcase(unit_test_index,test_cluster,log_file)

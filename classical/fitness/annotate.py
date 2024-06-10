@@ -9,6 +9,17 @@ from subprocess import PIPE
 import threading
 from ..generationAlg.coveragetarget import CoverageTarget
 from .insertionlocalsprint import insert_print_locals_using_ast,insert_print_locals_lineno_using_ast
+def get_executed_lines_percent(project_path:str):
+    executed_lines_percent=0
+    coverage_file = open(f"{project_path}/classical/coverage/coverage.json")
+    
+    # dictionary
+    data = json.load(coverage_file)
+    executed_lines_percent= data['files']['classical/outputtests/test.py']['summary']['percent_covered']
+        
+    # Closing file
+    coverage_file.close()
+    return executed_lines_percent
 def get_uncovered_targets_indices(project_path:str):
     missing_branches_index=[]
     coverage_file = open(f"{project_path}/classical/coverage/coverage.json")
@@ -274,6 +285,11 @@ def fix_condition(condition,locals_dict):
     pattern_for = r'^for\b'
     match = re.search(pattern_for, condition)
     if match:
+        true_or_false=False
+    #if the condition was a while loop, we want to evaluate it to false as it is not covered
+    pattern_while = r'^while\b'
+    match2 = re.search(pattern_while, condition)
+    if match2:
         true_or_false=False
     return condition,true_or_false
 

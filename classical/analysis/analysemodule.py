@@ -29,7 +29,7 @@ class TestCluster:
         self.project_path = None
         self.min_max_rand_values=[0,100]
         self.params_occurence_dict={}
-        self.contains_conditions = False
+        self.contains_conditions = True
         self.start_time=start_time
         self.actual_targets_count=0
     
@@ -100,25 +100,25 @@ class TestCluster:
     
     def set_actual_targets_count(self,count):
         """Sets the count of actual targets, if one branch exists --> this is considered 2 targets (true, false)"""
-        self.actual_targets_count=2*count
+        self.actual_targets_count=count
         
     def get_actual_targets_count(self):
         """ Returns the actual targets count"""
         return self.actual_targets_count
     
-def contains_conditions(code,test_cluster):
-    """Check if the code contains conditions or not"""
-    count=0
-    tree = ast.parse(code)
-    for node in ast.walk(tree):
-        if isinstance(node, ast.If) or isinstance(node,ast.While) or isinstance(node,ast.For):
-            count+=1
-    if count==0:
-        test_cluster.set_contains_conditions(False)
-        return False
-    test_cluster.set_actual_targets_count(count)
-    test_cluster.set_contains_conditions(True)
-    return True
+# def contains_conditions(code,test_cluster):
+#     """Check if the code contains conditions or not"""
+#     count=0
+#     tree = ast.parse(code)
+#     for node in ast.walk(tree):
+#         if isinstance(node, ast.If) or isinstance(node,ast.While) or isinstance(node,ast.For):
+#             count+=1
+#     if count==0:
+#         test_cluster.set_contains_conditions(False)
+#         return False
+#     test_cluster.set_actual_targets_count(count)
+#     test_cluster.set_contains_conditions(True)
+#     return True
 
 def analyse_module(module_name:str,project_path:str,log_file):
     """Analyse the module and return the results."""
@@ -163,9 +163,9 @@ def analyse_module(module_name:str,project_path:str,log_file):
             log_file.write(f"Function found: {name}\n")
             function_signature = inspect.signature(attr)
             # Before we proceed we need to check if the input code has branches or not
-            if not contains_conditions(module_code,test_cluster):
-                print("No branches (conditions) in the input code")
-                log_file.write("No branches (conditions) in the input code\n")
+            # if not contains_conditions(module_code,test_cluster):
+            #     print("No branches (conditions) in the input code")
+            #     log_file.write("No branches (conditions) in the input code\n")
             #check if any paramater does not have type annotation
             param_types = {}
             all_param_types= {}
