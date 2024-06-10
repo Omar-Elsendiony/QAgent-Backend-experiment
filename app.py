@@ -132,7 +132,7 @@ def generate_fixbugs():
                 # Access the stdout and stderr attributes of the result
                 
                 stdout = result.stdout
-                # print(stdout)
+                print(stdout)
                 stderr = result.stderr
                 print(stderr)
                 

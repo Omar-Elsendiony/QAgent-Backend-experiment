@@ -161,3 +161,13 @@ def quicksort(arr):
     lesser = quicksort([x for x in arr[1:] if x < pivot])
     greater = quicksort([x for x in arr[1:] if x > pivot])
     return lesser + [pivot] + greater
+
+
+
+
+import torch
+import faiss
+data = torch.load('BugEmbeddings_All.pt', map_location=torch.device('cpu'))
+dimension = data.shape[1]  
+index = faiss.IndexFlatIP(dimension)
+index.add(data.numpy())

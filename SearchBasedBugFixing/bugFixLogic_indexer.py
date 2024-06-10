@@ -10,7 +10,7 @@ import random
 from typing import List, Set, Dict, Callable
 # from runCode import runCode
 import faultLocalizationUtils
-from SearchBasedBugFixing.identifier.identifierVisitor import IdentifierVisitor
+from identifier.identifierVisitorX import IdentifierVisitor
 import InsertVisitorX
 import SwapVisitorX
 

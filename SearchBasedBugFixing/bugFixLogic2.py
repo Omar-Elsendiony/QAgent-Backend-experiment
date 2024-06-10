@@ -20,13 +20,13 @@ import signal
 import sys
 # import time
 
-timerValue = 0.03
+timerValue = 0.06
 
 def handler(signum, frame):
     # print('Signal handler called with signal', signum)
     # signal.setitimer(signal.ITIMER_REAL, 0)
-    if (timerValue < 0.06):
-        timerValue += 0.01
+    # if (timerValue < 0.06):
+    #     timerValue += 0.01
     raise Exception("Infinite loop may occured!")
 
 # oldHandle = signal.signal(signal.SIGALRM, handler)
@@ -522,7 +522,7 @@ def main(BugProgram:str,
                     
         number_of_iterations += 1
         # print('------------------------------------------------------------------------------')
-        # print(number_of_iterations)
+        print(number_of_iterations)
     return Solutions, Pop
 
 
