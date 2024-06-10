@@ -16,7 +16,7 @@ class MOSA:
     def __init__(self,test_cluster):
         #self.testcluster to be added when the test cluster class is implemented
         self.stopping_criterion = 0 #0 for complete coverage, 1 for number of test cases
-        self.time_limit = 120
+        self.time_limit = 60
         self.population=[]
         self.population_size=10
         self.count_offspring_generated=0
@@ -330,10 +330,28 @@ class MOSA:
 
     def assign_crowding_distance(self, front):
         """Assigns the crowding distance to the test cases in the front."""
-        pass
+        front = list(front) # Convert the set to a list
+        size = len(front)
+        if size == 0:
+            return
+        elif size == 1:
+            front[0].crowding_distance = float('inf')
+        else:
+            for testcase in front:
+                testcase.crowding_distance = 0
+                if len(testcase.uncovered_targets)>0:
+                    testcase.agg_objective_score = sum(target.branch_distance for target in testcase.uncovered_targets)  # Sum of objective scores
+            front.sort(key=lambda x: x.agg_objective_score)  # Sort test cases based on objective score
+            front[0].crowding_distance = front[-1].crowding_distance = float('inf')
+            for i in range(1, size - 1):
+                front[i].crowding_distance = (front[i + 1].agg_objective_score - front[i - 1].agg_objective_score)
+            
+
     def sort_front_using_crowding_distance(self, front):
         """Sorts the front using the crowding distance."""
-        pass
+        front = list(front) # Convert the set to a list
+        front.sort(key=lambda x: x.crowding_distance, reverse=True)
+        return front
     def dominance_comparator(self,t1, t2):
         """Compares two test cases based on the dominance relation."""
         dominates1 = False
@@ -522,15 +540,25 @@ def use_mosa_algorithm(random_test_cases_list,test_cluster,log_file):
         mosa.fronts_list=mosa.preference_sorting(all_population)
         mosa.population=[]
         d=0
+        # The algorithm first selects the non-dominated test cases from the first front (F0); 
+        # If the number of selected test cases is lower than the population size M,
+        # The loop selects more test cases from the second front (F1),and so on.
+        # The loop stops when adding test cases from current front Fd exceeds the population size M
         while len(mosa.fronts_list)>d and len(mosa.population)+len(mosa.fronts_list[d])<mosa.population_size:
             # Crowding distance assignment
             mosa.assign_crowding_distance(mosa.fronts_list[d])#TODO
             mosa.population+=mosa.fronts_list[d]
             d+=1
         # alternative mosa.fronts_list[d].sort(key=lambda x: x.objective_score)
-        if len(mosa.fronts_list)>d :
-            sorted_front=mosa.sort_front_using_crowding_distance(mosa.fronts_list[d])#TODO
-            #mosa.population+=sorted_front[0:mosa.population_size-len(mosa.population)]#TODO
+
+        # if the number of selected test cases is less than the population size M,
+        if len(mosa.population)<mosa.population_size:
+            # the algorithm selects the test cases with the highest crowding distance from the current front Fd
+            if len(mosa.fronts_list)>d :
+                sorted_front=mosa.sort_front_using_crowding_distance(mosa.fronts_list[d])
+                # the algorithm selects the remaining test cases from the current front Fd according
+                # to the descending order of crowding distance.
+                mosa.population+=sorted_front[0:mosa.population_size-len(mosa.population)]
         # Revise the parameters of the algorithm
         mosa.revise_parameters()
     # Final reporting 

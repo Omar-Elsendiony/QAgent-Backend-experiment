@@ -43,7 +43,7 @@ def main_function():
         return None,None,"No test cases are generated."
 
     # Export test cases to file
-    test_file_string,err_msg=create_final_test_file(test_cases_list_mosa,test_cluster,log_file,results_wrapped)
+    test_file_string,results_wrapped,err_msg=create_final_test_file(test_cases_list_mosa,test_cluster,log_file,results_wrapped)
 
     if err_msg!="":
         return None,None,err_msg
@@ -60,7 +60,10 @@ def main_for_api(code):
         f.write(code)
     f.close()
     test_file_string,results_wrapped,err_msg=main_function()
-    return test_file_string,err_msg
+    if results_wrapped.branch_coverage_percent==100.0:
+        results_wrapped.statement_coverage_percent=100.0
+    lst=[results_wrapped.branch_coverage_percent,results_wrapped.statemt_coverage_percent,results_wrapped.time_consumed_min]
+    return test_file_string,err_msg,lst
 
 # if __name__ == "__main__":
 #     main_function()
