@@ -4,14 +4,14 @@ The main pipeline resides here
 """
 import ast
 from operatorsX import *
-import SearchBasedBugFixing.utilsX as utils
+import utilsX as utils
 import random
 from typing import List, Set, Dict, Callable
 # from runCode import runCode
-import SearchBasedBugFixing.faultLocalizationUtilities as faultLocalizationUtilities
-from SearchBasedBugFixing.identifier.identifierVisitorX import IdentifierVisitor
-import SearchBasedBugFixing.InsertVisitorX as InsertVisitor
-import SearchBasedBugFixing.SwapVisitorX as SwapVisitor
+import faultLocalizationUtilities as faultLocalizationUtilities
+from identifier.identifierVisitorX import IdentifierVisitor
+import InsertVisitorX as InsertVisitor
+import SwapVisitorX as SwapVisitor
 
 ####################################################################
 import sys

@@ -9,7 +9,7 @@ app = Flask(__name__)
 # from MainFunctions.TestFix import *
 # from MainFunctions.DecisionMaker import *
 # from MainFunctions.BugFix import *
-# from classical.main import main_for_api
+from classical.main import main_for_api
 
 # from cluster import Cluster
 # from SearchBasedBugFixing.bugFixLogic import *
@@ -58,7 +58,7 @@ import subprocess
 #endregion
 
 # from DBRet.unixcoder import UniXcoder
-from DBRet.deploy import *
+# from DBRet.deploy import *
 
 @app.route('/query', methods=['POST'])
 def query():
@@ -144,7 +144,7 @@ def generate_fixbugs():
         try:
             try:
                 # result = subprocess.run(['ls'])
-                result = subprocess.run(["python3", "/root/BugFix/LLM-Test-Generator/SearchBasedBugFixing/main.py", str(code), str(function_name), str(inputs), str(outputs)], capture_output=True, text=True)
+                result = subprocess.run(["python3", "/home/azureuser/GP/LLM-Test-Generator/SearchBasedBugFixing/main.py", str(code), str(function_name), str(inputs), str(outputs)], capture_output=True, text=True)
                 # Access the stdout and stderr attributes of the result
                 
                 stdout = result.stdout
@@ -186,5 +186,5 @@ code = """def simple_function(x, y):
 
 if __name__ == '__main__':
     # app.run(port=8080,debug=True, use_reloader=False)
-    app.run(port=8080)
+    app.run(host='0.0.0.0', port=80)
 

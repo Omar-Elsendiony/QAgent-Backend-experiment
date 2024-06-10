@@ -280,20 +280,20 @@ class copyMutation(ast.NodeTransformer):
     def visit_comprehension(self, node: ast.comprehension):
         return ast.copy_location(ast.comprehension(target=self.visit(node.target), iter=self.visit(node.iter), ifs=[self.visit(x) for x in node.ifs], is_async = node.is_async), node)
     
-    def visit_MatchAs(self, node: ast.MatchAs):
-        return ast.copy_location(ast.MatchAs(), node)
+    # def visit_MatchAs(self, node: ast.MatchAs):
+    #     return ast.copy_location(ast.MatchAs(), node)
     
-    def visit_MatchMapping(self, node: ast.MatchMapping):
-        return ast.copy_location(ast.MatchMapping(), node)
+    # def visit_MatchMapping(self, node: ast.MatchMapping):
+    #     return ast.copy_location(ast.MatchMapping(), node)
     
-    def visit_MatchSequence(self, node: ast.MatchSequence):
-        return ast.copy_location(ast.MatchSequence(), node)
+    # def visit_MatchSequence(self, node: ast.MatchSequence):
+    #     return ast.copy_location(ast.MatchSequence(), node)
     
-    def visit_MatchStar(self, node: ast.MatchStar):
-        return ast.copy_location(ast.MatchStar(), node)
+    # def visit_MatchStar(self, node: ast.MatchStar):
+    #     return ast.copy_location(ast.MatchStar(), node)
     
-    def visit_MatchValue(self, node: ast.MatchValue):
-        return ast.copy_location(ast.MatchValue(), node)
+    # def visit_MatchValue(self, node: ast.MatchValue):
+    #     return ast.copy_location(ast.MatchValue(), node)
     
     def visit_AsyncFunctionDef(self, node: ast.AsyncFunctionDef):
         return ast.copy_location(ast.AsyncFunctionDef(), node)

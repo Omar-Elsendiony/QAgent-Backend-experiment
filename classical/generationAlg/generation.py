@@ -5,7 +5,7 @@ import threading
 import typing
 import json
 from typing import List,Dict,Set,Tuple,Any
-from .constants import LIST_OF_TYPES
+# from .constants import LIST_OF_TYPES
 from ..analysis.analysemodule import TestCluster
 from .testcase import TestCase
 from ..coverage.runcoveragepy import run_coveragepy
@@ -43,9 +43,9 @@ def create_statement(test_cluster:TestCluster,test_case:TestCase,log_file):
         if param_annotation not in test_case.variables_dict:
             #if the type is not in the dict, add it, create new list
             test_case.variables_dict[param_annotation]=[[],[]] #list of names and list of values
-        if param_annotation==Any:
+        # if param_annotation==Any:
             #choose random type for the parameter
-            param_annotation=random.choice(LIST_OF_TYPES)
+            # param_annotation=random.choice(LIST_OF_TYPES)
         #this variable temp_param_name will be used to satisfy the function call with the created parameter in each itteration
         temp_param_name_index=len(test_case.variables_dict[param_annotation][0])
         temp_param_name=param_annotation.__name__+"_"+str(temp_param_name_index)
