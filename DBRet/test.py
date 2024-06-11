@@ -1,6 +1,6 @@
 import numpy as np
+# from .unixcoder import UniXcoder
 from .unixcoder import UniXcoder
-# from unixcoder import UniXcoder
 import os
 import json
 import torch 
@@ -67,10 +67,10 @@ def queryDB(query,k=3,isJava=True,isPython=True,thresholdSameLanguage=0.8,thresh
         idsAndDistancesJ=[]
     else:
         # sort the results based on similarity equally
-        idsAndDistancesP=getClosestNeibours(query,k,0.6)
+        idsAndDistancesP=getClosestNeibours(query,Pindex,k,0.6)
         # add a flag for python
         idsAndDistancesP_python=[(res[0],res[1],0) for res in idsAndDistancesP]
-        idsAndDistancesJ=getClosestNeibours(query,k,0.8)
+        idsAndDistancesJ=getClosestNeibours(query,Jindex,k,0.8)
         # add a flag for java
         idsAndDistancesJ_Java=[(res[0],res[1],1) for res in idsAndDistancesP]
         
@@ -80,7 +80,7 @@ def queryDB(query,k=3,isJava=True,isPython=True,thresholdSameLanguage=0.8,thresh
         # classify each id based on the flag
         idsAndDistancesP=[]
         idsAndDistancesJ=[]
-        for i in range(k):
+        for i in range(min(k,len(results))):
             if results[i][2]==0:
                 idsAndDistancesP.append((results[i][0],results[i][1]))
             else:
@@ -116,14 +116,19 @@ def query_db(code,isJava,isPython,thresholdSameLanguage=0.8,thresholdDifferentLa
     
     global model, DEVICE,centroidsJ,centroidsP
     query = get_embeddings(model, code, DEVICE)
+    query=torch.nn.functional.normalize(query,p=2, dim=1)
     query = query.numpy()
     codes,tests=queryDB(query,3,isJava,isPython,thresholdSameLanguage,thresholdDifferentLanguage)
     return codes,tests
 
 
 # code="lolxd"
-# isJava=True
+# isJava=False
 # isPython=False
 # thresholdSameLanguage=0.8
 # thresholdDifferentLanguage=0.6
 # codes,tests=query_db(code,isJava,isPython,thresholdSameLanguage,thresholdDifferentLanguage)
+# print(codes)
+# print(tests)
+# print(len(codes))
+# print(len(tests))

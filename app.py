@@ -81,6 +81,8 @@ def query():
         thresholdDifferentLanguage = request.json['thresholdDiffLang']
         codes, tests = query_db(code,isJava,isPython,thresholdSameLanguage,thresholdDifferentLanguage)
         # print("codes is", codes)
+        if len(codes) == 0:
+            return jsonify({"codes":["No similar code found"], "tests": [{"test 0":"No similar code found"}]})
         return jsonify({'codes': codes, 'tests': tests})
     except Exception as e:
         return jsonify({"error": str(e)})

@@ -122,6 +122,8 @@ def query_db(code,isJava,isPython,thresholdSameLanguage=0.8,thresholdDifferentLa
     
     global model, DEVICE,centroidsJ,centroidsP
     query = get_embeddings(model, code, DEVICE)
+    query=torch.nn.functional.normalize(query,p=2, dim=1)
     query = query.numpy()
+
     codes,tests=queryDB(query,35,3,isJava,isPython,thresholdSameLanguage,thresholdDifferentLanguage)
     return codes,tests
