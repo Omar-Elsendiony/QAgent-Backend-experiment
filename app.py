@@ -1,5 +1,4 @@
-# from DBRet.deploy import *
-# from vul_detection.vul_main import *
+from vul_detection.vul_main import *
 from flask_cors import CORS  # import flask_cors
 from flask import Flask, request, jsonify
 app = Flask(__name__)
@@ -9,10 +8,7 @@ from MainFunctions.TestGenerator import *
 from MainFunctions.TestFix import *
 from MainFunctions.DecisionMaker import *
 from MainFunctions.BugFix import *
-# from classical.main import main_for_api
-# from DBRet import DiskANN,unixcoder
-# from DBRet.deploy import *
-# from cluster import Cluster
+from classical.main import main_for_api
 # from SearchBasedBugFixing.bugFixLogic import *
 CORS(app)  # enable CORS
 
@@ -60,7 +56,7 @@ def run_python():
 
 # from DBRet.unixcoder import UniXcoder
 # from DBRet.deploy import *
-# from DBRet.test import *
+from DBRet.test import *
 
 @app.route('/query', methods=['POST'])
 def query():
@@ -102,6 +98,7 @@ def vulDetect():
 @app.route('/run-classical', methods=['POST'])
 def generate_classical():
     code = request.json.get('code')
+    print(code)
     if code:
         try:
             # execute the main function
