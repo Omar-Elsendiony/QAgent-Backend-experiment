@@ -6,7 +6,7 @@ class TestGenerator:
 
     def __init__(self, GenUnitTestChain, db, myglobals):
         self.GenUnitTestChain = GenUnitTestChain
-        self.db = db
+        # self.db = db
         self.myglobals = myglobals
         self.fewshotsnum = 3
         self.isFewShot = True
@@ -23,7 +23,7 @@ class TestGenerator:
         Args: None
         Return: None
         """
-        fewShotStr = self.getExamplesFromDB(codeUnderTest)
+        # fewShotStr = self.getExamplesFromDB(codeUnderTest)
         try:
             unittest = self.GenUnitTestChain.invoke(
                 {

@@ -25,5 +25,5 @@ judgeChain = InitializeJudgeChain(llm)
 bugFixChain = InitializeBugFixChain(llm)
 
 
-HEval_JsonObj = pd.read_json(path_or_buf="Datasets\humaneval.jsonl", lines=True)
-db = connectDB()
+# HEval_JsonObj = pd.read_json(path_or_buf="Datasets\humaneval.jsonl", lines=True)
+# db = connectDB()

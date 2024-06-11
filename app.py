@@ -18,51 +18,51 @@ CORS(app)  # enable CORS
 
 import subprocess
 
-#region QAgent
-# def setupQAgent():
-#     try:
-#         print("All imports successful!")
-#         testGenerator = TestGenerator(GenUnitTestChain, db, globals())
-#         testRegenerator = TestFix(
-#             UnitTestFeedbackChain,
-#             globals(),
-#             True,
-#         )
-#         judgeGenerator = DecisionMaker(judgeChain, globals())
-#         bugFixGenerator = BugFix(bugFixChain, globals(), True)
-#         return testGenerator, testRegenerator, bugFixGenerator, judgeGenerator
-#     except Exception as e:
-#         print(e)
-#         exit(-1)
+# region QAgent
+def setupQAgent():
+    try:
+        print("All imports successful!")
+        testGenerator = TestGenerator(GenUnitTestChain, "", globals())
+        testRegenerator = TestFix(
+            UnitTestFeedbackChain,
+            globals(),
+            True,
+        )
+        judgeGenerator = DecisionMaker(judgeChain, globals())
+        bugFixGenerator = BugFix(bugFixChain, globals(), True)
+        return testGenerator, testRegenerator, bugFixGenerator, judgeGenerator
+    except Exception as e:
+        print(e)
+        exit(-1)
 
 
-# testGenerator, testRegenerator, bugFixGenerator, judgeGenerator = setupQAgent()
+testGenerator, testRegenerator, bugFixGenerator, judgeGenerator = setupQAgent()
 
 
-# @app.route('/qagentai', methods=['POST'])
-# def run_python():
-#     code = request.json.get('code')
-#     description = request.json.get('description')
-#     if code:
-#         try:
-#             # execute the main function
-#             print("Running QAgentAI")
-#             result = QAgent_product(
-#                 code, description, testGenerator, testRegenerator, bugFixGenerator, judgeGenerator)
-#             print(result)
-#             return jsonify({'output': list(result)})
-#         except Exception as e:
-#             return jsonify({'error': str(e)}), 400
-#     else:
-#         return jsonify({'error': 'No code provided'}), 400
+@app.route('/qagentai', methods=['POST'])
+def run_python():
+    code = request.json.get('code')
+    description = request.json.get('description')
+    if code:
+        try:
+            # execute the main function
+            print("Running QAgentAI")
+            result = QAgent_product(
+                code, description, testGenerator, testRegenerator, bugFixGenerator, judgeGenerator)
+            print(result)
+            return jsonify({'output': list(result)})
+        except Exception as e:
+            return jsonify({'error': str(e)}), 400
+    else:
+        return jsonify({'error': 'No code provided'}), 400
 
 #endregion
 
 # from DBRet.unixcoder import UniXcoder
 # from DBRet.deploy import *
-from DBRet.test import *
+# from DBRet.test import *
 
-@app.route('/query', methods=['POST'])
+@app.route('/qagentai', methods=['POST'])
 def query():
     try:
         print(request.json)
@@ -190,5 +190,5 @@ code = """def simple_function(x, y):
 
 if __name__ == '__main__':
     # app.run(port=8080,debug=True, use_reloader=False)
-    app.run(host='0.0.0.0', port=80)
+    app.run(port=8080)
 
