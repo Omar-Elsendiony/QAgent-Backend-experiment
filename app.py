@@ -62,7 +62,7 @@ def run_python():
 # from DBRet.deploy import *
 # from DBRet.test import *
 
-@app.route('/qagentai', methods=['POST'])
+@app.route('/query', methods=['POST'])
 def query():
     try:
         print(request.json)
