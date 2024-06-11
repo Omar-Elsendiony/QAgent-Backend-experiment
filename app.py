@@ -3,14 +3,15 @@
 from flask_cors import CORS  # import flask_cors
 from flask import Flask, request, jsonify
 app = Flask(__name__)
-# from Pipeline_Interface import QAgent_product
-# from Configuration import *
-# from MainFunctions.TestGenerator import *
-# from MainFunctions.TestFix import *
-# from MainFunctions.DecisionMaker import *
-# from MainFunctions.BugFix import *
-from classical.main import main_for_api
-
+from Pipeline_Interface import QAgent_product
+from Configuration import *
+from MainFunctions.TestGenerator import *
+from MainFunctions.TestFix import *
+from MainFunctions.DecisionMaker import *
+from MainFunctions.BugFix import *
+# from classical.main import main_for_api
+# from DBRet import DiskANN,unixcoder
+# from DBRet.deploy import *
 # from cluster import Cluster
 # from SearchBasedBugFixing.bugFixLogic import *
 CORS(app)  # enable CORS

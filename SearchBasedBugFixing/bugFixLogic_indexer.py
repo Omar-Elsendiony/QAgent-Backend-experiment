@@ -195,8 +195,10 @@ def passesNegTests(program:str, program_name:str, inputs:List, outputs:List) -> 
     editedProgram = ""
     res = None
     for i in range(len(inputs)):
+        print(str(i) + "++++++")
         try:
             testcase = inputs[i]
+            print(testcase)
             if (len(testcase) == 1):
                 testcase = testcase[0]
                 if (isinstance(testcase, str)  and testcase.lower() == 'void'):
@@ -207,7 +209,7 @@ def passesNegTests(program:str, program_name:str, inputs:List, outputs:List) -> 
                 if (isError):
                     return False
                 res = res.strip()
-                # print(res)
+                print(res)
                 # print(outputs[0][0])
                 if (not compare_input_output(eval(res), outputs[i])):
                     return False
@@ -225,6 +227,11 @@ def passesNegTests(program:str, program_name:str, inputs:List, outputs:List) -> 
                 editedProgram = program + '\n' + inputStrings + f'\nres = {program_name}({outputStrings})\n\nprint(res)'
 
                 res, isError = runCode(editedProgram, globals())
+                print(res)
+                print(i)
+                print('***********************')
+                print(outputs[i])
+                print('***********************')
 
                 if (isError):
                     return False
@@ -550,13 +557,12 @@ def bugFix():
     inputCasesPath = 'testcases/Inputs'
     outputCasesPath = 'testcases/Outputs'
     metaDataPath = 'testcases/MetaData'
-    file_id = 19
+    file_id = 9
     file_name = f'{file_id}.txt'
     typeHintsInputs = []
     typeHintsOutputs = []
     methodUnderTestName = None
 
-    # print('Helloooooooooooooooooo')
     try:
         with open(f'{inputProgramPath}/{file_name}', 'r') as file:
             buggyProgram = file.read()
@@ -625,16 +631,20 @@ def bugFix():
     print(inputs)
     print(outputs)
 
-    # pr = """def return_list_1_to_10_except_5():
-    # lst = []
-    # for i in range(1, 11):
-    #     if i == 5:
-    #         continue
-    #     lst.append(i)
-    # return lst"""
-    # x = passesNegTests(pr, 'return_list_1_to_10_except_5', inputs, outputs)
-    # print(x)
-    # return
+    pr = """def levenshtein(source, target):
+    if source == '' or target == '':
+        return len(source) or len(target)
+    elif source[0] == target[0]:
+        return 1 + levenshtein(source[1:], target[1:]) 
+    else:
+        return 1 + min(
+            levenshtein(source,     target[1:]),
+            levenshtein(source[1:], target[1:]),
+            levenshtein(source[1:], target)
+        )"""
+    x = passesNegTests(pr, 'levenshtein', inputs, outputs)
+    print(x)
+    return
 
 
     error = faultLocalizationUtils.main(
