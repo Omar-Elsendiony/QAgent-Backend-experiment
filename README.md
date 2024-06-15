@@ -1,5 +1,3 @@
-# LLM-Test-Generator
+# QAgent Backend
 
-To run you have to put your HF_TOKEN in .env file
-TODO (for consistency of the repo when making it public) do not forget to run the pip installs (to be added)
-add humaneval.jsonl to the repo
+From a novel approach to unit test retrieval on the biggest dataset of unit tests as of June 2024, to generating automated unit tests, and even detecting line vulnerabilities or automated bug repair and fixing, you can find our services here offered to you as part of fullfuilment of our graduation project for cairo university, faculty of engineering. 
