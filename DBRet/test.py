@@ -13,8 +13,8 @@ current_dir = os.path.dirname(__file__)
 FaissIndexpathJ=os.path.join(current_dir,"catJava.index")
 FaissIndexpathP=os.path.join(current_dir,"catPy.index")
 
-Jindex=read_index(FaissIndexpathJ)
 Pindex=read_index(FaissIndexpathP)
+Jindex=read_index(FaissIndexpathJ)
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 model = UniXcoder("microsoft/unixcoder-base")

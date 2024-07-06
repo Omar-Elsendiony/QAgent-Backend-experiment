@@ -33,6 +33,7 @@ class TestGenerator:
                 }
             )
         except Exception as e:
+            print(e)
             print("ERROR in invoking GenUnitTestChain")
 
         unittestCode, isIncompleteResponse = getCodeFromResponse(unittest["text"], 0)

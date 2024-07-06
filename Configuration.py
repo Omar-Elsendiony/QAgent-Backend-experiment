@@ -11,7 +11,7 @@ if "Mixtral" in model_id:
     max_new_tokens = 20_000
 
 llm, chat_model = InitializeModel(
-    os.environ["HUGGINGFACEHUB_API_TOKEN"], model_id, max_new_tokens=max_new_tokens
+    os.environ["API_TOKEN"], model_id, max_new_tokens=max_new_tokens
 )
 
 GenUnitTestChain = InitializeTestChain(llm, True)

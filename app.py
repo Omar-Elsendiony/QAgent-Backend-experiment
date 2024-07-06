@@ -10,6 +10,9 @@ from MainFunctions.DecisionMaker import *
 from MainFunctions.BugFix import *
 from classical.main import main_for_api
 # from SearchBasedBugFixing.bugFixLogic import *
+# from DBRet.unixcoder import UniXcoder
+# from DBRet.deploy import *
+from DBRet.test import *
 CORS(app)  # enable CORS
 
 import subprocess
@@ -54,9 +57,6 @@ def run_python():
 
 #endregion
 
-# from DBRet.unixcoder import UniXcoder
-# from DBRet.deploy import *
-from DBRet.test import *
 
 @app.route('/query', methods=['POST'])
 def query():
@@ -100,17 +100,21 @@ def generate_classical():
     code = request.json.get('code')
     print(code)
     if code:
-        try:
+        # try:
             # execute the main function
-            result = main_for_api(code)
-            print(result)
-            return jsonify({'output': result})
-        except Exception as e:
-            return jsonify({'error': str(e)}), 400
+        result = main_for_api(code)
+        print(result)
+        return jsonify({'output': result})
+        # except Exception as e:
+        #     return jsonify({'error': str(e)}), 400
     else:
         return jsonify({'error': 'No code provided'}), 400
 
+@app.route('/')
+def hello():
+    # print("looooooooooooooooooooooooooooooooooooooooooooooooooo")
 
+    return 'hello man'
 
 
 @app.route('/run-fixbugs', methods=['POST'])
@@ -187,5 +191,5 @@ code = """def simple_function(x, y):
 
 if __name__ == '__main__':
     # app.run(port=8080,debug=True, use_reloader=False)
-    app.run(port=8080)
+    app.run(port=8000)
 
