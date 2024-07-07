@@ -10,13 +10,13 @@ RegenerateTestTemplate = """You are a Python expert, and your task is to debug a
 {description}
 
 *Given Code under Test:*
-```python
-{code}```
+'''python
+{code}'''
 You previously generated the following code as unit tests:
 
 *Unit Tests:*
-```python
-{UnitTests}```
+'''python
+{UnitTests}'''
 
 After running the code with these tests, you received the following feedback based on the test output:
 *Feedback:*

@@ -1,5 +1,4 @@
 import os
-
 import json
 from Model import InitializeModel  # , InitializeGptModel, InitializeModelArbiter
 from PromptChains.GenerateTest import InitializeTestChain  # , queryGptGenerateTest
@@ -13,4 +12,4 @@ from utils.FuncUtils import *
 from DB import *
 from dotenv import load_dotenv
 import pandas as pd
-from utils.CustomThread import CustomThread
+# from utils.CustomThread import CustomThread

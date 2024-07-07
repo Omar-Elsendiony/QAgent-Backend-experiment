@@ -55,7 +55,10 @@ def main_function():
 def main_for_api(code):
     #write the input code of the user to the file inputfunction.py
     path_to_open=os.path.join(os.getcwd(),"classical","inputfunction.py")
+    print("-------------------------")
     print(os.getcwd())
+    print(path_to_open)
+    print("-------------------------")
     with open(path_to_open, "w") as f:
         f.write(code)
     f.close()

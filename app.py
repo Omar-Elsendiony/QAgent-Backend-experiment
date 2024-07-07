@@ -48,7 +48,7 @@ def run_python():
             print("Running QAgentAI")
             result = QAgent_product(
                 code, description, testGenerator, testRegenerator, bugFixGenerator, judgeGenerator)
-            print(result)
+            # print(result)
             return jsonify({'output': list(result)})
         except Exception as e:
             return jsonify({'error': str(e)}), 400
