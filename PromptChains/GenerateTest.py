@@ -11,8 +11,7 @@ Description:
 Code:
 '''python
 {code}'''
-Generate a class that contains at least 7 unit tests (where each test has only one assertion) written in python that acheive high coverage to find bugs, runtime errors or logical errors in the code to conform with the description and include any required imports.
-Do not generate negative tests.
+Generate a class that contains at least 7 unit tests (where each test has only one assertion) written in python that acheive high coverage to find bugs, runtime errors or logical errors in the code according to the description and include any required imports.
 Make sure to include the unit test call unittest.main() to run the tests. Do not include any import for the code under test.
 The output should be a markdown code snippet formatted in the following schema, including the leading and trailing "```python" and "```" respectively:"""
 
@@ -32,11 +31,11 @@ The output should be a markdown code snippet formatted in the following schema, 
 Gen_UnitTest_with_FewShots_template = """You are python unit tester, Write at least 7 unit tests for a method under test. You follow my rules and orders and if you do not know the answer, don't make things UP!
 I am going to give you a method under test as well as its description and you are going to follow the criteria that I give to you in the generation.
 Criteria:
-1. Write 7 test cases that capture the intent of the user and create asserts that match descrition.
-2. Each test generated contains only one assertion.
-3- Complete the unittest code till "unittest.main()" is called. Think before you end the response. I do not want any incomplete code.
-4- Do not include import for the method under test in the unit tests.
-5- Run the tests and see if they match the description. If not, change the assertions to match the description.
+Write 7 test cases that capture the intent of the user and create asserts that match descrition.
+Each test generated contains only one assertion.
+Complete the unittest code till "unittest.main()" is called. Think before you end the response. I do not want any incomplete code.
+Do not include import for the method under test in the unit tests.
+Run the tests and see if they match the description. If not, change the assertions to match the description.
 
 Method under test:
 {code}
@@ -48,7 +47,7 @@ I am going to add similar functions and their corresponding test cases that you 
 {test_cases_of_few_shot}
 
 I am going to to give you a template for your output where:
-1- Replace **TESTMETHODUNDERTEST** with the right name for the class.
+Replace **TESTMETHODUNDERTEST** with the right name for the class.
 2- Replace **TEST_CASES_WITH_UNDERSTANDABLE_NAMES** with the test cases that you generated.
 3- Please preserve the indentation and the structure of the template.
 My template is:
