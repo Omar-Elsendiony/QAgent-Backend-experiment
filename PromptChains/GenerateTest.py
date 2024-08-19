@@ -72,6 +72,12 @@ def InitializeTestChain(llm, fewshots=False):
         Gen_UnitTest_with_FewShots_template = addMixtralTokens(
             Gen_UnitTest_with_FewShots_template
         )
+    if isinstance(llm, ChatHuggingFace):
+        GenerateTestTemplate = addMixtralTokens(GenerateTestTemplate)
+        Gen_UnitTest_with_FewShots_template = addMixtralTokens(
+            Gen_UnitTest_with_FewShots_template
+        )
+    
     if not fewshots:
         Generate_Unit_Tests_Template = PromptTemplate(
             template=GenerateTestTemplate,
@@ -104,28 +110,29 @@ def InitializeTestChain(llm, fewshots=False):
 #     return response
 
 
-# def createPromptStringGenerateTest(
-#     description, code, fewshots=False, test_cases_of_few_shot=None
-# ):
-#     if not fewshots:
-#         prompt = GenerateTestTemplate.format(description=description, code=code)
-#     else:
-#         prompt = Gen_UnitTest_with_FewShots_template.format(
-#             description=description,
-#             code=code,
-#             test_cases_of_few_shot=test_cases_of_few_shot,
-#         )
-#     return prompt
+def createPromptStringGenerateTest(
+    description, code, fewshots=False, test_cases_of_few_shot=None
+):
+    if not fewshots:
+        prompt = GenerateTestTemplate.format(description=description, code=code)
+    else:
+        prompt = Gen_UnitTest_with_FewShots_template.format(
+            description=description,
+            code=code,
+            test_cases_of_few_shot=test_cases_of_few_shot,
+        )
+    return prompt
 
 
-# def queryGptGenerateTest(
-#     model, description, code, fewshots=False, test_cases_of_few_shot=None
-# ):
-#     prompt = createPromptStringGenerateTest(
-#         description, code, fewshots, test_cases_of_few_shot
-#     )
-#     response = openai.ChatCompletion.create(
-#         model=model, messages=[{"role": "user", "content": prompt}]
-#     )
+def queryGptGenerateTest(
+    model, description, code, fewshots=False, test_cases_of_few_shot=None
+):
+    prompt = createPromptStringGenerateTest(
+        description, code, fewshots, test_cases_of_few_shot
+    )
+    
+    response = openai.ChatCompletion.create(
+        model=model, messages=[{"role": "user", "content": prompt}]
+    )
 
-#     return response
+    return response

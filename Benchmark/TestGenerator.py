@@ -131,6 +131,7 @@ class TestGenerator:
                 NonSucceedingCasesNamesList = (
                     NonSucceedingCasesNames["failed"] + NonSucceedingCasesNames["error"]
                 )
+                
                 self.writeResults(
                     feedback,
                     feedbackparsed,
@@ -209,11 +210,15 @@ class TestGenerator:
         Args: code (str): The code of the example
         Return: fewShotStr (str): The few shot code and test cases
         """
+        # get the number of shots from the environment variables and cast it to an integer
+        fewshotsnum = int(os.getenv("FEWSHOTS"))
+        # print(fewshotsnum)
+        # print(type(fewshotsnum))
         # get the few shot code and test cases
         codeOfFewShots, testCasesFewShots = getFewShots(self.db, code)
         # take the most similar few shot other than the code itself
-        codeOfFewShots = codeOfFewShots[1 : self.fewshotsnum]
-        testCasesFewShots = testCasesFewShots[1 : self.fewshotsnum]
+        codeOfFewShots = codeOfFewShots[0 : fewshotsnum]
+        testCasesFewShots = testCasesFewShots[0 : fewshotsnum]
         fewShotStr = preprocessStringFewShot(codeOfFewShots, testCasesFewShots)
         return fewShotStr
 
@@ -271,6 +276,7 @@ class TestGenerator:
         if feedback == "timed out":
             feedbackparsed = "FAIL: 7; ERROR: 0"
             return feedback, feedbackparsed, codeTobeRun
+        
         feedbackparsed = getFeedbackFromRun(feedback)
         return feedback, feedbackparsed, codeTobeRun
 
@@ -300,7 +306,7 @@ class TestGenerator:
             )
             print("Number of Ran Tests : ", numOfAssertions)
             print("Number of Succeeded Test : ", numOfAssertions)
-            print("Number of Succeeded Test : ", 0)
+            # print("Number of Succeeded Test : ", 0)
             FileHandle.write("Test example " + str(i) + " succeeded\n")
             FileHandle.write("Number of Ran Tests : " + str(numOfAssertions) + "\n")
             FileHandle.write(
