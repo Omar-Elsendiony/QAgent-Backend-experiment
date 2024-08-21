@@ -45,7 +45,7 @@ class TestFix:
         self.casesDf = pd.DataFrame()
         self.firstFeedback = True
 
-    def generate(self):
+    def generate(self, startIndex):
         """
         This function is responsible for generating the test cases and running them
         The function is responsible for:
@@ -61,22 +61,23 @@ class TestFix:
         self.reset()
         FileHandle = open(self.OutputFolder + "Cases.txt", "w+")
         for i in range(len(self.CasesLogs)):
-            # if (i == 4):
-            #     print('jyjy')
-            # print("Running Example ", i, "\n=====================\n")
+            if (i == 2):
+                print('jyjy')
+            print("Running Example ", i + startIndex, "\n=====================\n")
 
             currDescription, currCode, currGeneratedCode, currFeedback = (
                 self.extractInfo(i)
             )
             # no feedback means testcase passed so don't run it again
             if ("OK" in currFeedback or pd.isna(currFeedback) or currFeedback == "" or currFeedback is None ):
-                print("Example", i, " has already passed")
+                print("Example", i + startIndex, " has already passed")
                 FileHandle.write(
                     "Example "
-                    + str(i)
+                    + str(i + startIndex)
                     + " has already passed\n=====================================\n"
                 )
                 continue
+            
             try:
                 GenerationPostFeedback = self.UnitTestFeedbackChain.invoke(
                     {
@@ -92,18 +93,19 @@ class TestFix:
                 print(e)
                 FileHandle.write(
                     "Example "
-                    + str(i)
+                    + str(i + startIndex)
                     + " Didn't Run Due to Errorr\n=====================================\n"
                 )
                 continue
-            except KeyboardInterrupt:
-                print("Keyboard Interrupt")
-                FileHandle.write(
-                    "Example "
-                    + str(i)
-                    + " Didn't Run Due to Error\n=====================================\n"
-                )
-                continue
+            # except KeyboardInterrupt as e:
+            #     print(e)
+            #     print("Keyboard Interrupt")
+            #     FileHandle.write(
+            #         "Example "
+            #         + str(i)
+            #         + " Didn't Run Due to Error\n=====================================\n"
+            #     )
+            #    continue
             
             newUnitTestCode, isIncompleteResponse = getCodeFromResponse(
                 GenerationPostFeedback["text"], 1
@@ -112,14 +114,16 @@ class TestFix:
                 self.incompleteResponses += 1
                 print(
                     "Test Case "
-                    + str(i)
+                    + str(i + startIndex)
                     + " Didn't Run Due to Incomplete Response\n=====================================\n"
                 )
                 FileHandle.write(
                     "Example "
-                    + str(i)
+                    + str(i + startIndex)
                     + " Didn't Run Due to Incomplete Response\n=====================================\n"
                 )
+            if (i == 10):
+                x = 4
             unittestCode = preprocessUnitTest(newUnitTestCode)
             codeTobeRun = getRunningCode(currCode, unittestCode)
             feedback = runCode(codeTobeRun, self.myglobals)
@@ -136,6 +140,7 @@ class TestFix:
                 FileHandle,
                 NonSucceedingCasesNamesList,
                 i,
+                i + startIndex
             )
             self.descriptions.append(currDescription)
             self.codes.append(currCode)
@@ -144,7 +149,7 @@ class TestFix:
             # codeRanList.append(codeTobeRun)
             newRow = pd.DataFrame(
                 {
-                    "CaseNumber": i,
+                    "CaseNumber": i + startIndex,
                     "Description": currDescription,
                     "Code": currCode,
                     "GeneratedCode": unittestCode,
@@ -224,6 +229,7 @@ class TestFix:
         FileHanlde,
         NonSucceedingCasesNamesList,
         i,
+        virtualIndex # the index that is attributed to the whole dataset
     ):
         """
         Responsible for writing results to cases.txt and cases.json
@@ -236,12 +242,12 @@ class TestFix:
             self.successfulExamplesNum += 1
             self.OKCases += 1
             print(
-                f"Test example {i} succeeded\n======================================\n"
+                f"Test example {virtualIndex} succeeded\n======================================\n"
             )
             print("Number of Ran Tests : ", numOfAssertions)
             print("Number of Succeeded Test : ", numOfAssertions)
             print("Number of Succeeded Test : ", 0)
-            FileHanlde.write("Test example " + str(i) + " succeeded\n")
+            FileHanlde.write("Test example " + str(virtualIndex) + " succeeded\n")
             FileHanlde.write("Number of Ran Tests : " + str(numOfAssertions) + "\n")
             FileHanlde.write(
                 "Number of Succeeded Test : " + str(numOfAssertions) + "\n"
@@ -261,7 +267,7 @@ class TestFix:
 
             newCaseRow = pd.DataFrame(
                 {
-                    "CaseNumber": i,
+                    "CaseNumber": virtualIndex,
                     "Feedback Total Tests": numOfAssertions,
                     "Feedback Tests failed": 0,
                     "Feedback Error Tests": 0,
@@ -285,7 +291,7 @@ class TestFix:
                 or "timed out" in feedbackparsed.lower()
             ):
                 print(
-                    f"Test example {i} failed due to syntax or indentation or timeout\n======================================\n"
+                    f"Test example {virtualIndex} failed due to syntax or indentation or timeout\n======================================\n"
                 )
                 print("Number of Ran Tests : ", 0)
                 print("Number of failed Tests : ", 0)
@@ -293,7 +299,7 @@ class TestFix:
                 print("Number of Succeeded Test : ", 0)
                 FileHanlde.write(
                     "Test example "
-                    + str(i)
+                    + str(virtualIndex)
                     + " failed due to syntax or indentation or timeout\n"
                 )
                 FileHanlde.write("Number of Ran Tests : " + str(numOfAssertions) + "\n")
@@ -305,7 +311,7 @@ class TestFix:
             self.failedExamplesNum += 1
             failedCasesNum, errorCasesNum = getNumNonSucceedingTestcases(feedback)
             numberOfSucceeded = numOfAssertions - failedCasesNum - errorCasesNum
-            print(f"Test example {i} failed\n======================================\n")
+            print(f"Test example {virtualIndex} failed\n======================================\n")
             print("Number of Ran Tests : ", numOfAssertions)
             print("Number of failed Tests : ", failedCasesNum)
             print("Number of error Tests : ", errorCasesNum)
@@ -313,7 +319,7 @@ class TestFix:
                 "Number of Succeeded Test : ",
                 numberOfSucceeded,
             )
-            FileHanlde.write("Test example " + str(i) + " failed\n")
+            FileHanlde.write("Test example " + str(virtualIndex) + " failed\n")
             FileHanlde.write("Number of Ran Tests : " + str(numOfAssertions) + "\n")
             FileHanlde.write("Number of failed Tests : " + str(failedCasesNum) + "\n")
             FileHanlde.write("Number of Error Test : " + str(errorCasesNum) + "\n")
@@ -333,7 +339,7 @@ class TestFix:
 
             newCaseRow = pd.DataFrame(
                 {
-                    "CaseNumber": i,
+                    "CaseNumber": virtualIndex,
                     "Feedback Total Tests": numOfAssertions,
                     "Feedback Tests failed": failedCasesNum,
                     "Feedback Error Tests": errorCasesNum,
@@ -351,6 +357,7 @@ class TestFix:
             self.testsToRepeat += len(NonSucceedingCasesNamesList)
             self.failed_test_cases += failedCasesNum
             self.error_test_cases += errorCasesNum
+
 
     def printResults(self):
         """

@@ -9,7 +9,7 @@ model_id = "mistralai/Mixtral-8x7B-Instruct-v0.1"
 
 max_new_tokens = 6000
 if "Mixtral" in model_id:
-    max_new_tokens = 20_000
+    max_new_tokens = 29_000
 
 if (MODEL == "GPT-3.5-turbo"):
     llm, chat_model = InitializeGptModel(
@@ -18,7 +18,7 @@ if (MODEL == "GPT-3.5-turbo"):
     # queryGptGenerateTest()
 else:
     llm, chat_model = InitializeModel(
-        os.environ["API_TOKEN"], model_id, max_new_tokens=max_new_tokens
+        os.environ["HUGGINGFACEHUB_API_TOKEN"], model_id, max_new_tokens=max_new_tokens
     )
     GenUnitTestChain = InitializeTestChain(llm, True)
 

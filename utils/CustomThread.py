@@ -37,8 +37,8 @@ def runCode(code, myglobals):
     redirectedOutput2 = sys.stderr = StringIO()
     result = ""
     try:
-        thread = CustomThread()
-        thread.daemon = True
+        thread = CustomThread(daemon=True)
+        # thread.daemon = True
         thread.start()
         exec(code, myglobals)
         # thread.stop()
@@ -161,8 +161,7 @@ class TestFib(unittest.TestCase):
     def test_fib_of_10(self):
         self.assertEqual(fib(10), 55)
 
-    def test_fib_of_10(self):
-        self.assertEqual(fib(50), 298642)
+
 
 if __name__ == '__main__':
     unittest.main(argv=['first-arg-is-ignored'])()
