@@ -13,6 +13,7 @@ class TestGenerator:
         )
         self.myglobals = myglobals
         self.isHumanEval = isHumanEval
+        self.interfaceModerator = "LLama"  # the interface with huggingface
 
     def reset(self):
         self.totalTestCasesNum = 0
@@ -102,9 +103,16 @@ class TestGenerator:
                 with open(self.JSONFile, "w") as f:
                     json.dump(jsondata, f, indent=4)
                 continue
-            unittestCode, isIncompleteResponse = getCodeFromResponse(
-                unittest["text"], 0
-            )
+            
+            if (self.interfaceModerator == "LLama"):
+                unittestCode, isIncompleteResponse = getCodeFromResponse(
+                    unittest.text, 0
+                )
+            else:
+                unittestCode, isIncompleteResponse = getCodeFromResponse(
+                    unittest["text"], 0
+                )
+                
             if isIncompleteResponse:
                 self.incompleteResponses += 1
                 print(

@@ -22,7 +22,7 @@ def InitializeModel(
         },
         cache=False,
     )
-    chat_model = ChatHuggingFace(llm=llm)
+    # chat_model = ChatHuggingFace(llm=llm)
     return llm, llm
 
 

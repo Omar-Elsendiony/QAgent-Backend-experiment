@@ -12,4 +12,5 @@ from utils.FuncUtils import *
 from DB import *
 from dotenv import load_dotenv
 import pandas as pd
+from LLama_model import *
 # from utils.CustomThread import CustomThread
