@@ -297,7 +297,7 @@ class TestGenerator:
 
         """
         numOfAssertions = getNumAssertions(unittestCode)
-        if feedbackparsed == "" or feedbackparsed is None:
+        if feedbackparsed == "" or feedbackparsed is None: # that means that the test case is OK
             # in case of OK
             self.successfulExamplesNum += 1
             self.OKCases += 1
@@ -334,6 +334,7 @@ class TestGenerator:
 
         else:
             self.failedExamplesNum += 1
+            if (feedback == "timed out"): feedback = f"failures={numOfAssertions}; errors=0"
             failedCasesNum, errorCasesNum = getNumNonSucceedingTestcases(feedback)
             # NonSucceedingCasesNames = getNonSucceedingTestcases(feedback)
             # NonSucceedingCasesNamesList = (

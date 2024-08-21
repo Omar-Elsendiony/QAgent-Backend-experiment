@@ -61,20 +61,15 @@ class TestFix:
         self.reset()
         FileHandle = open(self.OutputFolder + "Cases.txt", "w+")
         for i in range(len(self.CasesLogs)):
-            # if (i == 28):
-            #     x = 9000
-            print("Running Example ", i, "\n=====================\n")
+            # if (i == 4):
+            #     print('jyjy')
+            # print("Running Example ", i, "\n=====================\n")
 
             currDescription, currCode, currGeneratedCode, currFeedback = (
                 self.extractInfo(i)
             )
             # no feedback means testcase passed so don't run it again
-            if (
-                "OK" in currFeedback
-                or pd.isna(currFeedback)
-                or currFeedback == ""
-                or currFeedback is None
-            ):
+            if ("OK" in currFeedback or pd.isna(currFeedback) or currFeedback == "" or currFeedback is None ):
                 print("Example", i, " has already passed")
                 FileHandle.write(
                     "Example "
@@ -101,6 +96,15 @@ class TestFix:
                     + " Didn't Run Due to Errorr\n=====================================\n"
                 )
                 continue
+            except KeyboardInterrupt:
+                print("Keyboard Interrupt")
+                FileHandle.write(
+                    "Example "
+                    + str(i)
+                    + " Didn't Run Due to Error\n=====================================\n"
+                )
+                continue
+            
             newUnitTestCode, isIncompleteResponse = getCodeFromResponse(
                 GenerationPostFeedback["text"], 1
             )
