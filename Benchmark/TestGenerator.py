@@ -105,13 +105,9 @@ class TestGenerator:
                 continue
             
             if (self.interfaceModerator == "LLama"):
-                unittestCode, isIncompleteResponse = getCodeFromResponse(
-                    unittest.text, 0
-                )
+                unittestCode, isIncompleteResponse = getCodeFromResponse(unittest.text, 0)
             else:
-                unittestCode, isIncompleteResponse = getCodeFromResponse(
-                    unittest["text"], 0
-                )
+                unittestCode, isIncompleteResponse = getCodeFromResponse(unittest["text"], 0)
                 
             if isIncompleteResponse:
                 self.incompleteResponses += 1

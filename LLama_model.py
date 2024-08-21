@@ -37,9 +37,13 @@ class LlamaModel:
 
     def InitializeModel(self, htoken, model_name="mistralai/Mixtral-8x7B-Instruct-v0.1", max_new_tokens=20000, type=1):
         llm = HuggingFaceInferenceAPI(model_name = model_name, token = htoken, max_tokens = max_new_tokens, temperature = 0.1)
-        self.__model = llm
-        self.__template = PromptTemplate(Gen_UnitTest_with_FewShots_template)
         self.__type = type
+        self.__model = llm
+        if (type == 1):
+            self.__template = PromptTemplate(Gen_UnitTest_with_FewShots_template)
+        elif (type == 2):
+            self.__template = PromptTemplate(RegenerateTestTemplate)
+            
         return llm
 
     def get_model(self):
