@@ -60,6 +60,7 @@ def getCodeFromTestFixing(response,
         r"[^\"](?<=```python\n)(.*)?\)(?=```)",
         r"[^\"](?<=```python\n)(.*)?",
     ]
+    
     for i, pattern in enumerate(patterns):
         code_match = re.search(pattern, ExtractedResponse, re.DOTALL)
         if code_match is not None:

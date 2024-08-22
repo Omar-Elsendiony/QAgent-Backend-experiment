@@ -20,13 +20,13 @@ class CustomThread(threading.Thread):
 
     def run(self):
         sleep(10)
-        interrupt_main()
+        # interrupt_main()
         # self._stopper.set()
-        while (True):
-            pass
+        # while (True):
+        #     pass
         # sleep(10)
-        # while not self._stopper.is_set():
-        #     interrupt_main()
+        if not self._stopper.is_set():
+            interrupt_main()
 
 
 
@@ -41,7 +41,7 @@ def runCode(code, myglobals):
         # thread.daemon = True
         thread.start()
         exec(code, myglobals)
-        # thread.stop()
+        thread.stop()
         result = redirectedOutput.getvalue()
     except Exception as e:
         # self._stopper.set()
@@ -56,6 +56,8 @@ def runCode(code, myglobals):
         result = "timed out"
     
     thread.stop()
+    # thread.join()
+
     myglobals.popitem()
     sys.stdout = oldStdOUT
     sys.stderr = oldStdERR
@@ -132,39 +134,40 @@ def runCode(code, myglobals):
 
 
 
-code = """
-def fib(n: int):
-    if n == 0:
-        return 0
-    if n == 1:
-        return 1
-    return fib(n - 1) + fib(n - 2)
+# code = """
+# def fib(n: int):
+#     if n == 0:
+#         return 0
+#     if n == 1:
+#         return 1
+#     return fib(n - 1) + fib(n - 2)
 
-import unittest
+# import unittest
 
-class TestFib(unittest.TestCase):
-    def test_fib_of_0(self):
-        self.assertEqual(fib(0), 0)
+# class TestFib(unittest.TestCase):
+#     def test_fib_of_0(self):
+#         self.assertEqual(fib(0), 0)
 
-    def test_fib_of_1(self):
-        self.assertEqual(fib(1), 1)
+#     def test_fib_of_1(self):
+#         self.assertEqual(fib(1), 1)
 
-    def test_fib_of_2(self):
-        self.assertEqual(fib(2), 1)
+#     def test_fib_of_2(self):
+#         self.assertEqual(fib(2), 1)
 
-    def test_fib_of_3(self):
-        self.assertEqual(fib(3), 2)
+#     def test_fib_of_3(self):
+#         self.assertEqual(fib(3), 2)
 
-    def test_fib_of_8(self):
-        self.assertEqual(fib(8), 21)
+#     def test_fib_of_8(self):
+#         self.assertEqual(fib(8), 21)
 
-    def test_fib_of_10(self):
-        self.assertEqual(fib(10), 55)
+#     def test_fib_of_10(self):
+#         self.assertEqual(fib(10), 55)
 
+#     def test_fib_of_10(self):
+#         self.assertEqual(fib(50), 55)
 
+# if __name__ == '__main__':
+#     unittest.main(argv=['first-arg-is-ignored'])()
+# """
 
-if __name__ == '__main__':
-    unittest.main(argv=['first-arg-is-ignored'])()
-"""
-
-print(runCode(code, globals()))
+# print(runCode(code, globals()))

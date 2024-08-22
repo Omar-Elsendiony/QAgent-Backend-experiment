@@ -1,6 +1,12 @@
 from Imports import *
 from utils.CustomThread import *
 
+from huggingface_hub import InferenceClient
+from typing import Dict
+from prompts_text import *
+from llama_index.core import PromptTemplate
+
+
 
 class TestFix:
 
@@ -9,7 +15,7 @@ class TestFix:
         self.UnitTestFeedbackChain = UnitTestFeedbackChain
         self.myglobals = myglobals
         self.firstFeedback = firstFeedback
-        self.interfaceModerator = "LLama"
+        self.interfaceModerator = "HF"
         
 
     def reset(self):
@@ -59,31 +65,50 @@ class TestFix:
         self.reset()
         FileHandle = open(self.OutputFolder + "Cases.txt", "w+")
         for i in range(len(self.CasesLogs)):
-            sleep(1)
+            print("********************************************************************")
             print("Running Example ", i + startIndex, "\n=====================\n")
 
-            currDescription, currCode, currGeneratedCode, currFeedback = (
-                self.extractInfo(i)
-            )
+            # Extract the description and code from the example
+            currDescription, currCode, currGeneratedCode, currFeedback = self.extractInfo(i)
+            
             # no feedback means testcase passed so don't run it again
             if ("OK" in currFeedback or pd.isna(currFeedback) or currFeedback == "" or currFeedback is None ):
                 print("Example", i + startIndex, " has already passed")
-                FileHandle.write(
-                    "Example "
-                    + str(i + startIndex)
-                    + " has already passed\n=====================================\n"
-                )
+                FileHandle.write( "Example " + str(i + startIndex) + " has already passed\n=====================================\n")
                 continue
             
             try:
-                GenerationPostFeedback = self.UnitTestFeedbackChain.invoke(
-                    {
-                        "description": currDescription,
-                        "code": currCode,
-                        "UnitTests": currGeneratedCode,
-                        "Feedback": currFeedback,
-                    }
-                )
+                if (self.interfaceModerator == "HF"):
+                    client = InferenceClient(
+                        model="mistralai/Mixtral-8x7B-Instruct-v0.1",
+                        token="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",
+                    )
+                    # def inferFun(prompt):
+                        # response = ""
+                    qa_template = PromptTemplate(RegenerateTestTemplate)
+
+                    prompt = qa_template.format(description=currDescription, code=currCode, UnitTests=currGeneratedCode, Feedback=currFeedback)
+
+                    GenerationPostFeedback = ""
+                    for message in client.chat_completion(
+                        messages=[{"role": "user", "content": prompt}],
+                        max_tokens=28_500,
+                        stream=True,
+                        temperature=0.1,
+                        # top_p = 0.6,
+                        ):
+                        
+                        GenerationPostFeedback += message.choices[0].delta.content
+                    
+                else:
+                    GenerationPostFeedback = self.UnitTestFeedbackChain.invoke(
+                        {
+                            "description": currDescription,
+                            "code": currCode,
+                            "UnitTests": currGeneratedCode,
+                            "Feedback": currFeedback,
+                        }
+                    )
             except Exception as e:
                 print("ERROR in invoking Feedback Chain")
                 self.apiErrors += 1
@@ -98,16 +123,17 @@ class TestFix:
             #         + str(i)
             #         + " Didn't Run Due to Error\n=====================================\n"
             #     )
-            #    continue
-            print(GenerationPostFeedback.text)
+            #     continue
+
             if (self.interfaceModerator == "LLama"):
                 newUnitTestCode, isIncompleteResponse = getCodeFromResponse(GenerationPostFeedback.text, 1)
+            elif (self.interfaceModerator == "HF"):
+                newUnitTestCode, isIncompleteResponse = getCodeFromResponse(GenerationPostFeedback, 1)
             else:
                 newUnitTestCode, isIncompleteResponse = getCodeFromResponse(GenerationPostFeedback["text"], 1)
             
-            # newUnitTestCode, isIncompleteResponse = getCodeFromResponse(
-            #     GenerationPostFeedback["text"], 1
-            # )
+
+            
             if isIncompleteResponse:
                 self.incompleteResponses += 1
                 print(
@@ -120,8 +146,7 @@ class TestFix:
                     + str(i + startIndex)
                     + " Didn't Run Due to Incomplete Response\n=====================================\n"
                 )
-            if (i == 10):
-                x = 4
+
             unittestCode = preprocessUnitTest(newUnitTestCode)
             codeTobeRun = getRunningCode(currCode, unittestCode)
             feedback = runCode(codeTobeRun, self.myglobals)
@@ -158,9 +183,9 @@ class TestFix:
                 },
                 index=[0],
             )
+            
             # df = df.append(newRow, ignore_index=True)
             self.logsDf = pd.concat([self.logsDf, newRow])
-            # Save the updated DataFrame back to the excel file using 'openpyxl' engine for writing
             jsondata = self.logsDf.to_dict(orient="records")
             with open(self.JSONFile, "w") as f:
                 json.dump(jsondata, f, indent=4)

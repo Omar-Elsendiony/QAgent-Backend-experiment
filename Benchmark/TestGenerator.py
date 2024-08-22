@@ -106,37 +106,37 @@ class TestGenerator:
                 unittestCode, isIncompleteResponse = getCodeFromResponse(unittest, 0)
             else:
                 unittestCode, isIncompleteResponse = getCodeFromResponse(unittest["text"], 0)
-                
+
             if isIncompleteResponse:
                 self.incompleteResponses += 1
                 print( "Test Case " + str(i) + " Didn't Run Due to Incomplete Response\n=====================================\n")
                 FileHandle.write( "Test Case " + str(i) + " Didn't Run Due to Incomplete Response\n=====================================\n")
-            try:
-                feedback, feedbackparsed, codeTobeRun = self.runTest(code, unittestCode)
+            
+            feedback, feedbackparsed, codeTobeRun = self.runTest(code, unittestCode)
 
-                # print(feedbackparsed)
-                # feedback = "timed out"
-                # feedbackparsed = None
-                # if (feedback == "timed out") or (feedback == "API Error"):
-                #     pass
+            # print(feedbackparsed)
+            # feedback = "timed out"
+            # feedbackparsed = None
+            # if (feedback == "timed out") or (feedback == "API Error"):
+            #     pass
 
-                NonSucceedingCasesNames = getNonSucceedingTestcases(feedback)
+            NonSucceedingCasesNames = getNonSucceedingTestcases(feedback)
 
-                NonSucceedingCasesNamesList = (
-                    NonSucceedingCasesNames["failed"] + NonSucceedingCasesNames["error"]
-                )
-                
-                self.writeResults(
-                    feedback,
-                    feedbackparsed,
-                    unittestCode,
-                    FileHandle,
-                    NonSucceedingCasesNamesList,
-                    i,
-                )
-                testsToRepeat = getEachTestCase(unittestCode, NonSucceedingCasesNamesList)
-            except KeyboardInterrupt:
-                pass
+            NonSucceedingCasesNamesList = (
+                NonSucceedingCasesNames["failed"] + NonSucceedingCasesNames["error"]
+            )
+            
+            self.writeResults(
+                feedback,
+                feedbackparsed,
+                unittestCode,
+                FileHandle,
+                NonSucceedingCasesNamesList,
+                i,
+            )
+            testsToRepeat = getEachTestCase(unittestCode, NonSucceedingCasesNamesList)
+            
+
             self.descriptions.append(description)
             self.codes.append(code)
             self.resCodes.append(unittestCode)

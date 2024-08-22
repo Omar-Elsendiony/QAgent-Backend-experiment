@@ -1,6 +1,7 @@
 from Imports import *
-load_dotenv()
 
+
+load_dotenv()
 MODEL = os.getenv("MODEL")
 # model_name = "bigcode/starcoder2-15b"
 model_name = "google/gemma-7b-it"
@@ -9,7 +10,7 @@ model_name = "mistralai/Mixtral-8x7B-Instruct-v0.1"
 
 max_new_tokens = 6000
 if "Mixtral" in model_name:
-    max_new_tokens = 20_000
+    max_new_tokens = 29_000
 
 # if (MODEL == "GPT-3.5-turbo"):
 #     llm, chat_model = InitializeGptModel(
