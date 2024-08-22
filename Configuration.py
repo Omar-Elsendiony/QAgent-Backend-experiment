@@ -9,7 +9,7 @@ model_name = "mistralai/Mixtral-8x7B-Instruct-v0.1"
 
 max_new_tokens = 6000
 if "Mixtral" in model_name:
-    max_new_tokens = 29_000
+    max_new_tokens = 20_000
 
 # if (MODEL == "GPT-3.5-turbo"):
 #     llm, chat_model = InitializeGptModel(
@@ -23,15 +23,15 @@ if "Mixtral" in model_name:
 #     GenUnitTestChain = InitializeTestChain(llm, True)
 
 ### Re-initialize the model for the other chains
-GenUnitTestChain = LlamaModel()
-UnitTestFeedbackChain = LlamaModel()
-llamaBugFix = LlamaModel()
+GenUnitTestChain = HFCustomInferenceAPI()
+UnitTestFeedbackChain = HFCustomInferenceAPI()
+llamaBugFix = HFCustomInferenceAPI()
 
 # Generate Unit Tests
-GenUnitTestChain.InitializeModel(os.environ["HUGGINGFACEHUB_API_TOKEN"], model_name, 20000, 1)
+GenUnitTestChain.InitializeModel(os.environ["HUGGINGFACEHUB_API_TOKEN"], model_name, max_new_tokens, 1)
 
 # UnitTestFeedbackChain = InitializeFeedbackChain(llm)
-UnitTestFeedbackChain.InitializeModel(os.environ["HUGGINGFACEHUB_API_TOKEN"], model_name, 20000, 2)
+UnitTestFeedbackChain.InitializeModel(os.environ["HUGGINGFACEHUB_API_TOKEN"], model_name, max_new_tokens, 2)
 
 
 # judgeChain = InitializeJudgeChain(llm)

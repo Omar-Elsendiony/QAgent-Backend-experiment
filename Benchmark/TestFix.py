@@ -4,16 +4,13 @@ from utils.CustomThread import *
 
 class TestFix:
 
-    def __init__(
-        self,
-        UnitTestFeedbackChain,
-        firstFeedback,
-        myglobals,
-    ):
+    def __init__( self, UnitTestFeedbackChain, firstFeedback, myglobals):
         self.reset()
         self.UnitTestFeedbackChain = UnitTestFeedbackChain
         self.myglobals = myglobals
         self.firstFeedback = firstFeedback
+        self.interfaceModerator = "LLama"
+        
 
     def reset(self):
         self.totalTestCasesNum = 0
@@ -56,13 +53,13 @@ class TestFix:
         Args: None
         Return: None
         """
-        print(self.firstFeedback)
+        # print(self.firstFeedback)
+        
         self.checkPaths()
         self.reset()
         FileHandle = open(self.OutputFolder + "Cases.txt", "w+")
         for i in range(len(self.CasesLogs)):
-            if (i == 2):
-                print('jyjy')
+            sleep(1)
             print("Running Example ", i + startIndex, "\n=====================\n")
 
             currDescription, currCode, currGeneratedCode, currFeedback = (
@@ -91,11 +88,7 @@ class TestFix:
                 print("ERROR in invoking Feedback Chain")
                 self.apiErrors += 1
                 print(e)
-                FileHandle.write(
-                    "Example "
-                    + str(i + startIndex)
-                    + " Didn't Run Due to Errorr\n=====================================\n"
-                )
+                FileHandle.write( "Example " + str(i + startIndex) + " Didn't Run Due to Errorr\n=====================================\n")
                 continue
             # except KeyboardInterrupt as e:
             #     print(e)
@@ -106,10 +99,15 @@ class TestFix:
             #         + " Didn't Run Due to Error\n=====================================\n"
             #     )
             #    continue
+            print(GenerationPostFeedback.text)
+            if (self.interfaceModerator == "LLama"):
+                newUnitTestCode, isIncompleteResponse = getCodeFromResponse(GenerationPostFeedback.text, 1)
+            else:
+                newUnitTestCode, isIncompleteResponse = getCodeFromResponse(GenerationPostFeedback["text"], 1)
             
-            newUnitTestCode, isIncompleteResponse = getCodeFromResponse(
-                GenerationPostFeedback["text"], 1
-            )
+            # newUnitTestCode, isIncompleteResponse = getCodeFromResponse(
+            #     GenerationPostFeedback["text"], 1
+            # )
             if isIncompleteResponse:
                 self.incompleteResponses += 1
                 print(

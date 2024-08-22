@@ -13,7 +13,7 @@ class TestGenerator:
         )
         self.myglobals = myglobals
         self.isHumanEval = isHumanEval
-        self.interfaceModerator = "LLama"  # the interface with huggingface
+        self.interfaceModerator = "HF"  # the interface with huggingface
 
     def reset(self):
         self.totalTestCasesNum = 0
@@ -79,11 +79,7 @@ class TestGenerator:
                 print("ERROR in invoking GenUnitTestChain")
                 self.apiErrors += 1
                 print(e)
-                FileHandle.write(
-                    "Test Case "
-                    + str(i)
-                    + " Didn't Run Due to Errorr\n=====================================\n"
-                )
+                FileHandle.write("Test Case " + str(i) + " Didn't Run Due to Errorr\n=====================================\n")
                 newRow = pd.DataFrame(
                     {
                         "CaseNumber": i,
@@ -106,21 +102,15 @@ class TestGenerator:
             
             if (self.interfaceModerator == "LLama"):
                 unittestCode, isIncompleteResponse = getCodeFromResponse(unittest.text, 0)
+            elif (self.interfaceModerator == "HF"):
+                unittestCode, isIncompleteResponse = getCodeFromResponse(unittest, 0)
             else:
                 unittestCode, isIncompleteResponse = getCodeFromResponse(unittest["text"], 0)
                 
             if isIncompleteResponse:
                 self.incompleteResponses += 1
-                print(
-                    "Test Case "
-                    + str(i)
-                    + " Didn't Run Due to Incomplete Response\n=====================================\n"
-                )
-                FileHandle.write(
-                    "Test Case "
-                    + str(i)
-                    + " Didn't Run Due to Incomplete Response\n=====================================\n"
-                )
+                print( "Test Case " + str(i) + " Didn't Run Due to Incomplete Response\n=====================================\n")
+                FileHandle.write( "Test Case " + str(i) + " Didn't Run Due to Incomplete Response\n=====================================\n")
             try:
                 feedback, feedbackparsed, codeTobeRun = self.runTest(code, unittestCode)
 
@@ -272,8 +262,10 @@ class TestGenerator:
         """
         unittestCode = preprocessUnitTest(unittestCode)
         codeTobeRun = getRunningCode(code, unittestCode)
+        feedback = ""
         try:
             feedback = runCode(codeTobeRun, self.myglobals)
+            pass
         except KeyboardInterrupt:
             feedback = "timed out"
 

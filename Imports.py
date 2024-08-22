@@ -13,4 +13,5 @@ from DB import *
 from dotenv import load_dotenv
 import pandas as pd
 from LLama_model import *
+from hugging_face_infer import *
 # from utils.CustomThread import CustomThread

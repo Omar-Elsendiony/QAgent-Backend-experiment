@@ -60,3 +60,6 @@ Preserve all existing functionality not related to the bugs.
 
 Return your revised unit tests as only one formatted markdown code snippet without further explanation, surrounded by triple backticks and the word 'python'."""
 
+def addMixtralTokens(template):
+    """Adds Mixtral Special Tokens to the prompt in case of vanilla llm by API to try to prevent incomplete responses problem."""
+    return "<s> [INST] " + template + "</s> [/INST]"
