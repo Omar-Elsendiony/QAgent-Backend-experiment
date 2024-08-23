@@ -63,3 +63,43 @@
 # print("Tests to Repeat: ", testsToRepeat)
 
 
+
+import sys
+import re
+sys.setrecursionlimit(100)
+    
+
+
+def get_odd_collatz(n):
+    if n%2==0:
+        odd_collatz = [] 
+    else:
+        odd_collatz = [n]
+    while n > 1:
+        if n % 2 == 0:
+            n = n/2
+        else:
+            n = n*3 + 1
+            
+        if n%2 == 1:
+            odd_collatz.append(int(n))
+
+    return sorted(odd_collatz)
+
+import unittest
+
+class TestGetOddCollatz(unittest.TestCase):
+    def test_get_odd_collatz_for_one(self):
+        result = get_odd_collatz(1)
+        self.assertEqual(result, [1])
+
+    def test_get_odd_collatz_for_even_number(self):
+        result = get_odd_collatz(4)
+        self.assertEqual(result, [1])
+
+    def test_get_odd_collatz_for_odd_number(self):
+        result = get_odd_collatz(5)
+
+if __name__ == '__main__':
+    unittest.main(argv=['first-arg-is-ignored'])()
+

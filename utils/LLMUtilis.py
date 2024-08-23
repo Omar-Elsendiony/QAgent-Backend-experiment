@@ -1,11 +1,12 @@
 import re
-
+from time import sleep
 
 # made according to mixtral response
 # Skips first code (CUT) and starts searching from after that
 def getCodefromTestGeneration(response):
     incompleteResponse = False
     ExtractedResponse = response
+    code_match = ""
     # print(response)
     # s = re.finditer(r"```python", response)
     # ExtractedResponse = ""
@@ -24,17 +25,24 @@ def getCodefromTestGeneration(response):
     for i, pattern in enumerate(patterns):
         code_match = re.search(pattern, ExtractedResponse, re.DOTALL)
         if code_match is not None:
-            if i == len(patterns) - 1:
-                incompleteResponse = True
+            # if i == len(patterns) - 1:
+            #     incompleteResponse = True
             break
     
     # if code_match is None:
     #     return (response[startIndex:], True)
+    # print(response)
+    # sleep(1)
+    if (code_match is None):
+        return (response, False)
     
     code = re.sub("from.*(?=class)", "", code_match.group(0), flags=re.DOTALL)
     return code, incompleteResponse
 
 
+mycode = ("""Here is the unit test for the `even_odd_palindrome` function following the given criteria:\n\n```python\nimport unittest\n\nclass TestEvenOddPalindrome(unittest.TestCase):\n    def test_even_odd_palindrome_when_n_is_three(self):\n        result = even_odd_palindrome(3)\n        self.assertEqual(result, (1, 2))\n\n    def test_even_odd_palindrome_when_n_is_four(self):\n        result = even_odd_palindrome(4)\n        self.assertEqual(result, (2, 1))\n\n    def test_even_odd_palindrome_when_n_is_five(self):\n        result = even_odd_palindrome(5)\n        self.assertEqual(result, (2, 2))\n\n    def test_even_odd_palindrome_when_n_is_six(self):\n        result = even_odd_palindrome(6)\n""")
+code, tc = getCodefromTestGeneration(mycode)
+print(tc)
 # skips any substring that contains a statement from the prompt template
 # handles only if the llm changes either the code or the test cases
 # TODO: handle if the llm changes both the code and the test cases
@@ -119,7 +127,7 @@ def getCodeFromResponse(response, testFixing=0):
     if testFixing == 0:
         return getCodefromTestGeneration(response)
     elif testFixing == 1:
-        return getCodeFromTestFixing(response)
+        return getCodefromTestGeneration(response)
     else:
         # for bug fixing
         return getCodeFromBugFixing(response, "</s> [/INST]")
