@@ -33,7 +33,8 @@ class HFCustomInferenceAPI:
             
         elif (self.__type == 2):
             prompt_final = self.__template.format(description=prompt["description"], code=prompt["code"], UnitTests=prompt["UnitTests"], Feedback=prompt["Feedback"])
-        print(prompt_final)
+        
+        # print(prompt_final)
         return self.inferFun(prompt_final)
 
     def InitializeModel(self, htoken, model_name="mistralai/Mixtral-8x7B-Instruct-v0.1", max_new_tokens=20000, type=1):

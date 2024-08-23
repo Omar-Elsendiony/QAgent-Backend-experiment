@@ -112,10 +112,11 @@ def preprocessUnitTest(code):
 def getRunningCode(codeUnderTest, unitTestCode):
     """Takes in the code under test and the unittest code and returns the code to run"""
     
+    # intro code indentation is important for the code to run
     introCode = """
-    import sys
-    import re
-    sys.setrecursionlimit(100)
+import sys
+import re
+sys.setrecursionlimit(100)
     """
     runningCode = introCode + "\n" + codeUnderTest + "\n" + unitTestCode
     return runningCode

@@ -39,26 +39,24 @@ RegenerateTestTemplate = """You are a Python expert, and your task is to debug a
 {description}
 
 *Given Code under Test:*
-'''python
-{code}'''
-You previously generated the following code as unit tests:
+{code}
 
+You previously generated the following code as unit tests:
 *Unit Tests:*
-'''python
-{UnitTests}'''
+{UnitTests}
 
 After running the code with these tests, you received the following feedback based on the test output:
 *Feedback:*
 {Feedback}
 
 Your goal is to revise the tests based on the feedback. Ensure to:
+ADDRESS all highlighted bugs in the feedback.
+MODIFY only the unit tests
+DO NOT include new imports for the tests.
+PRESERVE all existing functionality not related to the bugs.
 
-Address all highlighted bugs in the feedback.
-Modify only the unit tests
-Do not include new imports for the tests.
-Preserve all existing functionality not related to the bugs.
+RETURN your revised unit tests as only one formatted markdown code snippet without further explanation, surrounded by triple backticks and the word 'python'."""
 
-Return your revised unit tests as only one formatted markdown code snippet without further explanation, surrounded by triple backticks and the word 'python'."""
 
 def addMixtralTokens(template):
     """Adds Mixtral Special Tokens to the prompt in case of vanilla llm by API to try to prevent incomplete responses problem."""

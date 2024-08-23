@@ -78,37 +78,37 @@ class TestFix:
                 continue
             
             try:
-                if (self.interfaceModerator == "HF"):
-                    client = InferenceClient(
-                        model="mistralai/Mixtral-8x7B-Instruct-v0.1",
-                        token="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",
-                    )
-                    # def inferFun(prompt):
-                        # response = ""
-                    qa_template = PromptTemplate(RegenerateTestTemplate)
+                # if (self.interfaceModerator == "HF"):
+                #     client = InferenceClient(
+                #         model="mistralai/Mixtral-8x7B-Instruct-v0.1",
+                #         token="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",
+                #     )
+                #     # def inferFun(prompt):
+                #         # response = ""
+                #     qa_template = PromptTemplate(RegenerateTestTemplate)
 
-                    prompt = qa_template.format(description=currDescription, code=currCode, UnitTests=currGeneratedCode, Feedback=currFeedback)
+                #     prompt = qa_template.format(description=currDescription, code=currCode, UnitTests=currGeneratedCode, Feedback=currFeedback)
 
-                    GenerationPostFeedback = ""
-                    for message in client.chat_completion(
-                        messages=[{"role": "user", "content": prompt}],
-                        max_tokens=28_500,
-                        stream=True,
-                        temperature=0.1,
-                        # top_p = 0.6,
-                        ):
+                #     GenerationPostFeedback = ""
+                #     for message in client.chat_completion(
+                #         messages=[{"role": "user", "content": prompt}],
+                #         max_tokens=28_500,
+                #         stream=True,
+                #         temperature=0.1,
+                #         # top_p = 0.6,
+                #         ):
                         
-                        GenerationPostFeedback += message.choices[0].delta.content
+                #         GenerationPostFeedback += message.choices[0].delta.content
                     
-                else:
-                    GenerationPostFeedback = self.UnitTestFeedbackChain.invoke(
-                        {
-                            "description": currDescription,
-                            "code": currCode,
-                            "UnitTests": currGeneratedCode,
-                            "Feedback": currFeedback,
-                        }
-                    )
+                # else:
+                GenerationPostFeedback = self.UnitTestFeedbackChain.invoke(
+                    {
+                        "description": currDescription,
+                        "code": currCode,
+                        "UnitTests": currGeneratedCode,
+                        "Feedback": currFeedback,
+                    }
+                )
             except Exception as e:
                 print("ERROR in invoking Feedback Chain")
                 self.apiErrors += 1
