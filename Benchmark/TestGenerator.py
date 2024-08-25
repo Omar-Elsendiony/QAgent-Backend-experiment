@@ -1,6 +1,6 @@
 from Imports import *
 from utils.CustomThread import *
-
+from DBRet.test import *
 
 class TestGenerator:
 
@@ -57,23 +57,26 @@ class TestGenerator:
         self.reset()
         FileHandle = open(self.OutputFolder + "Cases.txt", "w+")
         for i in range(sI, eI):
-            # if (i == 107): 
-            #     x = 2
+
             print("Running Test Case ", i)
-            FileHandle.write(
-                "Running Test Case "
-                + str(i)
-                + "\n=====================================\n"
-            )
+            FileHandle.write( "Running Test Case " + str(i) + "\n=====================================\n")
             # description and code from database
             code, description = self.extractInfo(i)
-            fewShotStr = self.extractFewShots(code)
+            # fewShotStr = self.extractFewShots(code)
+            _ , fewShotStr = query_db(code, False, True)
+            fewShot = ""
+            if (fewShotStr != []):
+                for f in fewShotStr:
+                    fewShot += f["test 0"] + "\n"
+                print("[[[[[[[[[[[[[[[[[]]]]]]]]]]]]]]]]]")
+                print(fewShotStr[0])
+                print("[[[[[[[[[[[[[[[[[]]]]]]]]]]]]]]]]]")
             try:
                 unittest = self.GenUnitTestChain.invoke(
                     {
                         "description": description,
                         "code": code,
-                        "test_cases_of_few_shot": "",  # few shot str empty till RAG is implemented
+                        "test_cases_of_few_shot": fewShot,  # few shot str empty till RAG is implemented
                     }
                 )  # ,"test_cases_of_few_shot":fewShotStr
             except Exception as e:

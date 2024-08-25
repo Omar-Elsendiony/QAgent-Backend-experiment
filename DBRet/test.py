@@ -49,11 +49,11 @@ def getClosestNeibours(query,index,k=3,threshold=0.8):
     for sim,index in zip(similarities,indices):
         if sim>=threshold:
             results.append((index,sim))
-    print(results)
+    # print(results)
     return results
 
 
-def queryDB(query,k=3,isJava=True,isPython=True,thresholdSameLanguage=0.8,thresholdDifferentLanguage=0.6):
+def queryDB(query, k=3, isJava=True, isPython=True, thresholdSameLanguage=0.5, thresholdDifferentLanguage=0.6):
     global Jindex,Pindex
     if isJava:
         #give more priority to Java results
@@ -112,7 +112,7 @@ def queryDB(query,k=3,isJava=True,isPython=True,thresholdSameLanguage=0.8,thresh
 
     return codes , tests
 
-def query_db(code,isJava,isPython,thresholdSameLanguage=0.8,thresholdDifferentLanguage=0.6):
+def query_db(code, isJava, isPython, thresholdSameLanguage=0.5, thresholdDifferentLanguage=0.6):
     
     global model, DEVICE, centroidsJ, centroidsP
     query = get_embeddings(model, code, DEVICE)
