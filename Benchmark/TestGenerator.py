@@ -56,8 +56,8 @@ class TestGenerator:
         self.checkPaths()
         self.reset()
         FileHandle = open(self.OutputFolder + "Cases.txt", "w+")
+        RAGdict = {}
         for i in range(sI, eI):
-
             print("Running Test Case ", i)
             FileHandle.write( "Running Test Case " + str(i) + "\n=====================================\n")
             # description and code from database
@@ -71,6 +71,7 @@ class TestGenerator:
                 print("[[[[[[[[[[[[[[[[[]]]]]]]]]]]]]]]]]")
                 print(fewShotStr[0])
                 print("[[[[[[[[[[[[[[[[[]]]]]]]]]]]]]]]]]")
+            
             try:
                 unittest = self.GenUnitTestChain.invoke(
                     {
