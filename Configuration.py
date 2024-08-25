@@ -35,10 +35,11 @@ GenUnitTestChain.InitializeModel(os.environ["HUGGINGFACEHUB_API_TOKEN"], model_n
 UnitTestFeedbackChain.InitializeModel(os.environ["HUGGINGFACEHUB_API_TOKEN"], model_name, max_new_tokens, 2)
 
 
-# judgeChain = InitializeJudgeChain(llm)
+# judgeChain = InitializeModel(llm)
 
-# bugFixChain = InitializeBugFixChain(llm)
+# bugFixChain = InitializeModel(llm)
 
 
 HEval_JsonObj = pd.read_json(path_or_buf="Datasets/humaneval.jsonl", lines=True)
+
 db = connectDB()
