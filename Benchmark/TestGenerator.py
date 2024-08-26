@@ -59,6 +59,8 @@ class TestGenerator:
         RAGList = []
         # currentCase = ""
         for i in range(sI, eI):
+            sleep(1)
+            print("************************************")
             print("Running Test Case ", i)
             FileHandle.write( "Running Test Case " + str(i) + "\n=====================================\n")
             # description and code from database
@@ -69,7 +71,7 @@ class TestGenerator:
             fewShotcode = ""
             fewshotNum = 0
             RAGdict = {}
-
+            retrievalAugmented = ""
             if (fewShotStr != []):
                 while (fewshotNum < self.fewshotsnum):
                     fewShottestcase += fewShotStr[fewshotNum]["test 0"] + "\n"
@@ -79,6 +81,7 @@ class TestGenerator:
                 # print(fewShotStr[0])
                 # print("[[[[[[[[[[[[[[[[[]]]]]]]]]]]]]]]]]")
                 
+            retrievalAugmented += "Function" + "\n" + fewShotcode + "\n" + "its test Cases" + "\n" + fewShottestcase
             RAGdict["case number"] = str(i)
             RAGdict["code"] = fewShotcode
             RAGdict["unittest"] = fewShottestcase
@@ -88,7 +91,7 @@ class TestGenerator:
                     {
                         "description": description,
                         "code": code,
-                        "test_cases_of_few_shot": fewShottestcase,  # few shot str empty till RAG is implemented
+                        "test_cases_of_few_shot": retrievalAugmented,  # few shot str empty till RAG is implemented
                     }
                 )  # ,"test_cases_of_few_shot":fewShotStr
             except Exception as e:

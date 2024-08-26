@@ -309,10 +309,7 @@ class TestFix:
 
         else:
             if (
-                "syntaxerror" in feedbackparsed.lower()
-                or "indentationerror" in feedbackparsed.lower()
-                or "timed out" in feedbackparsed.lower()
-            ):
+                "syntaxerror" in feedbackparsed.lower() or "indentationerror" in feedbackparsed.lower()  or "timed out" in feedbackparsed.lower()):
                 print(
                     f"Test example {virtualIndex} failed due to syntax or indentation or timeout\n======================================\n"
                 )
@@ -321,9 +318,7 @@ class TestFix:
                 print("Number of error Tests : ", 1)
                 print("Number of Succeeded Test : ", 0)
                 FileHanlde.write(
-                    "Test example "
-                    + str(virtualIndex)
-                    + " failed due to syntax or indentation or timeout\n"
+                    "Test example " + str(virtualIndex) + " failed due to syntax or indentation or timeout\n"
                 )
                 FileHanlde.write("Number of Ran Tests : " + str(numOfAssertions) + "\n")
                 FileHanlde.write("Number of failed Tests : " + str(0) + "\n")
