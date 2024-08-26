@@ -10,7 +10,7 @@ model_name = "mistralai/Mixtral-8x7B-Instruct-v0.1"
 
 max_new_tokens = 6000
 if "Mixtral" in model_name:
-    max_new_tokens = 29_100
+    max_new_tokens = 31000
 
 # if (MODEL == "GPT-3.5-turbo"):
 #     llm, chat_model = InitializeGptModel(

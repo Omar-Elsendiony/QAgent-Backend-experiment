@@ -39,7 +39,7 @@ class TestGenerator:
         self.logsDf = pd.DataFrame()
         self.casesDf = pd.DataFrame()
         self.LOGGING = True
-        self.fewshotsnum = 3
+        self.fewshotsnum = 1
         self.isFewShot = True
 
     def generate(self, sI, eI):
@@ -56,28 +56,39 @@ class TestGenerator:
         self.checkPaths()
         self.reset()
         FileHandle = open(self.OutputFolder + "Cases.txt", "w+")
-        RAGdict = {}
+        RAGList = []
+        # currentCase = ""
         for i in range(sI, eI):
             print("Running Test Case ", i)
             FileHandle.write( "Running Test Case " + str(i) + "\n=====================================\n")
             # description and code from database
             code, description = self.extractInfo(i)
             # fewShotStr = self.extractFewShots(code)
-            _ , fewShotStr = query_db(code, False, True)
-            fewShot = ""
+            fewShotCode , fewShotStr = query_db(code, False, True)
+            fewShottestcase = ""
+            fewShotcode = ""
+            fewshotNum = 0
+            RAGdict = {}
+
             if (fewShotStr != []):
-                for f in fewShotStr:
-                    fewShot += f["test 0"] + "\n"
-                print("[[[[[[[[[[[[[[[[[]]]]]]]]]]]]]]]]]")
-                print(fewShotStr[0])
-                print("[[[[[[[[[[[[[[[[[]]]]]]]]]]]]]]]]]")
-            
+                while (fewshotNum < self.fewshotsnum):
+                    fewShottestcase += fewShotStr[fewshotNum]["test 0"] + "\n"
+                    fewShotcode += fewShotCode[fewshotNum] + "\n"
+                    fewshotNum += 1
+                # print("[[[[[[[[[[[[[[[[[]]]]]]]]]]]]]]]]]")
+                # print(fewShotStr[0])
+                # print("[[[[[[[[[[[[[[[[[]]]]]]]]]]]]]]]]]")
+                
+            RAGdict["case number"] = str(i)
+            RAGdict["code"] = fewShotcode
+            RAGdict["unittest"] = fewShottestcase
+            RAGList.append(RAGdict)
             try:
                 unittest = self.GenUnitTestChain.invoke(
                     {
                         "description": description,
                         "code": code,
-                        "test_cases_of_few_shot": fewShot,  # few shot str empty till RAG is implemented
+                        "test_cases_of_few_shot": fewShottestcase,  # few shot str empty till RAG is implemented
                     }
                 )  # ,"test_cases_of_few_shot":fewShotStr
             except Exception as e:
@@ -161,10 +172,14 @@ class TestGenerator:
                 index=[0],
             )
             self.logsDf = pd.concat([self.logsDf, newRow])
-            # Save the updated DataFrame back to the excel file using 'openpyxl' engine for writing
             jsondata = self.logsDf.to_dict(orient="records")
             with open(self.JSONFile, "w") as f:
                 json.dump(jsondata, f, indent=4)
+            
+            
+        with open(self.OutputFolder + "RAG.json", "w") as f:
+            json.dump(RAGList, f, indent=4)
+        
         FileHandle.close()
 
         self.printResults()
@@ -336,7 +351,14 @@ class TestGenerator:
         else:
             self.failedExamplesNum += 1
             if (feedback == "timed out"): feedback = f"failures={numOfAssertions}; errors=0"
-            failedCasesNum, errorCasesNum = getNumNonSucceedingTestcases(feedback)
+            SE = re.search(r'SyntaxError', feedback) # check if there is a syntax error
+            IE = re.search(r'IndentationError', feedback) # check if there is am indentation error
+            if (SE or IE):
+                errorCasesNum = numOfAssertions
+                failedCasesNum = 0
+                # self.testsToRepeatNum += numOfAssertions
+            else:
+                failedCasesNum, errorCasesNum = getNumNonSucceedingTestcases(feedback)
             # NonSucceedingCasesNames = getNonSucceedingTestcases(feedback)
             # NonSucceedingCasesNamesList = (
             #     NonSucceedingCasesNames["failed"] + NonSucceedingCasesNames["error"]
@@ -375,6 +397,7 @@ class TestGenerator:
             casejsondata = self.casesDf.to_dict(orient="records")
             with open(self.CasesJSONFile, "w") as f:
                 json.dump(casejsondata, f, indent=4)
+            
             self.testsToRepeatNum += len(NonSucceedingCasesNamesList)
             self.totalTestCasesNum += numOfAssertions
             self.failed_test_cases += failedCasesNum
