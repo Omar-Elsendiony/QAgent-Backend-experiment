@@ -60,6 +60,7 @@ class TestGenerator:
         # currentCase = ""
         for i in range(sI, eI):
             sleep(1)
+            if (i == 91): continue
             print("************************************")
             print("Running Test Case ", i)
             FileHandle.write( "Running Test Case " + str(i) + "\n=====================================\n")
@@ -77,15 +78,13 @@ class TestGenerator:
                     fewShottestcase += fewShotStr[fewshotNum]["test 0"] + "\n"
                     fewShotcode += fewShotCode[fewshotNum] + "\n"
                     fewshotNum += 1
-                # print("[[[[[[[[[[[[[[[[[]]]]]]]]]]]]]]]]]")
-                # print(fewShotStr[0])
-                # print("[[[[[[[[[[[[[[[[[]]]]]]]]]]]]]]]]]")
                 
             retrievalAugmented += "Function" + "\n" + fewShotcode + "\n" + "its test Cases" + "\n" + fewShottestcase
             RAGdict["case number"] = str(i)
             RAGdict["code"] = fewShotcode
             RAGdict["unittest"] = fewShottestcase
             RAGList.append(RAGdict)
+            
             try:
                 unittest = self.GenUnitTestChain.invoke(
                     {

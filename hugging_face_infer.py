@@ -20,7 +20,8 @@ class HFCustomInferenceAPI:
             messages=[{"role": "user", "content": prompt}],
             max_tokens=self.__max_tokens,
             stream=True,
-            temperature=0.1
+            temperature=1,
+            top_p= 0.1
         ):
             response += message.choices[0].delta.content
         return response
@@ -40,7 +41,7 @@ class HFCustomInferenceAPI:
     def InitializeModel(self, htoken, model_name="mistralai/Mixtral-8x7B-Instruct-v0.1", max_new_tokens=20000, type=1):
         llm = InferenceClient(
             model=model_name,
-            token=htoken,
+            token=htoken
         )
         
         self.__max_tokens = max_new_tokens

@@ -32,7 +32,7 @@ Evaluate your generated test cases and change the assertions if needed to comply
 """
 
 Gen_UnitTest_with_FewShots_template = """
-You are a Python unit tester. Write clear and concise unit tests for the given method with Each test generated containing only one assertion., following the provided guidelines and using the template. Your tests should cover a range of scenarios and assert specific outcomes to ensure the method behaves as expected. Remember to evaluate your tests and adjust assertions if needed. The method under test and its description will be provided, along with examples of similar functions and test cases. Your goal is to create effective tests that adhere to the criteria and help validate the functionality of the given method.
+You are a Python unit tester. Write clear and concise unit tests for the given method containing at least 5 tests with each test generated containing only one assertion, following the provided guidelines and using the template. Your tests should cover a range of scenarios and assert specific outcomes to ensure the method behaves as expected. Remember to evaluate your tests and adjust assertions if needed. The method under test and its description will be provided, along with examples of similar functions and test cases to help in generation. Your goal is to create effective tests that adhere to the criteria and help validate the functionality of the given method.
 Do not include any imports in the unit tests.
 method:
 {code}
@@ -53,8 +53,11 @@ class **TESTMETHODUNDERTEST**(unittest.TestCase):
 if __name__ == '__main__':
     unittest.main()
 ```
-Replace **TESTMETHODUNDERTEST** with the appropriate class name and **TEST_CASES_WITH_UNDERSTANDABLE_NAMES** with the generated test cases. Ensure your tests are clear, concise, and accurately reflect the method's behavior based on the description provided.
+Replace **TESTMETHODUNDERTEST** with the appropriate class name and **TEST_CASES_WITH_UNDERSTANDABLE_NAMES** with the generated test cases. Ensure your tests are clear, concise, and accurately reflect the method's behavior based on the description provided and similar functions.
 """
+
+
+
 
 
 RegenerateTestTemplatelol = """You are a Python expert, and your task is to debug and improve the following Python unitTest code based on the given description, code snippet, and unit tests feedback:

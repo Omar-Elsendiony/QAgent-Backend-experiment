@@ -6,11 +6,12 @@ MODEL = os.getenv("MODEL")
 # model_name = "bigcode/starcoder2-15b"
 model_name = "google/gemma-7b-it"
 model_name = "mistralai/Mixtral-8x7B-Instruct-v0.1"
+model_name = "mistralai/Mistral-7B-Instruct-v0.2"
 
 
 max_new_tokens = 6000
-if "Mixtral" in model_name:
-    max_new_tokens = 31000
+if "Mixtral" in model_name or "Mistral" in model_name:
+    max_new_tokens = 31100
 
 # if (MODEL == "GPT-3.5-turbo"):
 #     llm, chat_model = InitializeGptModel(
